@@ -42,13 +42,12 @@ players, this includes:
 The given object is also what you'll use to perform chosen
 actions in the game, this includes:
 
-* Playing development cards.
+* Playing development card.
 * Rolling the dice.
 * Proposing a trade.
 * Trading with the bank.
 * Building roads, settlements and cities.
 * Buying development cards.
-* Playing one development card from hand.
 
 ----------------------------------------------------------
                          TRADING
