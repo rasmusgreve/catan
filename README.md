@@ -48,6 +48,7 @@ actions in the game, this includes:
 * Trading with the bank.
 * Building roads, settlements and cities.
 * Buying development cards.
+* Playing one development card from hand.
 
 ----------------------------------------------------------
                          TRADING
