@@ -8,22 +8,14 @@ This project is intended as an experiment at making a
 framework for competing at the game of Settlers of Catan
 by Mayfair Games using AI's.
 
-The project is made in C# using Visual Studio 2012 and
+The project is made in C# using Visual Studio 2010 and
 XNA 4.0. It can be found here:
 
 http://www.microsoft.com/en-us/download/details.aspx?id=23
 714
 
-In order to get XNA to work in VS12 you need to have VS10
-installed aswell though. But this can be the Express 
-version, it can be found here:
 http://www.microsoft.com/visualstudio/eng/downloads#d-2010
 -express
-
-You will need to perform this tweek to get it working:
-
-http://stackoverflow.com/questions/10881005/how-to-install
--xna-game-studio-on-visual-studio-2012
 
 ----------------------------------------------------------
                       RUNNING A MATCH
