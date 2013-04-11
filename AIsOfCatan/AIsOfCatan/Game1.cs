@@ -8,21 +8,22 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using TroyXnaAPI;
 
 namespace AIsOfCatan
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game1 : TXAGame
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        //GraphicsDeviceManager graphics;
+        //SpriteBatch spriteBatch;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            //graphics = new GraphicsDeviceManager(this);
+            //Content.RootDirectory = "Content";
         }
 
         /// <summary>
@@ -47,6 +48,11 @@ namespace AIsOfCatan
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            //TEXTURES.Add("Tile_Plains", Content.Load<Texture2D>("Plains"));
+            //Texture2D plains = TEXTURES["Tile_Plains"];
+
+            Content.Load<SpriteFont>("Ariel");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -67,8 +73,8 @@ namespace AIsOfCatan
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            //    this.Exit();
 
             // TODO: Add your update logic here
 
