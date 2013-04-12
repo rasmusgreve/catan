@@ -11,11 +11,9 @@ by Mayfair Games using AI's.
 The project is made in C# using Visual Studio 2010 and
 XNA 4.0. It can be found here:
 
-http://www.microsoft.com/en-us/download/details.aspx?id=23
-714
+http://www.microsoft.com/en-us/download/details.aspx?id=23714
 
-http://www.microsoft.com/visualstudio/eng/downloads#d-2010
--express
+http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
 
 ----------------------------------------------------------
                       RUNNING A MATCH
