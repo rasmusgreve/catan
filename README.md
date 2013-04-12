@@ -11,11 +11,9 @@ by Mayfair Games using AI's.
 The project is made in C# using Visual Studio 2010 and
 XNA 4.0. It can be found here:
 
-http://www.microsoft.com/en-us/download/details.aspx?id=23
-714
+http://www.microsoft.com/en-us/download/details.aspx?id=23714
 
-http://www.microsoft.com/visualstudio/eng/downloads#d-2010
--express
+http://www.microsoft.com/visualstudio/eng/downloads#d-2010-express
 
 ----------------------------------------------------------
                       RUNNING A MATCH
@@ -48,6 +46,8 @@ actions in the game, this includes:
 * Trading with the bank.
 * Building roads, settlements and cities.
 * Buying development cards.
+
+<img src="https://docs.google.com/drawings/d/1RH69Vucy1VBqW0YaUUklK9THl8kOxvpyc3Oe4-oKl4g/pub?w=960&amp;h=720">
 
 ----------------------------------------------------------
                          TRADING

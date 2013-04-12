@@ -105,6 +105,9 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
+    <Reference Include="TroyXnaAPI">
+      <HintPath>.\TroyXnaAPI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
@@ -121,10 +124,6 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Stuff\Project\Randomstuff\TroyXnaAPI\TroyXnaAPI\TroyXnaAPI.csproj">
-      <Project>{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}</Project>
-      <Name>TroyXnaAPI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AIsOfCatanContent\AIsOfCatanContent.contentproj">
       <Name>AIsOfCatanContent</Name>
       <XnaReferenceType>Content</XnaReferenceType>

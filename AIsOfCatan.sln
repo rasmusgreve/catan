@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIsOfCatan", "AIsOfCatan\AI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIsOfCatanContent", "AIsOfCatan\AIsOfCatanContent\AIsOfCatanContent.contentproj", "{097624CD-458E-4FC0-9135-D559160441F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TroyXnaAPI", "..\..\..\Stuff\Project\Randomstuff\TroyXnaAPI\TroyXnaAPI\TroyXnaAPI.csproj", "{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,10 +17,6 @@ Global
 		{FD128C9F-A79C-41E9-885F-1CCF24849060}.Release|x86.Build.0 = Release|x86
 		{097624CD-458E-4FC0-9135-D559160441F8}.Debug|x86.ActiveCfg = Debug|x86
 		{097624CD-458E-4FC0-9135-D559160441F8}.Release|x86.ActiveCfg = Release|x86
-		{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}.Debug|x86.ActiveCfg = Debug|x86
-		{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}.Debug|x86.Build.0 = Debug|x86
-		{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}.Release|x86.ActiveCfg = Release|x86
-		{6D10C76D-7774-4EB2-B241-560EC1F1C2A5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
