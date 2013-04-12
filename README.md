@@ -47,6 +47,8 @@ actions in the game, this includes:
 * Building roads, settlements and cities.
 * Buying development cards.
 
+<img src="https://docs.google.com/drawings/d/1RH69Vucy1VBqW0YaUUklK9THl8kOxvpyc3Oe4-oKl4g/pub?w=960&amp;h=720">
+
 ----------------------------------------------------------
                          TRADING
 ----------------------------------------------------------
