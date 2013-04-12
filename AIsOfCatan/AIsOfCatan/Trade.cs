@@ -5,12 +5,6 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    //                     19 of each in bank
-    public enum Resources {Brick, Lumber, Wool, Grain, Ore}; // names from wikipedia
-    //                   3      4       4        4       3          1       X
-    public enum Terrain {Hills, Forest, Pasture, Fields, Mountains, Desert, Water} 
-    //                            14      5             2             2             2
-    public enum DevelopmentCards {Knight, VictoryPoint, RoadBuilding, YearOfPlenty, Monopoly}
     public enum TradeStatus {Declined, Accepted, Countered};
 
     class Trade
