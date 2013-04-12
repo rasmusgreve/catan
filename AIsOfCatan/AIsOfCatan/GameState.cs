@@ -93,7 +93,7 @@ namespace AIsOfCatan
             return terrain[coords.Item1][coords.Item2];
         }
 
-        public Tile GetTerrain(int row, int column)
+        public Tile GetTile(int row, int column)
         {
             return terrain[row][column];
         }
