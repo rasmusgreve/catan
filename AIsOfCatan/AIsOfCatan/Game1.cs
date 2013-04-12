@@ -56,6 +56,13 @@ namespace AIsOfCatan
             //Texture2D plains = TEXTURES["Tile_Plains"];
 
             ARIAL = Content.Load<SpriteFont>("Arial");
+            TEXTURES.Add("T_Desert", Content.Load<Texture2D>("DesertTile"));
+            TEXTURES.Add("T_Fields", Content.Load<Texture2D>("FieldsTile"));
+            TEXTURES.Add("T_Forest", Content.Load<Texture2D>("ForestTile"));
+            TEXTURES.Add("T_Hills", Content.Load<Texture2D>("HillsTile"));
+            TEXTURES.Add("T_Mountains", Content.Load<Texture2D>("MountainsTile"));
+            TEXTURES.Add("T_Pasture", Content.Load<Texture2D>("PastureTile"));
+            TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
 
             // TODO: use this.Content to load your game content here
         }
