@@ -15,7 +15,8 @@ namespace AIsOfCatan
                 game.Run();
             }*/
 
-            GameState state = new GameState(1337);
+            GameState state = new GameState(0);
+            System.Diagnostics.Debug.WriteLine(state.ToString());
         }
     }
 #endif

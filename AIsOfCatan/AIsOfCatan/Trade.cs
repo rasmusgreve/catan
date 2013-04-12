@@ -11,11 +11,11 @@ namespace AIsOfCatan
     {
         private TradeStatus status = TradeStatus.Declined;
 
-        // For a Wildcard put several Resources in the same inner list.
-        public List<List<Resources>> Give { get; private set; }
-        public List<List<Resources>> Want { get; private set; }
+        // For a Wildcard put several Resource in the same inner list.
+        public List<List<Resource>> Give { get; private set; }
+        public List<List<Resource>> Want { get; private set; }
 
-        public Trade(List<List<Resources>> give, List<List<Resources>> want){
+        public Trade(List<List<Resource>> give, List<List<Resource>> want){
             this.Give = give;
             this.Want = want;
         }
