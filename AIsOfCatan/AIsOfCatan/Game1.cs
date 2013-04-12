@@ -36,7 +36,11 @@ namespace AIsOfCatan
         {
             // TODO: Add your initialization logic here
 
+            TXAScreen startScreen = new TXAMenuScreen("Start", new Vector2());
+
             base.Initialize();
+
+            screenManager.AddScreen("start", startScreen);
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace AIsOfCatan
             //TEXTURES.Add("Tile_Plains", Content.Load<Texture2D>("Plains"));
             //Texture2D plains = TEXTURES["Tile_Plains"];
 
-            Content.Load<SpriteFont>("Ariel");
+            ARIAL = Content.Load<SpriteFont>("Arial");
 
             // TODO: use this.Content to load your game content here
         }
