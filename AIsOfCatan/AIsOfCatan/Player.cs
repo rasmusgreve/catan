@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class Player
+    public class Player
     {
         private readonly int id;
         private Agent agent;

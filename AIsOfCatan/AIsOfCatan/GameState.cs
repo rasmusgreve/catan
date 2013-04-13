@@ -22,16 +22,31 @@ namespace AIsOfCatan
         public int DevelopmentCards { get; private set; }
         public int[] ResourceBank { get; private set; }
 
-        private Object[] players;
+        private Player[] players;
         private int curPlayer;
 
-        public GameState(Board board, List<DevelopmentCard> deck, int[] resourceBank, Object[] players, int curPlayer)
+        public GameState(Board board, List<DevelopmentCard> deck, int[] resourceBank, Player[] players, int curPlayer)
         {
             Board = board;
             DevelopmentCards = deck == null ? 0 : deck.Count;
             ResourceBank = resourceBank.ToArray();
             this.players = players;
             this.curPlayer = curPlayer;
+        }
+
+        public int GetResourceCount(int playerID)
+        {
+            return players[playerID].Resources.Count;
+        }
+
+        public int GetDevelopmentCardCount(int playerID)
+        {
+            return players[playerID].DevelopmentCards.Count;
+        }
+
+        public int GetKnightCount(int playerID)
+        {
+            return players[playerID].PlayedKnights;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace AIsOfCatan
 {
     public enum TradeStatus {Declined, Accepted, Countered};
 
-    class Trade
+    public class Trade
     {
         private TradeStatus status = TradeStatus.Declined;
 
