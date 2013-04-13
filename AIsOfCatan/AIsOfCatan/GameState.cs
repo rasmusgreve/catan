@@ -48,5 +48,20 @@ namespace AIsOfCatan
         {
             return players[playerID].PlayedKnights;
         }
+
+        public Resource[] GetOwnResources()
+        {
+            return players[curPlayer].Resources.ToArray();
+        }
+
+        public DevelopmentCard[] GetOwnDevelopmentCards()
+        {
+            return players[curPlayer].DevelopmentCards.ToArray();
+        }
+
+        public int GetResourceBank(Resource res)
+        {
+            return ResourceBank[(int)res];
+        }
     }
 }
