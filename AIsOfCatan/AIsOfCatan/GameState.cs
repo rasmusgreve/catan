@@ -25,6 +25,7 @@ namespace AIsOfCatan
         private Tile[][] terrain;
         private Dictionary<Tuple<int, int>, int> roads;
         private Dictionary<Tuple<int, int, int>, Piece> settlements;
+        private int robberLocation;
 
         public GameState(int boardSeed)
         {
@@ -73,6 +74,7 @@ namespace AIsOfCatan
                 {
                     terrain[coords.Item1][coords.Item2] = new Tile(terrainPool.First(), 0);
                     desertFound = true;
+                    robberLocation = placementOrder[i]; // place the robber
                 }else
                 {
                     terrain[coords.Item1][coords.Item2] = new Tile(terrainPool.First(), valueOrder[i - (desertFound ? 1 : 0)]);
@@ -88,27 +90,49 @@ namespace AIsOfCatan
         }
 
         /// <summary>
-        /// Gives the type of terrain and value at a given index of the board.
+        /// Gives the type of terrain and dice value for a given index of the board.
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">The index to check terrain for.</param>
+        /// <returns>A Tile object containing the terrain type and dice value.</returns>
         public Tile GetTile(int index)
         {
             Tuple<int, int> coords = GetTerrainCoords(index);
             return terrain[coords.Item1][coords.Item2];
         }
 
+        /// <summary>
+        /// Give the type of terrain and dice value for the given coordinates of the board.
+        /// </summary>
+        /// <param name="row">The row of the tile.</param>
+        /// <param name="column">The column of the tile. Even row numbers have a length
+        /// of 6 and uneven has a length of 7.</param>
+        /// <returns>A Tile object containing the terrain type and dice value.</returns>
         public Tile GetTile(int row, int column)
         {
             return terrain[row][column];
         }
 
+        /// <summary>
+        /// Gives the id of the player who has build a road at the requested edge.
+        /// </summary>
+        /// <param name="firstTile">The first index of the tiles to look between.</param>
+        /// <param name="secondTile">The second index of the tiles to look between.</param>
+        /// <returns>The player id of the player who has build a road here. If empty it returns -1.</returns>
         public int GetRoad(int firstTile, int secondTile)
         {
             var key = new Tuple<int, int>(firstTile < secondTile ? firstTile : secondTile, firstTile < secondTile ? secondTile : firstTile);
             return roads.ContainsKey(key) ? roads[key] : -1;
         }
 
+        /// <summary>
+        /// Gives the game piece at the vertex between three different tiles.
+        /// </summary>
+        /// <param name="firstTile">The first index of the tiles to look between.</param>
+        /// <param name="secondTile">The second index of the tiles to look between.</param>
+        /// <param name="thirdTile">The third index of the tiles to look between.</param>
+        /// <returns>The Piece object at the location, containing the type of token 
+        /// (Settlement or City) and the owning player id. If the location is empty
+        /// it will return null.</returns>
         public Piece GetPiece(int firstTile, int secondTile, int thirdTile)
         {
             List<int> tiles = new List<int>(3) {firstTile, secondTile, thirdTile};
@@ -118,11 +142,20 @@ namespace AIsOfCatan
             return settlements.ContainsKey(key) ? settlements[key] : null;
         }
 
+        /// <summary>
+        /// Gives the current location of the Robber token.
+        /// </summary>
+        /// <returns>The index on the board currently containing the robber.</returns>
+        public int GetRobberLocation()
+        {
+            return robberLocation;
+        }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
             builder.Append("Board Terrain:\n");
-            foreach (Tile[] row in terrain)
+            foreach(Tile[] row in terrain)
             {
                 foreach (Tile tile in row)
                 {
