@@ -7,6 +7,9 @@ namespace AIsOfCatan
 {
     interface Agent
     {
+        void Reset(int assignedID); // the agent should reset for a new game, the given id is the
+                                    // players position in the game (0 is first and 3 is last)
+
         void PlaceStart(GameState state); // Only (one) build settlement and build road (legally) will
                                           // be accepted.
         void BeforeDieRoll(GameState state); // you have the chance to play a knight before the die roll

@@ -15,7 +15,7 @@ namespace AIsOfCatan
         {
             this.players = players;
             dieRandom = new Random(dieSeed);
-            gameState = new GameState(boardSeed);
+            gameState = new GameState(new Board(boardSeed),null,null,null,0);
             turn = dieRandom.Next(players.Length);
 
             PlaceStarts();

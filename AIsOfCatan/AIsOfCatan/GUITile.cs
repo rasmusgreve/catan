@@ -26,9 +26,9 @@ namespace AIsOfCatan
         private Vector2 numberPos;
         private Vector2 textPos;
 
-        private GameState.Tile Tile { get; set; }
+        private Board.Tile Tile { get; set; }
 
-        public GUITile(int x, int y, GameState.Tile tile) : 
+        public GUITile(int x, int y, Board.Tile tile) : 
             base(
                 new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TILE_WIDTH), (float) ((0.66+y)*TileShift)),
                 GetTexture(tile.Terrain)
@@ -90,7 +90,7 @@ namespace AIsOfCatan
             
         }
 
-        private static bool isTileNumbered(GameState.Tile tile)
+        private static bool isTileNumbered(Board.Tile tile)
         {
             switch (tile.Terrain)
             {
