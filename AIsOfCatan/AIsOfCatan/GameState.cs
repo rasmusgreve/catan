@@ -82,6 +82,11 @@ namespace AIsOfCatan
             }
         }
 
+        public int GetRowLength(int row)
+        {
+            return row%2 == 0 ? 6 : 7;
+        }
+
         /// <summary>
         /// Gives the type of terrain and value at a given index of the board.
         /// </summary>

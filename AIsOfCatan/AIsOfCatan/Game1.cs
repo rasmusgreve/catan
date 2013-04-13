@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -19,6 +20,9 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
+        GameState state = new GameState(0);
+
+        private TXAScreen startScreen;
 
         public Game1()
         {
@@ -36,11 +40,16 @@ namespace AIsOfCatan
         {
             // TODO: Add your initialization logic here
 
-            TXAScreen startScreen = new TXAMenuScreen("Start", new Vector2());
-
             base.Initialize();
 
-            screenManager.AddScreen("start", startScreen);
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.ApplyChanges();
+
+
+
+            //board.CreateFromGameState(state);
+
         }
 
         /// <summary>
@@ -65,6 +74,13 @@ namespace AIsOfCatan
             TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
 
             // TODO: use this.Content to load your game content here
+
+            base.LoadContent();
+
+            startScreen = new MapScreen(state);
+
+            screenManager.AddScreen("start", startScreen);
+            //screenManager.SetScreen("start");
         }
 
         /// <summary>
@@ -98,8 +114,10 @@ namespace AIsOfCatan
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            //GraphicsDevice.Clear(Color.CornflowerBlue);
+            //spriteBatch.Begin();
+            //spriteBatch.Draw(TEXTURES["T_Forest"],new Vector2(0,0), Color.AliceBlue);
+            //spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
