@@ -8,25 +8,54 @@ namespace AIsOfCatan
     class GameController
     {
         private int turn;
-        private Random dieRandom;
+        private Random diceRandom;
+        private Random shuffleRandom;
         private GameState gameState;
-        private Agent[] players;
-        public void StartGame(Agent[] players, int boardSeed, int dieSeed)
+        private Player[] players;
+
+        private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
+
+        public void StartGame(Agent[] agents, int boardSeed, int diceSeed)
         {
-            this.players = players;
-            dieRandom = new Random(dieSeed);
+            this.players = new Player[agents.Length];
+            for (int i = 0; i < agents.Length; i++)
+            {
+                this.players[i] = new Player(agents[i], i);
+            }
+            diceRandom = new Random(diceSeed);
+            shuffleRandom = new Random(boardSeed); //the card deck is based on the board
             gameState = new GameState(boardSeed);
-            turn = dieRandom.Next(players.Length);
+            turn = diceRandom.Next(agents.Length);
 
             PlaceStarts();
             GameLoop();
         }
+        //                            14      5             2             2             2
+//        public enum DevelopmentCard { Knight, VictoryPoint, RoadBuilding, YearOfPlenty, Monopoly }
+
+        private void PopulateDevelopmentCardStack()
+        {
+            developmentCardStack.Clear(); //Just to be sure
+
+            for (int i = 0; i < 14; i++) developmentCardStack.Add(DevelopmentCard.Knight);
+            for (int i = 0; i < 5; i++) developmentCardStack.Add(DevelopmentCard.VictoryPoint);
+            for (int i = 0; i < 2; i++)
+            {
+                developmentCardStack.Add(DevelopmentCard.RoadBuilding);
+                developmentCardStack.Add(DevelopmentCard.YearOfPlenty);
+                developmentCardStack.Add(DevelopmentCard.Monopoly);
+            }
+
+            //Shuffle!
+
+        }
+
 
         private void GameLoop()
         {
             while (!GameFinished())
             {
-                TakeTurn(players[turn]);
+                TakeTurn(players[turn].Agent);
                 NextTurn();
             }
         }
@@ -40,7 +69,7 @@ namespace AIsOfCatan
         private void TakeTurn(Agent player)
         {
             player.BeforeDieRoll(gameState);
-            int roll = Roll();
+            int roll = RollDice();
             if (roll == 7)
             {
                 player.MoveRobber(gameState);
@@ -56,20 +85,20 @@ namespace AIsOfCatan
         {
             for (int i = 0; i < players.Length; i++)
             {
-                players[turn].PlaceStart(gameState);
+                players[turn].Agent.PlaceStart(gameState);
                 NextTurn();
             }
             for (int i = 0; i < players.Length; i++)
             {
                 PrevTurn();
-                players[turn].PlaceStart(gameState);
+                players[turn].Agent.PlaceStart(gameState);
                 //TODO: Hand out resources
             }
         }
 
-        private int Roll()
+        private int RollDice()
         {
-            return dieRandom.Next(6) + dieRandom.Next(6) + 2;
+            return diceRandom.Next(6) + diceRandom.Next(6) + 2;
         }
 
         private void NextTurn()
