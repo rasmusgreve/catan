@@ -24,8 +24,8 @@ namespace AIsOfCatan
             }
             diceRandom = new Random(diceSeed);
             shuffleRandom = new Random(boardSeed); //the card deck is based on the board
-            gameState = new GameState(boardSeed);
             turn = diceRandom.Next(agents.Length);
+
 
             PlaceStarts();
             GameLoop();
