@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -19,6 +20,11 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
+        readonly GameState state = new GameState(0);
+
+        public const float SCALE = 0.5f;
+
+        private TXAScreen startScreen;
 
         public Game1()
         {
@@ -37,6 +43,11 @@ namespace AIsOfCatan
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.ApplyChanges();
+
         }
 
         /// <summary>
@@ -48,12 +59,22 @@ namespace AIsOfCatan
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            //TEXTURES.Add("Tile_Plains", Content.Load<Texture2D>("Plains"));
-            //Texture2D plains = TEXTURES["Tile_Plains"];
+            ARIAL = Content.Load<SpriteFont>("Arial");
+            TEXTURES.Add("T_Desert", Content.Load<Texture2D>("DesertTile"));
+            TEXTURES.Add("T_Fields", Content.Load<Texture2D>("FieldsTile"));
+            TEXTURES.Add("T_Forest", Content.Load<Texture2D>("ForestTile"));
+            TEXTURES.Add("T_Hills", Content.Load<Texture2D>("HillsTile"));
+            TEXTURES.Add("T_Mountains", Content.Load<Texture2D>("MountainsTile"));
+            TEXTURES.Add("T_Pasture", Content.Load<Texture2D>("PastureTile"));
+            TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
+            TEXTURES.Add("TO_Number", Content.Load<Texture2D>("NumberTile"));
 
-            Content.Load<SpriteFont>("Ariel");
+            base.LoadContent();
 
-            // TODO: use this.Content to load your game content here
+            startScreen = new MapScreen(state);
+
+            screenManager.AddScreen("start", startScreen);
+            //screenManager.SetScreen("start");
         }
 
         /// <summary>
@@ -87,8 +108,6 @@ namespace AIsOfCatan
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
