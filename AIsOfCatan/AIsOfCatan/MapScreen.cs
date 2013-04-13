@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -24,12 +25,11 @@ namespace AIsOfCatan
 
                 for (int j = 0; j < board[i].Length; j++)
                 {
-                    GUITile tile = new GUITile(i, j, latestGameState.GetTile(i, j));
+                    GUITile tile = new GUITile(j, i, latestGameState.GetTile(i, j));
                     AddDrawableComponent(tile);
                     board[i][j] = tile;
                 }
             }
-
         }
 
         public void UpdateGameState(GameState state)
