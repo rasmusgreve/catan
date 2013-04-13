@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agent.cs" />
+    <Compile Include="GameController.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GUITile.cs" />
     <Compile Include="MapScreen.cs" />
