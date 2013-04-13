@@ -29,7 +29,7 @@ namespace AIsOfCatan
         {
             Board = board;
             DevelopmentCards = deck == null ? 0 : deck.Count;
-            ResourceBank = resourceBank.ToArray();
+            ResourceBank = resourceBank == null ? null : resourceBank.ToArray();
             this.players = players;
             this.curPlayer = curPlayer;
         }
