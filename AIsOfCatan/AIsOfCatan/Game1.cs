@@ -22,7 +22,7 @@ namespace AIsOfCatan
         //SpriteBatch spriteBatch;
         readonly GameState state = new GameState(0);
 
-        protected const float SCALE = 0.5f;
+        public const float SCALE = 0.5f;
 
         private TXAScreen startScreen;
 
@@ -60,13 +60,14 @@ namespace AIsOfCatan
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             ARIAL = Content.Load<SpriteFont>("Arial");
-            TEXTURES.Add("T_Desert", Content.Load<Texture2D>("DesertTile2"));
-            TEXTURES.Add("T_Fields", Content.Load<Texture2D>("FieldsTile2"));
-            TEXTURES.Add("T_Forest", Content.Load<Texture2D>("ForestTile2"));
-            TEXTURES.Add("T_Hills", Content.Load<Texture2D>("HillsTile2"));
-            TEXTURES.Add("T_Mountains", Content.Load<Texture2D>("MountainsTile2"));
-            TEXTURES.Add("T_Pasture", Content.Load<Texture2D>("PastureTile2"));
-            TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile2"));
+            TEXTURES.Add("T_Desert", Content.Load<Texture2D>("DesertTile"));
+            TEXTURES.Add("T_Fields", Content.Load<Texture2D>("FieldsTile"));
+            TEXTURES.Add("T_Forest", Content.Load<Texture2D>("ForestTile"));
+            TEXTURES.Add("T_Hills", Content.Load<Texture2D>("HillsTile"));
+            TEXTURES.Add("T_Mountains", Content.Load<Texture2D>("MountainsTile"));
+            TEXTURES.Add("T_Pasture", Content.Load<Texture2D>("PastureTile"));
+            TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
+            TEXTURES.Add("TO_Number", Content.Load<Texture2D>("NumberTile"));
 
             base.LoadContent();
 
