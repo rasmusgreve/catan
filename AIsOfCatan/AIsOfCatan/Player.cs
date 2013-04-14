@@ -8,7 +8,7 @@ namespace AIsOfCatan
     public class Player
     {
         private Agent agent;
-
+        public readonly int ID;
         private List<Resource> resources = new List<Resource>();
         private List<DevelopmentCard> developmentCards = new List<DevelopmentCard>();
         private int playedKnights = 0;
@@ -17,6 +17,7 @@ namespace AIsOfCatan
         {
             this.agent = agent;
             agent.Reset(id);
+            this.ID = id;
         }
 
         public int PlayedKnights

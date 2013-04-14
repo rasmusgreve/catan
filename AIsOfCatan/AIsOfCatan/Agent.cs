@@ -8,9 +8,9 @@ namespace AIsOfCatan
     public interface Agent
     {
         void Reset(int assignedID); // the agent should reset for a new game, the given id is the
-                                    // players position in the game (0 is first and 3 is last)
+                                    // players position in the game (0 is first and 3 is last) //TODO: Nej?
 
-        void PlaceStart(GameState state, GameActions actions); // Only (one) build settlement and build road (legally) will
+        void PlaceStart(GameState state, StartActions actions); // Only (one) build settlement and build road (legally) will
                                           // be accepted.
         void BeforeDiceRoll(GameState state, GameActions actions); // you have the chance to play a development card before the roll. (Page 16, #4)
 

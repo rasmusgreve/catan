@@ -108,6 +108,16 @@ namespace AIsOfCatan
         }
 
         /// <summary>
+        /// Get all pieces built on a given tile
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public List<Piece> GetPieces(int index)
+        {
+            throw new NotImplementedException(); //TODO: Please and thank you!
+        }
+
+        /// <summary>
         /// Gives the current location of the Robber token.
         /// </summary>
         /// <returns>The index on the board currently containing the robber.</returns>
