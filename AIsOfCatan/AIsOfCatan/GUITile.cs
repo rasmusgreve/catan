@@ -27,9 +27,9 @@ namespace AIsOfCatan
         private Vector2 textPos;
         private readonly Color valueColour;
 
-        private GameState.Tile Tile { get; set; }
+        private Board.Tile Tile { get; set; }
 
-        public GUITile(int x, int y, GameState.Tile tile) : 
+        public GUITile(int x, int y, Board.Tile tile) : 
             base(
                 new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TILE_WIDTH), (float) ((0.66+y)*TileShift)),
                 GetTexture(tile.Terrain)

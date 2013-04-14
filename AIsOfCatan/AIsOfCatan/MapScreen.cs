@@ -21,11 +21,11 @@ namespace AIsOfCatan
 
             for (int i = 0; i < board.Length; i++)
             {
-                board[i] = new GUITile[latestGameState.GetRowLength(i)];
+                board[i] = new GUITile[Board.GetRowLength(i)];
 
                 for (int j = 0; j < board[i].Length; j++)
                 {
-                    GUITile tile = new GUITile(j, i, latestGameState.GetTile(i, j));
+                    GUITile tile = new GUITile(j, i, latestGameState.Board.GetTile(i, j));
                     AddDrawableComponent(tile);
                     board[i][j] = tile;
                 }
