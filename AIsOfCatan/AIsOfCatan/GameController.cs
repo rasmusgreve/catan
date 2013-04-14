@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class GameController
+    public class GameController
     {
         private Random diceRandom;
         private Random shuffleRandom;
@@ -189,6 +189,9 @@ namespace AIsOfCatan
 
         public bool PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
+            if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
+
+            player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
             throw new NotImplementedException();
         }
 
@@ -205,7 +208,7 @@ namespace AIsOfCatan
 
         public GameState PlayMonopoly(Player player, Resource resource)
         {
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Year of Plenty found in hand");
+            if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
             player.DevelopmentCards.Remove(DevelopmentCard.Monopoly);
             //Take all resources of the given type out of all hands
             int count = 0;
