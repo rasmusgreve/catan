@@ -21,7 +21,7 @@ namespace AIsOfCatan
         private Dictionary<Tuple<int, int, int>, Piece> settlements;
         private int robberLocation;
 
-        public Board(int boardSeed)
+        private Board()
         {
             // initialize fields
             roads = new Dictionary<Tuple<int, int>, int>(22);
@@ -42,41 +42,16 @@ namespace AIsOfCatan
                 Tuple<int, int> coords = GetTerrainCoords(water);
                 terrain[coords.Item1][coords.Item2] = new Tile(Terrain.Water, 0);
             }
+        }
 
-            // generate random board
+        public Board(int terrainSeed, int numberSeed) : this()
+        {
+            InitTerrain(terrainSeed, numberSeed, true);
+        }
 
-            // construct pool
-            List<Terrain> terrainPool = new List<Terrain>(19);
-            for (int i = 0; i < 4; i++)
-            {
-                if (i < 3) terrainPool.Add(Terrain.Hills);
-                if (i < 3) terrainPool.Add(Terrain.Mountains);
-                terrainPool.Add(Terrain.Pasture);
-                terrainPool.Add(Terrain.Fields);
-                terrainPool.Add(Terrain.Forest);
-            }
-            terrainPool.Add(Terrain.Desert);
-            Shuffle(terrainPool, boardSeed); // shuffle
-
-            // place randomized tiles
-            bool desertFound = false;
-            for (int i = 0; i < placementOrder.Length; i++)
-            {
-
-                Tuple<int, int> coords = GetTerrainCoords(placementOrder[i]);
-                if (terrainPool.First() == Terrain.Desert)
-                {
-                    terrain[coords.Item1][coords.Item2] = new Tile(terrainPool.First(), 0);
-                    desertFound = true;
-                    robberLocation = placementOrder[i]; // place the robber
-                }
-                else
-                {
-                    terrain[coords.Item1][coords.Item2] = new Tile(terrainPool.First(), valueOrder[i - (desertFound ? 1 : 0)]);
-                }
-
-                terrainPool.RemoveAt(0);
-            }
+        public Board(int terrainSeed) : this()
+        {
+            InitTerrain(terrainSeed, 0, false);
         }
 
         /// <summary>
@@ -158,6 +133,45 @@ namespace AIsOfCatan
 
         //------------Private Methods------------------------------//
 
+        private void InitTerrain(int terrainSeed, int numberSeed, bool randomNumbers)
+        {
+            // generate random board
+
+            // construct pool
+            List<Terrain> terrainPool = new List<Terrain>(19);
+            for (int i = 0; i < 4; i++)
+            {
+                if (i < 3) terrainPool.Add(Terrain.Hills);
+                if (i < 3) terrainPool.Add(Terrain.Mountains);
+                terrainPool.Add(Terrain.Pasture);
+                terrainPool.Add(Terrain.Fields);
+                terrainPool.Add(Terrain.Forest);
+            }
+            terrainPool.Add(Terrain.Desert);
+            List<int> numberPool = new List<int>(valueOrder);
+
+            Shuffle(terrainPool, terrainSeed); // shuffle
+            if (randomNumbers) Shuffle(numberPool, numberSeed);
+
+            // place randomized tiles
+            bool desertFound = false;
+            for (int i = 0; i < placementOrder.Length; i++)
+            {
+
+                Tuple<int, int> coords = GetTerrainCoords(placementOrder[i]);
+                if (terrainPool[i] == Terrain.Desert)
+                {
+                    terrain[coords.Item1][coords.Item2] = new Tile(terrainPool[i], 0);
+                    desertFound = true;
+                    robberLocation = placementOrder[i]; // place the robber
+                }
+                else
+                {
+                    terrain[coords.Item1][coords.Item2] = new Tile(terrainPool[i], numberPool[i - (desertFound ? 1 : 0)]);
+                }
+            }
+        }
+
         private Tuple<int, int> GetTerrainCoords(int index)
         {
             int row = 0;
@@ -201,7 +215,7 @@ namespace AIsOfCatan
         public class Tile
         {
             public Terrain Terrain { get; private set; }
-            public int Value { get; private set; }
+            public int Value { get; internal set; }
 
             public Tile(Terrain terrain, int value)
             {

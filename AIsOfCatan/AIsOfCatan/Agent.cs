@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    interface Agent
+    public interface Agent
     {
         void Reset(int assignedID); // the agent should reset for a new game, the given id is the
                                     // players position in the game (0 is first and 3 is last)
