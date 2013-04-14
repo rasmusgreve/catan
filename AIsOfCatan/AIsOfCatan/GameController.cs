@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class GameController
+    public class GameController
     {
         private Random diceRandom;
         private Random shuffleRandom;
@@ -68,7 +68,7 @@ namespace AIsOfCatan
         {
             while (!GameFinished())
             {
-                TakeTurn(players[turn].Agent);
+                TakeTurn(players[turn]);
                 NextTurn();
             }
         }
@@ -79,18 +79,74 @@ namespace AIsOfCatan
             throw new NotImplementedException();
         }
 
-        private void TakeTurn(Agent player)
+        private void TakeTurn(Player player)
         {
-            //player.BeforeDiceRoll(gameState); //TODO
+            MainActions actions = new MainActions(player, this);
+            GameState beforeResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
+            player.Agent.BeforeDiceRoll(beforeResourcesState, actions);
+
             int roll = RollDice();
+            actions.DieRoll();
             if (roll == 7)
             {
-                //player.MoveRobber(gameState); //TODO
+                player.Agent.MoveRobber(beforeResourcesState); //TODO: Move robber on board!!!!
             }
             else
             {
-                //TODO: Hand out resources
-                //player.PerformTurn(gameState); //TODO
+                HandOutResources(roll);
+            }
+            GameState afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
+            player.Agent.PerformTurn(afterResourcesState, actions);
+        }
+
+        private void HandOutResources(int roll)
+        {
+            //Map from PlayerID to dictionary that maps resource to amount
+            Dictionary<int, Dictionary<Resource, int>> handouts = new Dictionary<int, Dictionary<Resource, int>>();
+            Dictionary<Resource, int> handoutSums = new Dictionary<Resource, int>();
+            for (int i = 0; i < players.Length; i++) handouts[i] = new Dictionary<Resource,int>();
+
+            //Count how many resources to be dealt
+            for (int i = 0; i <= 44; i++)
+            {
+                var tile = board.GetTile(i);
+                if (tile.Value != roll) continue;
+                foreach (var piece in board.GetPieces(i))
+                {
+                    if (piece.Token == Token.Settlement)
+                    {
+                        handouts[piece.Player][(Resource)tile.Terrain]++;
+                        handoutSums[(Resource)tile.Terrain]++;
+                    }
+                    else if (piece.Token == Token.City)
+                    {
+                        handouts[piece.Player][(Resource)tile.Terrain] += 2;
+                        handoutSums[(Resource)tile.Terrain] += 2;
+                    }
+                }
+            }
+
+            //Check if there are enough resources in the bank
+            foreach (var resource in handoutSums.Keys)
+            {
+                if (resourceBank[(int)resource] < handoutSums[resource])
+                {
+                    for (int i = 0; i < players.Length; i++)
+                    {
+                        handouts[i][resource] = 0;
+                    }
+                }
+            }
+
+            //Hand out resources
+            foreach (var player in players)
+            {
+                foreach (var resource in handouts[player.ID].Keys)
+                {
+                    int amount = handouts[player.ID][resource];
+                    player.Resources[(int)resource] += amount;
+                    resourceBank[(int)resource] -= amount;
+                }
             }
         }
 
@@ -98,13 +154,17 @@ namespace AIsOfCatan
         {
             for (int i = 0; i < players.Length; i++)
             {
-               // players[turn].Agent.PlaceStart(new GameState(board, developmentCardStack, resourceBank, players, turn));//TODO
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                var actions = new StartActions(players[turn], this);
+                players[turn].Agent.PlaceStart(state, actions);
                 NextTurn();
             }
             for (int i = 0; i < players.Length; i++)
             {
                 PrevTurn();
-                //players[turn].Agent.PlaceStart(gameState); //TODO
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                var actions = new StartActions(players[turn], this);
+                players[turn].Agent.PlaceStart(state, actions);
                 //TODO: Hand out resources
             }
         }
@@ -189,6 +249,9 @@ namespace AIsOfCatan
 
         public bool PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
+            if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
+
+            player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
             throw new NotImplementedException();
         }
 
@@ -205,7 +268,7 @@ namespace AIsOfCatan
 
         public GameState PlayMonopoly(Player player, Resource resource)
         {
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Year of Plenty found in hand");
+            if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
             player.DevelopmentCards.Remove(DevelopmentCard.Monopoly);
             //Take all resources of the given type out of all hands
             int count = 0;

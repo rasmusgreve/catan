@@ -5,27 +5,27 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    interface GameActions
+    public interface GameActions
     {
-        public DevelopmentCard DrawDevelopmentCard();
+         DevelopmentCard DrawDevelopmentCard();
 
-        public void PlayKnight();
+         void PlayKnight();
 
-        public bool PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
+         bool PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
 
-        public void PlayYearOfPlenty(Resource resource1, Resource resource2);
+         void PlayYearOfPlenty(Resource resource1, Resource resource2);
 
-        public GameState PlayMonopoly(Resource resource);
+         GameState PlayMonopoly(Resource resource);
 
-        public Trade[] ProposeTrade(Trade trade);
+         Trade[] ProposeTrade(Trade trade);
 
-        public void Trade(int otherPlayer);
+         void Trade(int otherPlayer);
 
-        public bool BuildHouse(int firstTile, int secondTile, int thirdTile);
+         bool BuildHouse(int firstTile, int secondTile, int thirdTile);
 
-        public bool BuildCity(int firstTile, int secondTile, int thirdTile);
+         bool BuildCity(int firstTile, int secondTile, int thirdTile);
 
-        public bool BuildRoad(int firstTile, int secondTile);
+         bool BuildRoad(int firstTile, int secondTile);
 
     }
 }
