@@ -20,7 +20,7 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
-        readonly GameState state = new GameState(new Board(0),null,null,null,0);
+        readonly GameState state = new GameState(new Board(1),null,null,null,0);
 
         public const float SCALE = 0.5f;
 
