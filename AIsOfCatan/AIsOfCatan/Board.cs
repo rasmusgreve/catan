@@ -193,6 +193,38 @@ namespace AIsOfCatan
             return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation);
         }
 
+        public Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3)
+        {
+            var o = Get3Tuple(index1,index2,index3);
+            return new Tuple<int,int>[]{new Tuple<int,int>(o.Item1,o.Item2), new Tuple<int,int>(o.Item2,o.Item3), new Tuple<int,int>(o.Item1,o.Item3)};
+        }
+
+        public Tuple<int,int,int>[] GetAdjacentIntersections(int index1, int index2)
+        {
+            var n1 = GetAdjacentTiles(index1);
+            return GetAdjacentTiles(index2).Where(t => n1.Contains(t)).Select(t => new Tuple<int, int, int>(index1, index2, t)).ToArray();
+        }
+
+        public List<int> GetAdjacentTiles(int index)
+        {
+            List<int> result = new List<int>();
+            if (index - 7 > 0) result.Add(index - 7);
+            if (index - 6 > 0) result.Add(index - 6);
+            if (index - 1 > 0) result.Add(index - 1);
+            if (index + 1 < 45) result.Add(index + 1);
+            if (index + 6 < 45) result.Add(index + 6);
+            if (index + 7 < 45) result.Add(index + 7);
+            return result;
+        }
+
+        public bool HasNoNeighbors(int index1, int index2, int index3)
+        {
+            Tuple<int,int,int> tuple = Get3Tuple(index1,index2,index3);
+            return GetAdjacentEdges(tuple.Item1, tuple.Item2, tuple.Item3).
+                SelectMany(edge => GetAdjacentIntersections(edge.Item1, edge.Item2)).
+                All(inter => inter.Equals(tuple) || GetPiece(inter.Item1, inter.Item2, inter.Item3) == null);
+        }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
