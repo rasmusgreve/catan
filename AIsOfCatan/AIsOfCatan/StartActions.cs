@@ -11,7 +11,7 @@ namespace AIsOfCatan
         private GameController controller;
         private bool houseBuilt = false;
         private bool roadBuilt = false;
-        private int[] housePosition;
+        private int[] settlementPosition;
         public StartActions(Player player, GameController controller)
         {
             this.player = player;
@@ -21,16 +21,17 @@ namespace AIsOfCatan
         /// <summary>
         /// Internal method used for handing out resources
         /// </summary>
-        public int[] GetHousePosition()
+        public int[] GetSettlementPosition()
         {
-            return housePosition.ToArray();
+            return settlementPosition.ToArray();
         }
 
         public bool BuildHouse(int firstTile, int secondTile, int thirdTile)
         {
             if (houseBuilt) throw new IllegalActionException("Only one house may be built in a turn during the startup");
-            housePosition = new int[] { firstTile, secondTile, thirdTile };
+            settlementPosition = new int[] { firstTile, secondTile, thirdTile };
 
+            //TODO: Implement this
             throw new NotImplementedException();
         }
 
@@ -38,9 +39,10 @@ namespace AIsOfCatan
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");
             if (!houseBuilt) throw new IllegalActionException("The house must be placed before the road");
-            if (!(housePosition.Contains(firstTile) && housePosition.Contains(secondTile)))
+            if (!(settlementPosition.Contains(firstTile) && settlementPosition.Contains(secondTile)))
                 throw new IllegalBuildPositionException("The road must be placed next to the house");
 
+            //TODO: Implement this
             throw new NotImplementedException();
         }
     }
