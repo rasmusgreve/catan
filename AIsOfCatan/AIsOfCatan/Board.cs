@@ -193,18 +193,37 @@ namespace AIsOfCatan
             return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation);
         }
 
+        /// <summary>
+        /// Gives all edges (places to build roads) adjacent to the given intersection.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
+        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
+        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
+        /// <returns>An array of 2-int-tuples with the (up to three) edges next to the intersection.</returns>
         public Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3)
         {
             var o = Get3Tuple(index1,index2,index3);
             return new Tuple<int,int>[]{new Tuple<int,int>(o.Item1,o.Item2), new Tuple<int,int>(o.Item2,o.Item3), new Tuple<int,int>(o.Item1,o.Item3)};
         }
 
+        /// <summary>
+        /// Gives all intersections (places to build settlements and cities)
+        /// adjacent to the give edge.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <returns>An array of 3-int-tuples with the (up to two) intersections at the ends of the edge.</returns>
         public Tuple<int,int,int>[] GetAdjacentIntersections(int index1, int index2)
         {
             var n1 = GetAdjacentTiles(index1);
             return GetAdjacentTiles(index2).Where(t => n1.Contains(t)).Select(t => new Tuple<int, int, int>(index1, index2, t)).ToArray();
         }
 
+        /// <summary>
+        /// Gets all tiles that are adjacent to the given tile.
+        /// </summary>
+        /// <param name="index">The tile to look around.</param>
+        /// <returns>A list of all the (legal) adjacent tiles.</returns>
         public List<int> GetAdjacentTiles(int index)
         {
             List<int> result = new List<int>();
@@ -217,6 +236,15 @@ namespace AIsOfCatan
             return result;
         }
 
+        /// <summary>
+        /// Checks if the given intersection has no pieces build at the
+        /// directly connected intersections (Distance Rule).
+        /// </summary>
+        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
+        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
+        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
+        /// <returns>Returns true if the given intersection has no direct neighboring intersections
+        /// containing settlements or cities, else false.</returns>
         public bool HasNoNeighbors(int index1, int index2, int index3)
         {
             Tuple<int,int,int> tuple = Get3Tuple(index1,index2,index3);
