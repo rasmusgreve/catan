@@ -90,7 +90,7 @@ namespace AIsOfCatan
             
         }
 
-        private static bool IsTileNumbered(GameState.Tile tile)
+        private static bool IsTileNumbered(Board.Tile tile)
         {
             switch (tile.Terrain)
             {

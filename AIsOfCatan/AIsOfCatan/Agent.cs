@@ -16,6 +16,8 @@ namespace AIsOfCatan
 
         int MoveRobber(GameState state); // you must move the robber to a new tile (CAN BE THE DESERT! Page 16, note 34)
 
+        int ChooseOpponentToDrawFrom(int[] validOpponents); //You must choose an opponent to draw a card from (called after you move the robber)
+
         Resource[] DiscardCards(GameState state, int toDiscard); // you must discard the toDiscard amount. The
                                                             // returned array must contain the types of cards to discard
 

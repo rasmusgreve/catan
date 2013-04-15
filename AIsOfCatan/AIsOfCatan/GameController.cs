@@ -9,15 +9,24 @@ namespace AIsOfCatan
     {
         private Random diceRandom;
         private Random shuffleRandom;
-        
+        //TODO: http://www.random.org/integers/?num=200&min=1&max=6&col=2&base=10&format=plain&rnd=new
         private Player[] players;
 
         private Board board;
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
         private int[] resourceBank;
         private int turn;
+        private int largestArmyID = -1;
+        private int longestRoadID = -1;
 
-        public void StartGame(Agent[] agents, int boardSeed, int diceSeed)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="agents"></param>
+        /// <param name="boardSeed"></param>
+        /// <param name="diceSeed"></param>
+        /// <returns>The id of the winner of the game</returns>
+        public int StartGame(Agent[] agents, int boardSeed, int diceSeed)
         {
             //Build player list
             this.players = new Player[agents.Length];
@@ -36,9 +45,9 @@ namespace AIsOfCatan
             shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
             
             //Start the game!
-            turn = diceRandom.Next(agents.Length);
+            turn = 0; //TODO: Shuffle agents array?
             PlaceStarts();
-            GameLoop();
+            return GameLoop();
         }
 
         private void PopulateDevelopmentCardStack()
@@ -64,24 +73,53 @@ namespace AIsOfCatan
             }
         }
 
-        private void GameLoop()
+        /// <summary>
+        /// Executes the game, each player turn by turn until a player wins
+        /// </summary>
+        /// <returns>The ID of the winning player</returns>
+        private int GameLoop()
         {
             while (true)
             {
                 TakeTurn(players[turn]);
                 
-                if (GameFinished()) break;
+                if (HasWon(players[turn])) return players[turn].ID;
 
                 NextTurn();
             }
         }
 
-        private Boolean GameFinished()
+        /// <summary>
+        /// Find out if a given player has won (if his number of victory points is over or equal to 10)
+        /// Points are counted as:
+        ///     Settlements give 1 point each
+        ///     Cities give 2 points each
+        ///     Victory point development cards give 1 point each
+        ///     Having the largest army or the longest road give 2 points each.
+        /// </summary>
+        /// <param name="player">The player to test</param>
+        /// <returns>True if the player has 10 or more victory points</returns>
+        private Boolean HasWon(Player player)
         {
-            //TODO: Implement this
-            throw new NotImplementedException();
+            int points = 0;
+            points += (5 - player.SettlementsLeft) * 1;
+            points += (4 - player.CitiesLeft) * 2;
+            
+            points += player.DevelopmentCards.Count(c => c == DevelopmentCard.VictoryPoint) * 1;
+            
+            if (player.ID == largestArmyID) points += 2;
+            if (player.ID == longestRoadID) points += 2;
+            
+            return (points >= 10);
         }
 
+        /// <summary>
+        /// Executes all parts of a players turn
+        ///     1. Allow the play of a development card before the dice are rolled
+        ///     2. Roll the dice (done automatically), hand out resources to all players, and move the robber if roll is 7
+        ///     3. Allow all actions according to the rules
+        /// </summary>
+        /// <param name="player"></param>
         private void TakeTurn(Player player)
         {
             MainActions actions = new MainActions(player, this);
@@ -92,7 +130,16 @@ namespace AIsOfCatan
             actions.DieRoll();
             if (roll == 7)
             {
-                player.Agent.MoveRobber(beforeResourcesState); //TODO: Move robber on board!!!!
+                int robberPosition = board.GetRobberLocation();
+                int oldPosition = board.GetRobberLocation();
+                while (robberPosition == oldPosition) //If the agent gives a bad answer we ask again
+                {
+                    robberPosition = player.Agent.MoveRobber(beforeResourcesState);
+                    if (board.GetTile(robberPosition).Terrain == Terrain.Water)
+                        robberPosition = oldPosition; //Let the agent try again if it's moved into water
+                }
+                //board = board.MoveRobber(robberPosition); //TODO: Should work after sync
+                //TODO: Draw a card from an opponent
             }
             else
             {
@@ -100,8 +147,6 @@ namespace AIsOfCatan
             }
             GameState afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
             player.Agent.PerformTurn(afterResourcesState, actions);
-
-            //TODO: Winner?
         }
 
         private void HandOutResources(int roll)
@@ -115,7 +160,7 @@ namespace AIsOfCatan
             for (int i = 0; i <= 44; i++)
             {
                 var tile = board.GetTile(i);
-                if (tile.Value != roll) continue;
+                if (tile.Value != roll || board.GetRobberLocation() == i) continue;
                 foreach (var piece in board.GetPieces(i))
                 {
                     if (piece.Token == Token.Settlement)
@@ -148,9 +193,7 @@ namespace AIsOfCatan
             {
                 foreach (var resource in handouts[player.ID].Keys)
                 {
-                    int amount = handouts[player.ID][resource];
-                    player.Resources[(int)resource] += amount;
-                    resourceBank[(int)resource] -= amount;
+                    GetResource(player, resource, handouts[player.ID][resource]);
                 }
             }
         }
@@ -170,7 +213,12 @@ namespace AIsOfCatan
                 var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
-                //TODO: Hand out resources
+                //Hand out resources
+                foreach (var pos in actions.GetHousePosition())
+                {
+                    var type = (Resource)board.GetTile(pos).Terrain;
+                    GetResource(players[turn], type);
+                }
             }
         }
 
@@ -257,6 +305,11 @@ namespace AIsOfCatan
             if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
 
             player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
+
+            //TODO: Check if the player has enough roads left. Let him place only one if that's all left
+            player.RoadsLeft -= 2;
+
+
             throw new NotImplementedException();
         }
 
@@ -291,16 +344,52 @@ namespace AIsOfCatan
 
         public bool BuildHouse(Player player, int firstTile, int secondTile, int thirdTile)
         {
+            var r = player.Resources;
+            if (!(r.Contains(Resource.Grain) && r.Contains(Resource.Wool) && r.Contains(Resource.Brick) && r.Contains(Resource.Lumber)))
+                throw new InsufficientResourcesException("Not enough resources to buy a settlement");
+            if (player.SettlementsLeft == 0)
+                throw new IllegalActionException("No more settlement pieces left of your color");
+
+            PayResource(player, Resource.Grain);
+            PayResource(player, Resource.Wool);
+            PayResource(player, Resource.Brick);
+            PayResource(player, Resource.Lumber);
+
+            player.SettlementsLeft--;
+
             throw new NotImplementedException();
         }
 
         public bool BuildCity(Player player, int firstTile, int secondTile, int thirdTile)
         {
+            var r = player.Resources;
+            if (!(r.Count(c => c == Resource.Ore) >= 3 && r.Count(c => c == Resource.Grain) >= 2))
+                throw new InsufficientResourcesException("Not enough resources to buy a city");
+            if (player.CitiesLeft == 0)
+                throw new IllegalActionException("No more city pieces left of your color");
+
+            PayResource(player, Resource.Ore, 3);
+            PayResource(player, Resource.Grain, 2);
+
+            player.CitiesLeft--;
+            player.SettlementsLeft++;
+
             throw new NotImplementedException();
         }
 
         public bool BuildRoad(Player player, int firstTile, int secondTile)
         {
+            var r = player.Resources;
+            if (!(r.Contains(Resource.Brick) && r.Contains(Resource.Lumber)))
+                throw new InsufficientResourcesException("Not enough resources to buy a road");
+            if (player.RoadsLeft == 0)
+                throw new IllegalActionException("No more road pieces left of your color");
+
+            PayResource(player, Resource.Brick);
+            PayResource(player, Resource.Lumber);
+
+            player.RoadsLeft--;
+
             throw new NotImplementedException();
         }
 

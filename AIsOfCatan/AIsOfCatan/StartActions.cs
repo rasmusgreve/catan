@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class StartActions
+    public class StartActions
     {
         private Player player;
         private GameController controller;
@@ -16,6 +16,14 @@ namespace AIsOfCatan
         {
             this.player = player;
             this.controller = controller;
+        }
+
+        /// <summary>
+        /// Internal method used for handing out resources
+        /// </summary>
+        public int[] GetHousePosition()
+        {
+            return housePosition.ToArray();
         }
 
         public bool BuildHouse(int firstTile, int secondTile, int thirdTile)
