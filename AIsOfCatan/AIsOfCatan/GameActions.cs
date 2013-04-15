@@ -11,7 +11,7 @@ namespace AIsOfCatan
 
          void PlayKnight();
 
-         bool PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
+         void PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
 
          void PlayYearOfPlenty(Resource resource1, Resource resource2);
 
