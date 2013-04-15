@@ -17,8 +17,8 @@ namespace AIsOfCatan
         private int[] resourceBank;
         private int turn;
         private int largestArmySize = 2; //One less than the minimum for getting the largest army card
-        private int largestArmyID = -1;
-        private int longestRoadID = -1;
+        private int largestArmyId = -1;
+        private int longestRoadId = -1;
 
         /// <summary>
         /// Start the game. This method will run for the length of the game and returns the id of the winner
@@ -30,10 +30,10 @@ namespace AIsOfCatan
         public int StartGame(Agent[] agents, int boardSeed, int diceSeed)
         {
             //Build player list
-            this.players = new Player[agents.Length];
+            players = new Player[agents.Length];
             for (int i = 0; i < agents.Length; i++)
             {
-                this.players[i] = new Player(agents[i], i);
+                players[i] = new Player(agents[i], i);
             }
 
             //Set up board
@@ -111,8 +111,8 @@ namespace AIsOfCatan
             
             points += player.DevelopmentCards.Count(c => c == DevelopmentCard.VictoryPoint) * 1;
             
-            if (player.ID == largestArmyID) points += 2;
-            if (player.ID == longestRoadID) points += 2;
+            if (player.ID == largestArmyId) points += 2;
+            if (player.ID == longestRoadId) points += 2;
             
             return (points >= 10);
         }
@@ -126,7 +126,7 @@ namespace AIsOfCatan
         /// <param name="player"></param>
         private void TakeTurn(Player player)
         {
-            MainActions actions = new MainActions(player, this);
+            var actions = new MainActions(player, this);
             player.Agent.BeforeDiceRoll(new GameState(board, developmentCardStack, resourceBank, players, turn), actions);
             
             int roll = RollDice();
@@ -158,7 +158,7 @@ namespace AIsOfCatan
             {
                 HandOutResources(roll);
             }
-            GameState afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
+            var afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
             player.Agent.PerformTurn(afterResourcesState, actions);
         }
 
@@ -214,8 +214,8 @@ namespace AIsOfCatan
         private void HandOutResources(int roll)
         {
             //Map from PlayerID to dictionary that maps resource to amount
-            Dictionary<int, Dictionary<Resource, int>> handouts = new Dictionary<int, Dictionary<Resource, int>>();
-            Dictionary<Resource, int> handoutSums = new Dictionary<Resource, int>();
+            var handouts = new Dictionary<int, Dictionary<Resource, int>>();
+            var handoutSums = new Dictionary<Resource, int>();
             for (int i = 0; i < players.Length; i++) handouts[i] = new Dictionary<Resource,int>();
 
             //Count how many resources to be dealt
@@ -396,7 +396,7 @@ namespace AIsOfCatan
             if (player.PlayedKnights > largestArmySize)
             {
                 largestArmySize = player.PlayedKnights;
-                largestArmyID = player.ID;
+                largestArmyId = player.ID;
             }
 
             MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
@@ -425,7 +425,9 @@ namespace AIsOfCatan
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile2, secondTile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
-                //TODO: connected check
+                if (!RoadConnected(firstTile2, secondTile2, player.ID))
+                    throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
+                
                 board = board.PlaceRoad(firstTile2, secondTile2, player.ID);
             }
             if (player.RoadsLeft >= 1)
@@ -433,13 +435,22 @@ namespace AIsOfCatan
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile1, secondTile1) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
-                //TODO: connected check
+                if (!RoadConnected(firstTile1, secondTile1, player.ID))
+                    throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
+                
                 board = board.PlaceRoad(firstTile1, secondTile1, player.ID);
             }
             else
             {
                 throw new IllegalActionException("No more road pieces left of your color");
             }
+        }
+
+        private bool RoadConnected(int firstTile, int secondTile, int playerId)
+        {
+            return board.GetAdjacentIntersections(firstTile, secondTile)
+                     .SelectMany(inter => board.GetAdjacentEdges(inter.Item1, inter.Item2, inter.Item3))
+                     .Any(edge => board.GetRoad(edge.Item1, edge.Item2) == playerId);
         }
 
         /// <summary>
@@ -474,11 +485,7 @@ namespace AIsOfCatan
             if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
             player.DevelopmentCards.Remove(DevelopmentCard.Monopoly);
             //Take all resources of the given type out of all hands
-            int count = 0;
-            for (int i = 0; i < players.Length; i++)
-            {
-                count += players[i].Resources.RemoveAll(c => c == resource);
-            }
+            int count = players.Sum(t => t.Resources.RemoveAll(c => c == resource));
             //And place them in the playing players hand
             for (int i = 0; i < count; i++)
             {
@@ -521,6 +528,7 @@ namespace AIsOfCatan
 
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+            //TODO: Update longest road!
             return true; //TODO: Maybe return new GameState?
         }
 
@@ -578,15 +586,18 @@ namespace AIsOfCatan
                 throw new InsufficientResourcesException("Not enough resources to buy a road");
             if (player.RoadsLeft == 0)
                 throw new IllegalActionException("No more road pieces left of your color");
-
+            if (board.GetRoad(firstTile, secondTile) != -1)
+                throw new IllegalBuildPositionException("The chosen position is occupied by another road");
+            if (!RoadConnected(firstTile,secondTile, player.ID))
+                throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
+            
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
             player.RoadsLeft--;
-            //TODO: Build road
-            //TODO: Verify build position
+            board.PlaceRoad(firstTile, secondTile, player.ID);
             //TODO: Update longest road
-            throw new NotImplementedException();
+            return true;
         }
 
     }
