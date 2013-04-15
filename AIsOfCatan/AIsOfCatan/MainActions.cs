@@ -49,13 +49,21 @@ namespace AIsOfCatan
             controller.PlayKnight(player);
         }
 
-        public bool PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
+        /// <summary>
+        /// Play the RoadBuilding development card and place two roads for free
+        /// If you only have one road left to place (because you are out of pieces) give the position in firstTile1 and secondTile1
+        /// </summary>
+        /// <param name="firstTile1">The first tile that the first road must be along</param>
+        /// <param name="secondTile1">The second tile that the first road must be along</param>
+        /// <param name="firstTile2">The first tile that the second road must be along</param>
+        /// <param name="secondTile2">The second tile that the second road must be along</param>
+        public void PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (hasPlayedDevCard)
                 throw new IllegalActionException("Max one development card can be played each turn");
             hasPlayedDevCard = true;
-            return controller.PlayRoadBuilding(player, firstTile1, secondTile1, firstTile2, secondTile2);
+            controller.PlayRoadBuilding(player, firstTile1, secondTile1, firstTile2, secondTile2);
         }
 
         public void PlayYearOfPlenty(Resource resource1, Resource resource2)

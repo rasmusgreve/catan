@@ -16,6 +16,7 @@ namespace AIsOfCatan
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
         private int[] resourceBank;
         private int turn;
+        private int largestArmySize = 2; //One less than the minimum for getting the largest army card
         private int largestArmyID = -1;
         private int longestRoadID = -1;
 
@@ -45,7 +46,7 @@ namespace AIsOfCatan
             shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
             
             //Start the game!
-            turn = 0; //TODO: Shuffle agents array?
+            turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE ID's ARE ASSIGNED!
             PlaceStarts();
             return GameLoop();
         }
@@ -123,23 +124,15 @@ namespace AIsOfCatan
         private void TakeTurn(Player player)
         {
             MainActions actions = new MainActions(player, this);
-            GameState beforeResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
-            player.Agent.BeforeDiceRoll(beforeResourcesState, actions);
-
+            player.Agent.BeforeDiceRoll(new GameState(board, developmentCardStack, resourceBank, players, turn), actions);
+            
             int roll = RollDice();
             actions.DieRoll();
+            
             if (roll == 7)
             {
-                int robberPosition = board.GetRobberLocation();
-                int oldPosition = board.GetRobberLocation();
-                while (robberPosition == oldPosition) //If the agent gives a bad answer we ask again
-                {
-                    robberPosition = player.Agent.MoveRobber(beforeResourcesState);
-                    if (board.GetTile(robberPosition).Terrain == Terrain.Water)
-                        robberPosition = oldPosition; //Let the agent try again if it's moved into water
-                }
-                //board = board.MoveRobber(robberPosition); //TODO: Should work after sync
-                //TODO: Draw a card from an opponent
+                MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
+                //TODO: Discard if over 7 cards
             }
             else
             {
@@ -147,6 +140,40 @@ namespace AIsOfCatan
             }
             GameState afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
             player.Agent.PerformTurn(afterResourcesState, actions);
+        }
+
+        private void MoveRobber(Player player, GameState gameState)
+        {
+            int robberPosition = player.Agent.MoveRobber(gameState);
+            if (board.GetTile(robberPosition).Terrain == Terrain.Water || robberPosition == board.GetRobberLocation())
+            {
+                Console.WriteLine("Agent " + player.Agent.GetType().Name + " moved robber illegally");
+                return;
+            }
+            board = board.MoveRobber(robberPosition);
+
+            //Draw a card from an opponent
+            var opponents = new List<int>();
+            foreach (var piece in board.GetPieces(robberPosition))
+            {
+                if (piece.Player == player.ID) continue;
+                if (opponents.Contains(piece.Player)) continue;
+                opponents.Add(piece.Player);
+            }
+            int choice = player.Agent.ChooseOpponentToDrawFrom(opponents.ToArray());
+            if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
+            {
+                Console.WriteLine("Agent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
+                return;
+            }
+
+            if (players[choice].Resources.Count == 0) return; //Nothing to take
+            
+            //Move a card from one player to another
+            var position = shuffleRandom.Next(players[choice].Resources.Count);
+            var toMove = players[choice].Resources[position];
+            players[choice].Resources.RemoveAt(position);
+            player.Resources.Add(toMove);
         }
 
         private void HandOutResources(int roll)
@@ -163,16 +190,9 @@ namespace AIsOfCatan
                 if (tile.Value != roll || board.GetRobberLocation() == i) continue;
                 foreach (var piece in board.GetPieces(i))
                 {
-                    if (piece.Token == Token.Settlement)
-                    {
-                        handouts[piece.Player][(Resource)tile.Terrain]++;
-                        handoutSums[(Resource)tile.Terrain]++;
-                    }
-                    else if (piece.Token == Token.City)
-                    {
-                        handouts[piece.Player][(Resource)tile.Terrain] += 2;
-                        handoutSums[(Resource)tile.Terrain] += 2;
-                    }
+                    int incr = (piece.Token == Token.Settlement) ? 1 : 2;
+                    handouts[piece.Player][(Resource)tile.Terrain] += incr;
+                    handoutSums[(Resource)tile.Terrain] += incr;
                 }
             }
 
@@ -296,21 +316,39 @@ namespace AIsOfCatan
 
             player.DevelopmentCards.Remove(DevelopmentCard.Knight);
             player.PlayedKnights++;
+            if (player.PlayedKnights > largestArmySize)
+            {
+                largestArmySize = player.PlayedKnights;
+                largestArmyID = player.ID;
+            }
 
-            player.Agent.MoveRobber(new GameState(board, developmentCardStack, resourceBank, players, turn));
+            MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
         }
 
-        public bool PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
+        public void PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
 
             player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
 
-            //TODO: Check if the player has enough roads left. Let him place only one if that's all left
-            player.RoadsLeft -= 2;
-
-
-            throw new NotImplementedException();
+            if (player.RoadsLeft >= 2)
+            {
+                player.RoadsLeft--;
+                if (board.GetRoad(firstTile2, secondTile2) != -1)
+                    throw new IllegalBuildPositionException("There is already a road on the selected position");
+                board = board.PlaceRoad(firstTile2, secondTile2, player.ID);
+            }
+            if (player.RoadsLeft >= 1)
+            {
+                player.RoadsLeft--;
+                if (board.GetRoad(firstTile1, secondTile1) != -1)
+                    throw new IllegalBuildPositionException("There is already a road on the selected position");
+                board = board.PlaceRoad(firstTile1, secondTile1, player.ID);
+            }
+            else
+            {
+                throw new IllegalActionException("No more road pieces left of your color");
+            }
         }
 
         public void PlayYearOfPlenty(Player player, Resource resource1, Resource resource2)
@@ -322,6 +360,7 @@ namespace AIsOfCatan
             player.DevelopmentCards.Remove(DevelopmentCard.YearOfPlenty);
             GetResource(player, resource1);
             GetResource(player, resource2);
+            //TODO: What if no more resources in bank?
         }
 
         public GameState PlayMonopoly(Player player, Resource resource)
@@ -356,7 +395,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Lumber);
 
             player.SettlementsLeft--;
-
+            //TODO: Build house
             throw new NotImplementedException();
         }
 
@@ -373,7 +412,7 @@ namespace AIsOfCatan
 
             player.CitiesLeft--;
             player.SettlementsLeft++;
-
+            //TODO: Build city
             throw new NotImplementedException();
         }
 
@@ -389,7 +428,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Lumber);
 
             player.RoadsLeft--;
-
+            //TODO: Build road
             throw new NotImplementedException();
         }
 
