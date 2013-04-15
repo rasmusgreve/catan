@@ -26,7 +26,15 @@ namespace AIsOfCatan
             return settlementPosition.ToArray();
         }
 
-        public bool BuildHouse(int firstTile, int secondTile, int thirdTile)
+        /// <summary>
+        /// IMPORTANT! May only be called once!
+        /// Must be called before BuildRoad
+        /// </summary>
+        /// <param name="firstTile"></param>
+        /// <param name="secondTile"></param>
+        /// <param name="thirdTile"></param>
+        /// <returns></returns>
+        public bool BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
             if (houseBuilt) throw new IllegalActionException("Only one house may be built in a turn during the startup");
             settlementPosition = new int[] { firstTile, secondTile, thirdTile };
@@ -35,6 +43,13 @@ namespace AIsOfCatan
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// IMPORTANT! May only be called once!
+        /// Must be called after BuildHouse
+        /// </summary>
+        /// <param name="firstTile"></param>
+        /// <param name="secondTile"></param>
+        /// <returns></returns>
         public bool BuildRoad(int firstTile, int secondTile)
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");

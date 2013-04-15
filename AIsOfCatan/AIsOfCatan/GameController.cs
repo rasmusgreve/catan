@@ -170,7 +170,7 @@ namespace AIsOfCatan
                 if (opponents.Contains(piece.Player)) continue;
                 opponents.Add(piece.Player);
             }
-            int choice = player.Agent.ChooseOpponentToDrawFrom(opponents.ToArray());
+            int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
                 Console.WriteLine("Agent " + player.Agent.GetType().Name + " chose an illegal player to draw from");

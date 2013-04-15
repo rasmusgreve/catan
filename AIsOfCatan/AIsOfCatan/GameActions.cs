@@ -7,25 +7,26 @@ namespace AIsOfCatan
 {
     public interface GameActions
     {
-         DevelopmentCard DrawDevelopmentCard();
 
-         void PlayKnight();
+        DevelopmentCard DrawDevelopmentCard();
 
-         void PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
+        void PlayKnight();
 
-         void PlayYearOfPlenty(Resource resource1, Resource resource2);
+        void PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
 
-         GameState PlayMonopoly(Resource resource);
+        void PlayYearOfPlenty(Resource resource1, Resource resource2);
 
-         Trade[] ProposeTrade(Trade trade);
+        GameState PlayMonopoly(Resource resource);
 
-         void Trade(int otherPlayer);
+        Trade[] ProposeTrade(Trade trade);
 
-         bool BuildSettlement(int firstTile, int secondTile, int thirdTile);
+        void Trade(int otherPlayer);
 
-         bool BuildCity(int firstTile, int secondTile, int thirdTile);
+        bool BuildSettlement(int firstTile, int secondTile, int thirdTile);
 
-         bool BuildRoad(int firstTile, int secondTile);
+        bool BuildCity(int firstTile, int secondTile, int thirdTile);
+
+        bool BuildRoad(int firstTile, int secondTile);
 
     }
 }
