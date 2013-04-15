@@ -134,8 +134,25 @@ namespace AIsOfCatan
             
             if (roll == 7)
             {
+                //Discard if over 7 cards
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                foreach (var p in players)
+                {
+                    if (p.Resources.Count > 7)
+                    {
+                        var cards = p.Agent.DiscardCards(state, p.Resources.Count / 2);
+                        if (cards.Length != p.Resources.Count / 2)
+                        {
+                            //Clone, shuffle, take, convert
+                            cards = p.Resources.ToList().OrderBy(e => Guid.NewGuid()).Take(p.Resources.Count / 2).ToArray();
+                        }
+                        foreach (var c in cards)
+                        {
+                            PayResource(p, c);
+                        }
+                    }
+                }
                 MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
-                //TODO: Discard if over 7 cards
             }
             else
             {
@@ -170,7 +187,7 @@ namespace AIsOfCatan
                 if (opponents.Contains(piece.Player)) continue;
                 opponents.Add(piece.Player);
             }
-            int choice = player.Agent.ChooseOpponentToDrawFrom(opponents.ToArray());
+            int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
                 Console.WriteLine("Agent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
