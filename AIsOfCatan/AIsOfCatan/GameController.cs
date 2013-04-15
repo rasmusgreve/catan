@@ -323,7 +323,7 @@ namespace AIsOfCatan
         }
 
         /// <summary>
-        /// Give a player an amount of a given resource
+        /// Give a player an amount of some resource
         /// If there are no more cards in the pile an NoMoreCardsException is thrown
         /// </summary>
         /// <param name="player">The player to give resources to</param>
@@ -338,6 +338,21 @@ namespace AIsOfCatan
                 resourceBank[(int)resource]--;
             }
         }
+
+        /// <summary>
+        /// Figure out if a given edge on the board is connected to a given players road in some end
+        /// </summary>
+        /// <param name="firstTile">The index of the first tile on the edge</param>
+        /// <param name="secondTile">The index of the second tile on the edge</param>
+        /// <param name="playerId">The id of the player to test</param>
+        /// <returns>True if the edge is connected to a road</returns>
+        private bool RoadConnected(int firstTile, int secondTile, int playerId)
+        {
+            return board.GetAdjacentIntersections(firstTile, secondTile)
+                     .SelectMany(inter => board.GetAdjacentEdges(inter.Item1, inter.Item2, inter.Item3))
+                     .Any(edge => board.GetRoad(edge.Item1, edge.Item2) == playerId);
+        }
+
 
         /*
          * ACTIONS
@@ -444,13 +459,6 @@ namespace AIsOfCatan
             {
                 throw new IllegalActionException("No more road pieces left of your color");
             }
-        }
-
-        private bool RoadConnected(int firstTile, int secondTile, int playerId)
-        {
-            return board.GetAdjacentIntersections(firstTile, secondTile)
-                     .SelectMany(inter => board.GetAdjacentEdges(inter.Item1, inter.Item2, inter.Item3))
-                     .Any(edge => board.GetRoad(edge.Item1, edge.Item2) == playerId);
         }
 
         /// <summary>
@@ -595,10 +603,44 @@ namespace AIsOfCatan
             PayResource(player, Resource.Lumber);
 
             player.RoadsLeft--;
-            board.PlaceRoad(firstTile, secondTile, player.ID);
+            board = board.PlaceRoad(firstTile, secondTile, player.ID);
             //TODO: Update longest road
             return true;
         }
 
+        /// <summary>
+        /// Let a player build a settlement without a requirement for connectivity and free of charge
+        /// The settlement still has to follow the distance rule and cannot be placed on top of another building
+        /// </summary>
+        /// <param name="player">The player placing the settlement</param>
+        /// <param name="firstTile">The index of the first tile in the intersection</param>
+        /// <param name="secondTile">The index of the second tile in the intersection</param>
+        /// <param name="thirdTile">The index of the third tile in the intersection</param>
+        public void BuildFirstSettlement(Player player, int firstTile, int secondTile, int thirdTile)
+        {
+            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
+                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
+            if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
+                throw new IllegalBuildPositionException("The chosen position is occupied by another building");
+
+            player.SettlementsLeft--;
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+        }
+
+        /// <summary>
+        /// Let a player build a road without a requirement for connectivity and free of charge
+        /// The road may not be placed on top of another road
+        /// Connectivity with previously placed settlement should be controlled elsewhere (in StartActions.cs)
+        /// </summary>
+        /// <param name="player">The player placing the road</param>
+        /// <param name="firstTile">The index of the first tile that the road will be along</param>
+        /// <param name="secondTile">The index of the second tile that the road will be along</param>
+        public void BuildFirstRoad(Player player, int firstTile, int secondTile)
+        {
+            if (board.GetRoad(firstTile, secondTile) != -1)
+                throw new IllegalBuildPositionException("The chosen position is occupied by another road");
+            player.RoadsLeft--;
+            board = board.PlaceRoad(firstTile, secondTile, player.ID);
+        }
     }
 }

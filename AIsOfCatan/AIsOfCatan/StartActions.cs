@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace AIsOfCatan
 {
     public class StartActions
     {
-        private Player player;
-        private GameController controller;
-        private bool houseBuilt = false;
+        private readonly Player player;
+        private readonly GameController controller;
+        private bool settlementBuilt = false;
         private bool roadBuilt = false;
         private int[] settlementPosition;
         public StartActions(Player player, GameController controller)
@@ -36,16 +33,16 @@ namespace AIsOfCatan
         /// <returns></returns>
         public bool BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
-            if (houseBuilt) throw new IllegalActionException("Only one house may be built in a turn during the startup");
-            settlementPosition = new int[] { firstTile, secondTile, thirdTile };
-
-            //TODO: Implement this
-            throw new NotImplementedException();
+            if (settlementBuilt) throw new IllegalActionException("Only one settlement may be built in a turn during the startup");
+            settlementPosition = new int[] { firstTile, secondTile, thirdTile};
+            controller.BuildFirstSettlement(player, firstTile, secondTile, thirdTile);
+            settlementBuilt = true;
+            return true;
         }
 
         /// <summary>
         /// IMPORTANT! May only be called once!
-        /// Must be called after BuildHouse
+        /// Must be called after BuildSettlement
         /// </summary>
         /// <param name="firstTile"></param>
         /// <param name="secondTile"></param>
@@ -53,12 +50,12 @@ namespace AIsOfCatan
         public bool BuildRoad(int firstTile, int secondTile)
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");
-            if (!houseBuilt) throw new IllegalActionException("The house must be placed before the road");
+            if (!settlementBuilt) throw new IllegalActionException("The settlement must be placed before the road");
             if (!(settlementPosition.Contains(firstTile) && settlementPosition.Contains(secondTile)))
-                throw new IllegalBuildPositionException("The road must be placed next to the house");
-
-            //TODO: Implement this
-            throw new NotImplementedException();
+                throw new IllegalBuildPositionException("The road must be placed next to the settlement");
+            controller.BuildFirstRoad(player, firstTile,secondTile);
+            roadBuilt = true;
+            return true;
         }
     }
 }
