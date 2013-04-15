@@ -425,6 +425,7 @@ namespace AIsOfCatan
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile2, secondTile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
+                //TODO: connected check
                 board = board.PlaceRoad(firstTile2, secondTile2, player.ID);
             }
             if (player.RoadsLeft >= 1)
@@ -432,6 +433,7 @@ namespace AIsOfCatan
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile1, secondTile1) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
+                //TODO: connected check
                 board = board.PlaceRoad(firstTile1, secondTile1, player.ID);
             }
             else
@@ -505,16 +507,21 @@ namespace AIsOfCatan
                 throw new InsufficientResourcesException("Not enough resources to buy a settlement");
             if (player.SettlementsLeft == 0)
                 throw new IllegalActionException("No more settlement pieces left of your color");
-            
+            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
+                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
+            if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
+                throw new IllegalBuildPositionException("The chosen position is occupied by another building");
+            if (board.GetRoad(firstTile, secondTile) != player.ID && board.GetRoad(firstTile, thirdTile) != player.ID && board.GetRoad(secondTile, thirdTile) != player.ID)
+                throw new IllegalBuildPositionException("The chosen position has no road leading to it");
+
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
             player.SettlementsLeft--;
-            //TODO: Build settlement
-            //TODO: Verify build position
-            throw new NotImplementedException();
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+            return true; //TODO: Maybe return new GameState?
         }
 
         /// <summary>
@@ -538,15 +545,19 @@ namespace AIsOfCatan
             if (player.CitiesLeft == 0)
                 throw new IllegalActionException("No more city pieces left of your color");
 
+            Board.Piece piece = board.GetPiece(firstTile, secondTile, thirdTile);
+            if (piece == null || piece.Player != player.ID || piece.Token != Token.Settlement)
+                throw new IllegalBuildPositionException("The chosen position does not contain one of your settlements");
+
+
             PayResource(player, Resource.Ore, 3);
             PayResource(player, Resource.Grain, 2);
 
             player.CitiesLeft--;
             player.SettlementsLeft++;
-            //TODO: Build city
-            //TODO: Verify build position
-            //TODO: Control settlement exists
-            throw new NotImplementedException();
+
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.City, player.ID));
+            return true; //TODO: Return new GameState?
         }
 
         /// <summary>
