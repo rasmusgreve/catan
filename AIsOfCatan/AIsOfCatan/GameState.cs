@@ -12,7 +12,7 @@ namespace AIsOfCatan
     //                            14      5             2             2             2
     public enum DevelopmentCard {Knight, VictoryPoint, RoadBuilding, YearOfPlenty, Monopoly}
 
-    public enum Token {Road, Settlement, City};
+    public enum Token {Settlement, City};
 
     //----------------------------------------------------------------------------------------//
 
