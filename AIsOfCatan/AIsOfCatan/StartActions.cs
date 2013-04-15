@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class StartActions
+    public class StartActions
     {
         private Player player;
         private GameController controller;

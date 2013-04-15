@@ -10,7 +10,7 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (GUIControl game = new GUIControl())
             {
                 game.Run();
             }

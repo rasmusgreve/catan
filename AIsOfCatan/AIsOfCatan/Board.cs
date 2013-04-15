@@ -54,6 +54,12 @@ namespace AIsOfCatan
             InitTerrain(terrainSeed, 0, false);
         }
 
+        internal Board(string test) : this() //Used to test GUI
+        {
+            InitTerrain(0,0,false);
+            roads.Add(new Tuple<int, int>(16, 22), 1);
+        }
+
         /// <summary>
         /// Gives the type of terrain and dice value for a given index of the board.
         /// </summary>
@@ -116,6 +122,15 @@ namespace AIsOfCatan
         {
             throw new NotImplementedException(); //TODO: Please and thank you!
         }
+
+        /// <summary>
+        /// This returns a dictionary of all the road placements
+        /// </summary>
+        /// <returns>A COPY of the list of road placements</returns>
+        public Dictionary<Tuple<int, int>, int> GetAllRoads()
+        {
+            throw new NotImplementedException(); //TODO: Detection of where there is roads is going to be trial and error otherwise
+        }  
 
         /// <summary>
         /// Gives the current location of the Robber token.

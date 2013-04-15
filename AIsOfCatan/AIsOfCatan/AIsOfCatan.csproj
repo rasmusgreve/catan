@@ -116,17 +116,18 @@
     <Compile Include="GameActions.cs" />
     <Compile Include="GameController.cs" />
     <Compile Include="GameState.cs" />
-    <Compile Include="GUITile.cs" />
-    <Compile Include="IllegalActionException.cs" />
-    <Compile Include="IllegalBuildPositionException.cs" />
-    <Compile Include="InsufficientResourcesException.cs" />
+    <Compile Include="GUI\GUIRoad.cs" />
+    <Compile Include="GUI\GUITile.cs" />
+    <Compile Include="Exceptions\IllegalActionException.cs" />
+    <Compile Include="Exceptions\IllegalBuildPositionException.cs" />
+    <Compile Include="Exceptions\InsufficientResourcesException.cs" />
     <Compile Include="MainActions.cs" />
-    <Compile Include="MapScreen.cs" />
-    <Compile Include="NoMoreCardsException.cs" />
+    <Compile Include="GUI\MapScreen.cs" />
+    <Compile Include="Exceptions\NoMoreCardsException.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="GUI\GUIControl.cs" />
     <Compile Include="StartActions.cs" />
     <Compile Include="Trade.cs" />
   </ItemGroup>
