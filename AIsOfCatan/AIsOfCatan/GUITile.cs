@@ -25,6 +25,7 @@ namespace AIsOfCatan
 
         private Vector2 numberPos;
         private Vector2 textPos;
+        private readonly Color valueColour;
 
         private Board.Tile Tile { get; set; }
 
@@ -33,12 +34,12 @@ namespace AIsOfCatan
                 new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TILE_WIDTH), (float) ((0.66+y)*TileShift)),
                 GetTexture(tile.Terrain)
             )
-
         {
             Tile = tile;
             //Y = y;
             //X = x;
             NumAreaAndTextPos();
+            valueColour = (Tile.Value == 6 || Tile.Value == 8 ? Color.Red : Color.Black);
         }
 
         private static Texture2D GetTexture(Terrain ter)
@@ -81,16 +82,15 @@ namespace AIsOfCatan
         protected override void Draw(SpriteBatch batch)
         {
             base.Draw(batch);
-            if (isTileNumbered(Tile))
+            if (IsTileNumbered(Tile))
             {
                 batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,Game1.SCALE,SpriteEffects.None,0.1f);
-                Color valueColour = (Tile.Value == 6 || Tile.Value == 8 ? Color.Red : Color.Black);
                 batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,Game1.SCALE,SpriteEffects.None, 0f);
             }
             
         }
 
-        private static bool isTileNumbered(Board.Tile tile)
+        private static bool IsTileNumbered(GameState.Tile tile)
         {
             switch (tile.Terrain)
             {
