@@ -339,6 +339,11 @@ namespace AIsOfCatan
             }
         }
 
+        private GameState CurrentGamestate()
+        {
+            return new GameState(board, developmentCardStack, resourceBank, players, turn);
+        }
+
         /// <summary>
         /// Figure out if a given edge on the board is connected to a given players road in some end
         /// </summary>
@@ -389,7 +394,7 @@ namespace AIsOfCatan
             throw new NotImplementedException();
         }
 
-        public void CompleteTrade(Player player, int playerid)
+        public GameState CompleteTrade(Player player, int playerid)
         {
             throw new NotImplementedException();
         }
@@ -401,7 +406,7 @@ namespace AIsOfCatan
         /// The largest army special card is relocated if playing this knight causes it to be
         /// </summary>
         /// <param name="player">The player playing a knight</param>
-        public void PlayKnight(Player player)
+        public GameState PlayKnight(Player player)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.Knight))
                 throw new InsufficientResourcesException("No knight found in hand");
@@ -415,6 +420,7 @@ namespace AIsOfCatan
             }
 
             MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -429,7 +435,7 @@ namespace AIsOfCatan
         /// <param name="secondTile1">The second tile that the first road must be along</param>
         /// <param name="firstTile2">The first tile that the second road must be along</param>
         /// <param name="secondTile2">The second tile that the second road must be along</param>
-        public void PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
+        public GameState PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
 
@@ -459,6 +465,7 @@ namespace AIsOfCatan
             {
                 throw new IllegalActionException("No more road pieces left of your color");
             }
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -469,7 +476,7 @@ namespace AIsOfCatan
         /// <param name="player">The player playing the year of plenty development card</param>
         /// <param name="resource1">The type of resource for the first card</param>
         /// <param name="resource2">The type of resource for the second card</param>
-        public void PlayYearOfPlenty(Player player, Resource resource1, Resource resource2)
+        public GameState PlayYearOfPlenty(Player player, Resource resource1, Resource resource2)
         {
             if (resourceBank[(int)resource1] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource1.ToString());
             if (resourceBank[(int)resource2] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource2.ToString());
@@ -478,6 +485,7 @@ namespace AIsOfCatan
             player.DevelopmentCards.Remove(DevelopmentCard.YearOfPlenty);
             GetResource(player, resource1);
             GetResource(player, resource2);
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -499,7 +507,7 @@ namespace AIsOfCatan
             {
                 player.Resources.Add(resource);
             }
-            return new GameState(board, developmentCardStack, resourceBank, players, turn);
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -515,7 +523,7 @@ namespace AIsOfCatan
         /// <param name="secondTile">The index of the second tile in the intersection</param>
         /// <param name="thirdTile">The index of the third tile in the intersection</param>
         /// <returns></returns>
-        public bool BuildSettlement(Player player, int firstTile, int secondTile, int thirdTile)
+        public GameState BuildSettlement(Player player, int firstTile, int secondTile, int thirdTile)
         {
             var r = player.Resources;
             if (!(r.Contains(Resource.Grain) && r.Contains(Resource.Wool) && r.Contains(Resource.Brick) && r.Contains(Resource.Lumber)))
@@ -537,7 +545,7 @@ namespace AIsOfCatan
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
             //TODO: Update longest road!
-            return true; //TODO: Maybe return new GameState?
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -553,7 +561,7 @@ namespace AIsOfCatan
         /// <param name="secondTile">The index of the second tile in the intersection</param>
         /// <param name="thirdTile">The index of the third tile in the intersection</param>
         /// <returns></returns>
-        public bool BuildCity(Player player, int firstTile, int secondTile, int thirdTile)
+        public GameState BuildCity(Player player, int firstTile, int secondTile, int thirdTile)
         {
             var r = player.Resources;
             if (!(r.Count(c => c == Resource.Ore) >= 3 && r.Count(c => c == Resource.Grain) >= 2))
@@ -573,7 +581,7 @@ namespace AIsOfCatan
             player.SettlementsLeft++;
 
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.City, player.ID));
-            return true; //TODO: Return new GameState?
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -587,7 +595,7 @@ namespace AIsOfCatan
         /// <param name="firstTile">The first tile that the road will be along</param>
         /// <param name="secondTile">The second tile that the road will be along</param>
         /// <returns></returns>
-        public bool BuildRoad(Player player, int firstTile, int secondTile)
+        public GameState BuildRoad(Player player, int firstTile, int secondTile)
         {
             var r = player.Resources;
             if (!(r.Contains(Resource.Brick) && r.Contains(Resource.Lumber)))
@@ -605,7 +613,7 @@ namespace AIsOfCatan
             player.RoadsLeft--;
             board = board.PlaceRoad(firstTile, secondTile, player.ID);
             //TODO: Update longest road
-            return true;
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -616,7 +624,7 @@ namespace AIsOfCatan
         /// <param name="firstTile">The index of the first tile in the intersection</param>
         /// <param name="secondTile">The index of the second tile in the intersection</param>
         /// <param name="thirdTile">The index of the third tile in the intersection</param>
-        public void BuildFirstSettlement(Player player, int firstTile, int secondTile, int thirdTile)
+        public GameState BuildFirstSettlement(Player player, int firstTile, int secondTile, int thirdTile)
         {
             if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
                 throw new IllegalBuildPositionException("The chosen position violates the distance rule");
@@ -625,6 +633,7 @@ namespace AIsOfCatan
 
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+            return CurrentGamestate();
         }
 
         /// <summary>
@@ -635,12 +644,13 @@ namespace AIsOfCatan
         /// <param name="player">The player placing the road</param>
         /// <param name="firstTile">The index of the first tile that the road will be along</param>
         /// <param name="secondTile">The index of the second tile that the road will be along</param>
-        public void BuildFirstRoad(Player player, int firstTile, int secondTile)
+        public GameState BuildFirstRoad(Player player, int firstTile, int secondTile)
         {
             if (board.GetRoad(firstTile, secondTile) != -1)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another road");
             player.RoadsLeft--;
             board = board.PlaceRoad(firstTile, secondTile, player.ID);
+            return CurrentGamestate();
         }
     }
 }
