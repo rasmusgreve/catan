@@ -21,7 +21,7 @@ namespace AIsOfCatan
 
          void Trade(int otherPlayer);
 
-         bool BuildHouse(int firstTile, int secondTile, int thirdTile);
+         bool BuildSettlement(int firstTile, int secondTile, int thirdTile);
 
          bool BuildCity(int firstTile, int secondTile, int thirdTile);
 

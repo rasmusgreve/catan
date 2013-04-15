@@ -102,11 +102,11 @@ namespace AIsOfCatan
 
         //Building
 
-        public bool BuildHouse(int firstTile, int secondTile, int thirdTile)
+        public bool BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
-            return controller.BuildHouse(player, firstTile, secondTile, thirdTile);
+            return controller.BuildSettlement(player, firstTile, secondTile, thirdTile);
         }
 
         public bool BuildCity(int firstTile, int secondTile, int thirdTile)

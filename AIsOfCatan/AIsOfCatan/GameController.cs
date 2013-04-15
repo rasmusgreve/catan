@@ -21,11 +21,11 @@ namespace AIsOfCatan
         private int longestRoadID = -1;
 
         /// <summary>
-        /// 
+        /// Start the game. This method will run for the length of the game and returns the id of the winner
         /// </summary>
-        /// <param name="agents"></param>
-        /// <param name="boardSeed"></param>
-        /// <param name="diceSeed"></param>
+        /// <param name="agents">The competing agents (The order in which they are submitted is irrelevant)</param>
+        /// <param name="boardSeed">The seed for the board generator, used to shuffle development cards, and for drawing a random card after moving the robber</param>
+        /// <param name="diceSeed">The seed for the dice</param>
         /// <returns>The id of the winner of the game</returns>
         public int StartGame(Agent[] agents, int boardSeed, int diceSeed)
         {
@@ -51,6 +51,9 @@ namespace AIsOfCatan
             return GameLoop();
         }
 
+        /// <summary>
+        /// Populate and shuffle the development card stack according to the rules (rules p. 2 - Game Contents)
+        /// </summary>
         private void PopulateDevelopmentCardStack()
         {
             developmentCardStack.Clear();
@@ -142,6 +145,13 @@ namespace AIsOfCatan
             player.Agent.PerformTurn(afterResourcesState, actions);
         }
 
+        /// <summary>
+        /// Let a player move the robber to a new location and draw a random card from a player with a building on the tile
+        /// If the agent moves the robber to a water tile or the tile that it was already on, nothing will happen
+        /// If the agent tries to draw a card from a unaffected player, no cards will be drawn
+        /// </summary>
+        /// <param name="player">The player that must move the robber</param>
+        /// <param name="gameState">The gamestate to send to the player</param>
         private void MoveRobber(Player player, GameState gameState)
         {
             int robberPosition = player.Agent.MoveRobber(gameState);
@@ -176,6 +186,14 @@ namespace AIsOfCatan
             player.Resources.Add(toMove);
         }
 
+        /// <summary>
+        /// Hand out resources to players according to a roll
+        /// Gives resources to players with buildings on tiles with a number corresponding to the roll
+        /// and only if the tile doesn't have the robber.
+        /// If there is not enough resources of a kind in the bank so that all player who shall receive,
+        /// can get the amount they are allowed to, none of that kind are dealt (see rules p. 8 top)
+        /// </summary>
+        /// <param name="roll">The value of the roll</param>
         private void HandOutResources(int roll)
         {
             //Map from PlayerID to dictionary that maps resource to amount
@@ -218,6 +236,10 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Let the players place their starting settlements and roads and receive resources 
+        /// from all neighboring tiles from the last placed settlement (rules p. 7 top)
+        /// </summary>
         private void PlaceStarts()
         {
             for (int i = 0; i < players.Length; i++)
@@ -234,7 +256,7 @@ namespace AIsOfCatan
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 //Hand out resources
-                foreach (var pos in actions.GetHousePosition())
+                foreach (var pos in actions.GetSettlementPosition())
                 {
                     var type = (Resource)board.GetTile(pos).Terrain;
                     GetResource(players[turn], type);
@@ -242,22 +264,38 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Roll two d6 using the seeded random number generator and get the sum
+        /// </summary>
+        /// <returns>The sum of the roll</returns>
         private int RollDice()
         {
             return diceRandom.Next(6) + diceRandom.Next(6) + 2;
         }
 
+        /// <summary>
+        /// Increment the turn variable modulo the number of players
+        /// </summary>
         private void NextTurn()
         {
             turn = (turn + 1) % players.Length;
         }
 
+        /// <summary>
+        /// Decrement the turn variable, if it goes below 0, wrap around
+        /// </summary>
         private void PrevTurn()
         {
             turn = turn - 1;
             if (turn < 0) turn += players.Length;
         }
 
+        /// <summary>
+        /// Let a given player pay an amount of a resource to the bank
+        /// </summary>
+        /// <param name="player">The player that must pay</param>
+        /// <param name="resource">The type of resource to pay</param>
+        /// <param name="quantity">The quantity of the resource to pay (default 1)</param>
         private void PayResource(Player player, Resource resource, int quantity = 1)
         {
             for (int i = 0; i < quantity; i++)
@@ -267,6 +305,13 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Give a player an amount of a given resource
+        /// If there are no more cards in the pile an NoMoreCardsException is thrown
+        /// </summary>
+        /// <param name="player">The player to give resources to</param>
+        /// <param name="resource">The type of resource he receives</param>
+        /// <param name="quantity">The amount of the resource he receives (default 1)</param>
         private void GetResource(Player player, Resource resource, int quantity = 1)
         {
             for (int i = 0; i < quantity; i++)
@@ -281,6 +326,14 @@ namespace AIsOfCatan
          * ACTIONS
          */
 
+        /// <summary>
+        /// Let a player draw a development card
+        /// If the player doesn't have enough resources a InsufficientResourcesException is thrown
+        /// If the development card stack is empty a NoMoreCardsException is thrown
+        /// Resources to pay for the card are removed from the player hand and returned to the resource bank
+        /// </summary>
+        /// <param name="player">The player drawing a development card</param>
+        /// <returns>The drawn development card</returns>
         public DevelopmentCard DrawDevelopmentCard(Player player)
         {
             var r = player.Resources;
@@ -288,7 +341,7 @@ namespace AIsOfCatan
                 throw new InsufficientResourcesException("Not enough resources to buy a development card");
 
             if (developmentCardStack.Count == 0)
-                throw new NoMoreCardsException("DevelopmentCardStack is empty");
+                throw new NoMoreCardsException("Development card stack is empty");
 
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
@@ -309,6 +362,13 @@ namespace AIsOfCatan
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Let a player play a knight development card
+        /// If the player doesn't have a knight on his hand a InsufficientResourcesException is thrown
+        /// A knight is removed from the players hand
+        /// The largest army special card is relocated if playing this knight causes it to be
+        /// </summary>
+        /// <param name="player">The player playing a knight</param>
         public void PlayKnight(Player player)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.Knight))
@@ -325,6 +385,18 @@ namespace AIsOfCatan
             MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
         }
 
+        /// <summary>
+        /// Let a player play a road building development card
+        /// If the player doesn't have a RoadBuilding card on his hand a InsufficientResourcesException is thrown
+        /// If the player doesn't have any road pieces left a IllegalActionException is thrown
+        /// If the player tries to place a road at a position where a road is already present a IllegalBuildPositionException is thrown
+        /// If the player only has one road piece left, the position to place it must be passed as firstTile1, firstTile2 (the others are ignored)
+        /// </summary>
+        /// <param name="player">The player that plays the RoadBuilding development card</param>
+        /// <param name="firstTile1">The first tile that the first road must be along</param>
+        /// <param name="secondTile1">The second tile that the first road must be along</param>
+        /// <param name="firstTile2">The first tile that the second road must be along</param>
+        /// <param name="secondTile2">The second tile that the second road must be along</param>
         public void PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
@@ -351,6 +423,14 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Let a player play a year of plenty development card
+        /// If the player doesn't have a YearOfPlenty card on his hand a InsufficientResourcesException is thrown
+        /// If the resource bank doesn't have enough cards to fulfill the request a NoMoreCardsException is thrown
+        /// </summary>
+        /// <param name="player">The player playing the year of plenty development card</param>
+        /// <param name="resource1">The type of resource for the first card</param>
+        /// <param name="resource2">The type of resource for the second card</param>
         public void PlayYearOfPlenty(Player player, Resource resource1, Resource resource2)
         {
             if (resourceBank[(int)resource1] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource1.ToString());
@@ -360,9 +440,16 @@ namespace AIsOfCatan
             player.DevelopmentCards.Remove(DevelopmentCard.YearOfPlenty);
             GetResource(player, resource1);
             GetResource(player, resource2);
-            //TODO: What if no more resources in bank?
         }
 
+        /// <summary>
+        /// Let a player play a Monopoly development card
+        /// If the player doesn't have a Monopoly card on his hand a InsufficientResourcesException is thrown
+        /// All resources of the given type is removed from players hands and all given to the playing player
+        /// </summary>
+        /// <param name="player">The player playing the monopoly development card</param>
+        /// <param name="resource">The resource to get monopoly on</param>
+        /// <returns></returns>
         public GameState PlayMonopoly(Player player, Resource resource)
         {
             if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
@@ -381,24 +468,51 @@ namespace AIsOfCatan
             return new GameState(board, developmentCardStack, resourceBank, players, turn);
         }
 
-        public bool BuildHouse(Player player, int firstTile, int secondTile, int thirdTile)
+        /// <summary>
+        /// Let a player build a settlement
+        /// If the player doesn't have enough resources to build a settlement a InsufficientResourcesException is thrown
+        /// If the player tries to build too close to another building, or not connected to a road a IllegalBuildPosition is thrown
+        /// If the player doesn't have any more settlement pieces left to place a IllegalActionException is thrown
+        /// The required resources are taken from the player and placed back at the resource bank
+        /// If the settlement is placed at a harbor, the harbor can be used immediately (rules p. 7 - footnote 12)
+        /// </summary>
+        /// <param name="player">The player building a settlement</param>
+        /// <param name="firstTile">The index of the first tile in the intersection</param>
+        /// <param name="secondTile">The index of the second tile in the intersection</param>
+        /// <param name="thirdTile">The index of the third tile in the intersection</param>
+        /// <returns></returns>
+        public bool BuildSettlement(Player player, int firstTile, int secondTile, int thirdTile)
         {
             var r = player.Resources;
             if (!(r.Contains(Resource.Grain) && r.Contains(Resource.Wool) && r.Contains(Resource.Brick) && r.Contains(Resource.Lumber)))
                 throw new InsufficientResourcesException("Not enough resources to buy a settlement");
             if (player.SettlementsLeft == 0)
                 throw new IllegalActionException("No more settlement pieces left of your color");
-
+            
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
             player.SettlementsLeft--;
-            //TODO: Build house
+            //TODO: Build settlement
+            //TODO: Verify build position
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Let a player upgrade a settlement to a city
+        /// If the player doesn't have enough resources to build a city a InsufficientResourcesException is thrown
+        /// If the player tries to build at a position where he doesn't have a settlement a IllegalBuildPosition is thrown
+        /// If the player doesn't have any more settlement pieces left to place a IllegalActionException is thrown
+        /// The required resources are taken from the player and placed back at the resource bank
+        /// The settlement previously on the location is given back to the player
+        /// </summary>
+        /// <param name="player">The player upgrading to a city</param>
+        /// <param name="firstTile">The index of the first tile in the intersection</param>
+        /// <param name="secondTile">The index of the second tile in the intersection</param>
+        /// <param name="thirdTile">The index of the third tile in the intersection</param>
+        /// <returns></returns>
         public bool BuildCity(Player player, int firstTile, int secondTile, int thirdTile)
         {
             var r = player.Resources;
@@ -413,9 +527,22 @@ namespace AIsOfCatan
             player.CitiesLeft--;
             player.SettlementsLeft++;
             //TODO: Build city
+            //TODO: Verify build position
+            //TODO: Control settlement exists
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Let a player build a road
+        /// If the player doesn't have enough resources to build a road a InsufficientResourcesException is thrown
+        /// If the player tries to build at a position not connected to another road, settlement or city a IllegalBuildPositionException is thrown
+        /// If the player doesn't have any more road pieces left to place a IllegalActionException is thrown
+        /// If the player
+        /// </summary>
+        /// <param name="player">The player building a road</param>
+        /// <param name="firstTile">The first tile that the road will be along</param>
+        /// <param name="secondTile">The second tile that the road will be along</param>
+        /// <returns></returns>
         public bool BuildRoad(Player player, int firstTile, int secondTile)
         {
             var r = player.Resources;
@@ -429,6 +556,8 @@ namespace AIsOfCatan
 
             player.RoadsLeft--;
             //TODO: Build road
+            //TODO: Verify build position
+            //TODO: Update longest road
             throw new NotImplementedException();
         }
 
