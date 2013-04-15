@@ -66,9 +66,12 @@ namespace AIsOfCatan
 
         private void GameLoop()
         {
-            while (!GameFinished())
+            while (true)
             {
                 TakeTurn(players[turn]);
+                
+                if (GameFinished()) break;
+
                 NextTurn();
             }
         }
@@ -97,6 +100,8 @@ namespace AIsOfCatan
             }
             GameState afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
             player.Agent.PerformTurn(afterResourcesState, actions);
+
+            //TODO: Winner?
         }
 
         private void HandOutResources(int roll)
