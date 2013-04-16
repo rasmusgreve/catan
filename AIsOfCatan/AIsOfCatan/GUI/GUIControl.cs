@@ -16,17 +16,17 @@ namespace AIsOfCatan
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : TXAGame
+    public class GUIControl : TXAGame
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
-        readonly GameState state = new GameState(new Board(1),null,null,null,0);
+        GameState state = new GameState(new Board(""),null,null,null,0);
 
         public const float SCALE = 0.5f;
 
         private TXAScreen startScreen;
 
-        public Game1()
+        public GUIControl()
         {
             //graphics = new GraphicsDeviceManager(this);
             //Content.RootDirectory = "Content";
@@ -68,6 +68,7 @@ namespace AIsOfCatan
             TEXTURES.Add("T_Pasture", Content.Load<Texture2D>("PastureTile"));
             TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
             TEXTURES.Add("TO_Number", Content.Load<Texture2D>("NumberTile"));
+            TEXTURES.Add("TO_Road", Content.Load<Texture2D>("RoadToken"));
 
             base.LoadContent();
 

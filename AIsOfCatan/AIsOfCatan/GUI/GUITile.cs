@@ -12,8 +12,8 @@ namespace AIsOfCatan
 {
     class GUITile : TXADrawableComponent
     {
-        public const int TILE_WIDTH = 111;
-        public const int TILE_HEIGHT = 128;
+        public const int TILE_WIDTH = (int) (222 * GUIControl.SCALE);
+        public const int TILE_HEIGHT = (int) (255*GUIControl.SCALE);
         private static readonly float TileShift = (float)Math.Sqrt(Math.Pow(TILE_WIDTH, 2) - Math.Pow((TILE_WIDTH / 2), 2));
 
         //private static readonly Vector2 EAST = new Vector2(0, TILE_WIDTH);
@@ -54,8 +54,8 @@ namespace AIsOfCatan
 
         protected override void UpdateRect()
         {
-            int width = (int)Math.Round(Texture.Width * Game1.SCALE);
-            int height = (int)Math.Round(Texture.Height * Game1.SCALE);
+            int width = (int)Math.Round(Texture.Width * GUIControl.SCALE);
+            int height = (int)Math.Round(Texture.Height * GUIControl.SCALE);
 
             Area = new Rectangle(
                 ((int)Math.Round(Position.X)) - (width / 2),
@@ -71,12 +71,12 @@ namespace AIsOfCatan
             int height = TXAGame.TEXTURES["TO_Number"].Height;
 
             numberPos = new Vector2(
-                (Position.X/Game1.SCALE) - (width/2),
-                (Position.Y / Game1.SCALE) - (height / 2));
+                (Position.X/GUIControl.SCALE) - (width/2),
+                (Position.Y / GUIControl.SCALE) - (height / 2));
 
             Vector2 measurementValue = TXAGame.ARIAL.MeasureString(Tile.Value.ToString(CultureInfo.InvariantCulture));
 
-            textPos = new Vector2((Position.X / Game1.SCALE - (measurementValue.X / 2)), (Position.Y / Game1.SCALE - (measurementValue.Y / 2)));
+            textPos = new Vector2((Position.X / GUIControl.SCALE - (measurementValue.X / 2)), (Position.Y / GUIControl.SCALE - (measurementValue.Y / 2)));
         }
 
         protected override void Draw(SpriteBatch batch)
@@ -84,8 +84,8 @@ namespace AIsOfCatan
             base.Draw(batch);
             if (IsTileNumbered(Tile))
             {
-                batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,Game1.SCALE,SpriteEffects.None,0.1f);
-                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,Game1.SCALE,SpriteEffects.None, 0f);
+                batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,GUIControl.SCALE,SpriteEffects.None,0.1f);
+                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,GUIControl.SCALE,SpriteEffects.None, 0f);
             }
             
         }
