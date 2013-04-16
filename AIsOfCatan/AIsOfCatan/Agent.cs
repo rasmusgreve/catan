@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace AIsOfCatan
 {
     public interface Agent
@@ -11,8 +7,8 @@ namespace AIsOfCatan
         /// Reset the agent, getting it ready for a new game
         /// The agent should store the assigned ID for later in the game
         /// </summary>
-        /// <param name="assignedID">The ID assigned to this player</param>
-        void Reset(int assignedID);
+        /// <param name="assignedId">The ID assigned to this player</param>
+        void Reset(int assignedId);
 
         /// <summary>
         /// This method is called twice at the beginning of the game and is where
@@ -65,13 +61,26 @@ namespace AIsOfCatan
         Resource[] DiscardCards(GameState state, int toDiscard);
 
         /// <summary>
-        /// Use the GameState to perform the turn. Only legal actions will be accepted. Return to finish turn.
-        /// Must finish trading before building
-        /// If you have played a development card under "BeforeDiceRoll" you can't do it now!
+        /// After the dice roll and resources have been handed out or the robber moved you can perform any number of actions
+        /// This method is supplied a GameState which is where the current state of the game is located
+        /// The supplied GameActions object contains methods for doing various things that are possible during the turn
+        /// Note that you may play at most 1 development card in each turn. This also includes in the BeforeDiceRoll method.
+        /// When you are done with your turn simply return from the function and the next player will have his turn.
         /// </summary>
+        /// <param name="state">The state of the game as the main part of your turn begins</param>
+        /// <param name="actions">The actions you can perform during your turn. Note that performing actions doesn't update the GameState but most methods return a new updated version</param>
         void PerformTurn(GameState state, GameActions actions);
 
-        Trade HandleTrade(Trade offer); // Change the status of the Trade and return. In case of counter-
-                                       // offer remove extra Resource from the trade Lists.
+        /// <summary>
+        /// During a players turn it is possible to propose a trade with the other players
+        /// In this method you must handle this case by choosing what to do when a trade is proposed
+        /// The input trade is the one that the current player has proposed to all players
+        /// You may choose to either accept the offer, decline the offer or make a counter offer with other resources
+        /// Note that even though you have acceptet the trade, it is up to the proposing player 
+        /// to choose which player he want to trade with, and if he wants to trade at all
+        /// </summary>
+        /// <param name="offer">The proposing players trade offer</param>
+        /// <returns>Either the same offer accepted or declined, or a counteroffer</returns>
+        Trade HandleTrade(Trade offer);
     }
 }
