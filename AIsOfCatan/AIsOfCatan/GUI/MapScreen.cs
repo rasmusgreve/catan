@@ -68,21 +68,32 @@ namespace AIsOfCatan
                 Tuple<int, int> t1coord = GetTerrainCoords(tile1);
                 Tuple<int, int> t2coord = GetTerrainCoords(tile2);
 
-                Vector2 diffVector = board[t1coord.Item1][t1coord.Item2].Position -
-                                     board[t2coord.Item1][t2coord.Item2].Position;
+                Vector2 diffVector = board[t2coord.Item1][t2coord.Item2].Position -
+                                     board[t1coord.Item1][t1coord.Item2].Position;
 
-                Vector2 placeVector = new Vector2(diffVector.X/2, diffVector.Y/2);
+                Vector2 placeVector = new Vector2(board[t1coord.Item1][t1coord.Item2].Position.X*2 + diffVector.X/2,
+                                                  board[t1coord.Item1][t1coord.Item2].Position.Y*2 + diffVector.Y/2);
 
-                float rotation = 0f;
+                Debug.WriteLine(string.Format("DiffVector: {0}", diffVector));
+
+                float rotation = 0;//(float)Math.PI;
 
                 if (diffVector.X < 0)
                 {
-                    rotation = (float) ((2/3)*Math.PI);
+                    float value = (float) Math.PI;
+                    value /= 3;
+                    value *= 2;
+                    rotation = value;
                 }
                 else if (diffVector.X < diffVector.Y)
                 {
-                    rotation = (float)((1 / 3) * Math.PI);
+                    float value = (float) Math.PI;
+                    value /= 3;
+                    value *= 1;
+                    rotation = value; 
                 }
+
+                Debug.WriteLine(string.Format("rotation: {0}, player {1}", rotation,road.Value));
 
                 //Color color = GetPlayerColor(road.Value);
 

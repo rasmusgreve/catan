@@ -84,8 +84,8 @@ namespace AIsOfCatan
             base.Draw(batch);
             if (IsTileNumbered(Tile))
             {
-                batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,GUIControl.SCALE,SpriteEffects.None,0.1f);
-                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,GUIControl.SCALE,SpriteEffects.None, 0f);
+                batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,GUIControl.SCALE,SpriteEffects.None,0.5f);
+                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,GUIControl.SCALE,SpriteEffects.None, 0.45f);
             }
             
         }

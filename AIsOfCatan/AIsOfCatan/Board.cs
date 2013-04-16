@@ -67,6 +67,8 @@ namespace AIsOfCatan
         {
             InitTerrain(0,0,false);
             roads.Add(new Tuple<int, int>(16, 22), 1);
+            roads.Add(new Tuple<int, int>(28, 35), 2);
+            roads.Add(new Tuple<int, int>(23, 24), 3);
         }
 
         /// <summary>
@@ -144,15 +146,6 @@ namespace AIsOfCatan
             AddPiece(result, index, index + 6, index - 1);
             return result;
         } 
-
-        /// <summary>
-        /// This returns a dictionary of all the road placements
-        /// </summary>
-        /// <returns>A COPY of the list of road placements</returns>
-        public Dictionary<Tuple<int, int>, int> GetAllRoads()
-        {
-            throw new NotImplementedException(); //TODO: Detection of where there is roads is going to be trial and error otherwise
-        }  
 
         /// <summary>
         /// Gives the current location of the Robber token.

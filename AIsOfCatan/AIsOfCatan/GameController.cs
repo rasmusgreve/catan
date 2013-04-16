@@ -86,7 +86,7 @@ namespace AIsOfCatan
             {
                 TakeTurn(players[turn]);
                 
-                if (HasWon(players[turn])) return players[turn].ID;
+                if (HasWon(players[turn])) return players[turn].Id;
 
                 NextTurn();
             }
@@ -110,8 +110,8 @@ namespace AIsOfCatan
             
             points += player.DevelopmentCards.Count(c => c == DevelopmentCard.VictoryPoint) * 1;
             
-            if (player.ID == largestArmyId) points += 2;
-            if (player.ID == longestRoadId) points += 2;
+            if (player.Id == largestArmyId) points += 2;
+            if (player.Id == longestRoadId) points += 2;
             
             return (points >= 10);
         }
@@ -182,7 +182,7 @@ namespace AIsOfCatan
             var opponents = new List<int>();
             foreach (var piece in board.GetPieces(robberPosition))
             {
-                if (piece.Player == player.ID) continue;
+                if (piece.Player == player.Id) continue;
                 if (opponents.Contains(piece.Player)) continue;
                 opponents.Add(piece.Player);
             }
@@ -245,9 +245,9 @@ namespace AIsOfCatan
             //Hand out resources
             foreach (var player in players)
             {
-                foreach (var resource in handouts[player.ID].Keys)
+                foreach (var resource in handouts[player.Id].Keys)
                 {
-                    GetResource(player, resource, handouts[player.ID][resource]);
+                    GetResource(player, resource, handouts[player.Id][resource]);
                 }
             }
         }
@@ -394,9 +394,9 @@ namespace AIsOfCatan
             var dict = new Dictionary<int, Trade>();
             foreach (var other in players)
             {
-                dict[other.ID] = other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
+                dict[other.Id] = other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
             }
-            proposedTrades[player.ID] = dict;
+            proposedTrades[player.Id] = dict;
             return dict;
         }
 
@@ -423,7 +423,7 @@ namespace AIsOfCatan
             if (player.PlayedKnights > largestArmySize)
             {
                 largestArmySize = player.PlayedKnights;
-                largestArmyId = player.ID;
+                largestArmyId = player.Id;
             }
 
             MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
@@ -453,20 +453,20 @@ namespace AIsOfCatan
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile2, secondTile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
-                if (!RoadConnected(firstTile2, secondTile2, player.ID))
+                if (!RoadConnected(firstTile2, secondTile2, player.Id))
                     throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
                 
-                board = board.PlaceRoad(firstTile2, secondTile2, player.ID);
+                board = board.PlaceRoad(firstTile2, secondTile2, player.Id);
             }
             if (player.RoadsLeft >= 1)
             {
                 player.RoadsLeft--;
                 if (board.GetRoad(firstTile1, secondTile1) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
-                if (!RoadConnected(firstTile1, secondTile1, player.ID))
+                if (!RoadConnected(firstTile1, secondTile1, player.Id))
                     throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
                 
-                board = board.PlaceRoad(firstTile1, secondTile1, player.ID);
+                board = board.PlaceRoad(firstTile1, secondTile1, player.Id);
             }
             else
             {
@@ -541,7 +541,7 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
-            if (board.GetRoad(firstTile, secondTile) != player.ID && board.GetRoad(firstTile, thirdTile) != player.ID && board.GetRoad(secondTile, thirdTile) != player.ID)
+            if (board.GetRoad(firstTile, secondTile) != player.Id && board.GetRoad(firstTile, thirdTile) != player.Id && board.GetRoad(secondTile, thirdTile) != player.Id)
                 throw new IllegalBuildPositionException("The chosen position has no road leading to it");
 
             PayResource(player, Resource.Grain);
@@ -550,7 +550,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Lumber);
 
             player.SettlementsLeft--;
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
             //TODO: Update longest road!
             return CurrentGamestate();
         }
@@ -577,7 +577,7 @@ namespace AIsOfCatan
                 throw new IllegalActionException("No more city pieces left of your color");
 
             Board.Piece piece = board.GetPiece(firstTile, secondTile, thirdTile);
-            if (piece == null || piece.Player != player.ID || piece.Token != Token.Settlement)
+            if (piece == null || piece.Player != player.Id || piece.Token != Token.Settlement)
                 throw new IllegalBuildPositionException("The chosen position does not contain one of your settlements");
 
 
@@ -587,7 +587,7 @@ namespace AIsOfCatan
             player.CitiesLeft--;
             player.SettlementsLeft++;
 
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.City, player.ID));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.City, player.Id));
             return CurrentGamestate();
         }
 
@@ -610,14 +610,14 @@ namespace AIsOfCatan
                 throw new IllegalActionException("No more road pieces left of your color");
             if (board.GetRoad(firstTile, secondTile) != -1)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another road");
-            if (!RoadConnected(firstTile,secondTile, player.ID))
+            if (!RoadConnected(firstTile,secondTile, player.Id))
                 throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
             
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
             player.RoadsLeft--;
-            board = board.PlaceRoad(firstTile, secondTile, player.ID);
+            board = board.PlaceRoad(firstTile, secondTile, player.Id);
             //TODO: Update longest road
             return CurrentGamestate();
         }
@@ -638,7 +638,7 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
 
             player.SettlementsLeft--;
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.ID));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
             return CurrentGamestate();
         }
 
@@ -655,7 +655,7 @@ namespace AIsOfCatan
             if (board.GetRoad(firstTile, secondTile) != -1)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another road");
             player.RoadsLeft--;
-            board = board.PlaceRoad(firstTile, secondTile, player.ID);
+            board = board.PlaceRoad(firstTile, secondTile, player.Id);
             return CurrentGamestate();
         }
     }
