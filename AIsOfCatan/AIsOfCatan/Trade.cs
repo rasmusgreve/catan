@@ -22,7 +22,7 @@ namespace AIsOfCatan
 
         public Trade Reverse()
         {
-            return new Trade(Want,Give) {status = status};
+            return new Trade(DeepClone(Want),DeepClone(Give)) {status = status};
         }
 
         public void Accept()
@@ -38,6 +38,13 @@ namespace AIsOfCatan
         public TradeStatus GetStatus()
         {
             return status;
+        }
+
+        private List<List<Resource>> DeepClone(List<List<Resource>> list)
+        {
+            var result = new List<List<Resource>>(list.Count);
+            foreach (List<Resource> l in list) result.Add(new List<Resource>(l));
+            return result;
         }
     }
 }
