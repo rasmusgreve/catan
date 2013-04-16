@@ -389,13 +389,22 @@ namespace AIsOfCatan
             return last;
         }
 
-        public Trade[] ProposeTrade(Player player, Trade trade)
+        Dictionary<int, Dictionary<int, Trade>> proposedTrades = new Dictionary<int, Dictionary<int, Trade>>(); //TODO: Move this
+
+        public Dictionary<int, Trade> ProposeTrade(Player player, Trade trade)
         {
-            throw new NotImplementedException();
+            var dict = new Dictionary<int, Trade>();
+            foreach (var other in players)
+            {
+                dict[other.ID] = other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
+            }
+            proposedTrades[player.ID] = dict;
+            return dict;
         }
 
         public GameState CompleteTrade(Player player, int playerid)
         {
+
             throw new NotImplementedException();
         }
 

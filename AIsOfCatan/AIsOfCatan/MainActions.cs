@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace AIsOfCatan
 {
     public class MainActions : GameActions
@@ -82,7 +84,7 @@ namespace AIsOfCatan
 
         //Trading
 
-        public Trade[] ProposeTrade(Trade trade)
+        public Dictionary<int, Trade> ProposeTrade(Trade trade)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to propose trade before the die roll");

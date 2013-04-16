@@ -16,7 +16,7 @@ namespace AIsOfCatan
 
         GameState PlayMonopoly(Resource resource);
 
-        Trade[] ProposeTrade(Trade trade);
+        Dictionary<int, Trade> ProposeTrade(Trade trade);
 
         GameState Trade(int otherPlayer);
 
