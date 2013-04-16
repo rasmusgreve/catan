@@ -5,55 +5,65 @@ using System.Text;
 
 namespace AIsOfCatan
 {
+    /// <summary>
+    /// Data object containing information about a player in the game
+    /// </summary>
     public class Player
     {
-        private Agent agent;
-        public readonly int ID;
-        private List<Resource> resources = new List<Resource>();
-        private List<DevelopmentCard> developmentCards = new List<DevelopmentCard>();
-        private int playedKnights = 0;
-
         public Player(Agent agent, int id)
         {
-            this.agent = agent;
             agent.Reset(id);
-            this.ID = id;
+
+            RoadsLeft = 15; //You start with 15 roads
+            CitiesLeft = 4; //          - and 4 cities
+            SettlementsLeft = 5; //     - and 5 settlements, according to (rules p. 2 - Game Contents)
+            PlayedKnights = 0;
+
+            Agent = agent;
+            Id = id;
+            DevelopmentCards = new List<DevelopmentCard>();
+            Resources = new List<Resource>();
         }
 
-        public int PlayedKnights
-        {
-            get
-            {
-                return playedKnights;
-            }
-            set
-            {
-                playedKnights = value;
-            }
-        }
+        /// <summary>
+        /// How many knights has this player played in this game so far
+        /// </summary>
+        public int PlayedKnights { get; set; }
 
-        public List<DevelopmentCard> DevelopmentCards
-        {
-            get
-            {
-                return developmentCards;
-            }
-        }
+        /// <summary>
+        /// How many road pieces does this player have left to place
+        /// </summary>
+        public int RoadsLeft { get; set; }
+        
+        /// <summary>
+        /// How many city pieces does this player have left to place
+        /// </summary>
+        public int CitiesLeft { get; set; }
 
-        public List<Resource> Resources
-        {
-            get
-            {
-                return resources;
-            }
-        }
+        /// <summary>
+        /// How many settlement pieces does this player have left to place
+        /// </summary>
+        public int SettlementsLeft { get; set; }
+        
+        /// <summary>
+        /// The agent deciding actions for this player
+        /// </summary>
+        public Agent Agent { get; private set; }
 
-        public Agent Agent
-        {
-            get
-            {
-                return agent;
-            }
-        }
+        /// <summary>
+        /// The Id of this player
+        /// </summary>
+        public int Id { get; private set; }
+
+        /// <summary>
+        /// The development cards that this player has in his hand
+        /// </summary>
+        public List<DevelopmentCard> DevelopmentCards { get; private set; }
+
+        /// <summary>
+        /// The resource cards that this player has in his hand
+        /// </summary>
+        public List<Resource> Resources { get; private set; }
+
     }
 }

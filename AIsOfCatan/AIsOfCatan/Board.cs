@@ -21,6 +21,15 @@ namespace AIsOfCatan
         private Dictionary<Tuple<int, int, int>, Piece> settlements;
         private int robberLocation;
 
+        private Board(Tile[][] terrain, Dictionary<Tuple<int, int>, int> roads, 
+            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber)
+        {
+            this.terrain = terrain;
+            this.roads = roads;
+            this.settlements = settlements;
+            this.robberLocation = robber;
+        }
+
         private Board()
         {
             // initialize fields
@@ -91,9 +100,18 @@ namespace AIsOfCatan
         /// <returns>The player id of the player who has build a road here. If empty it returns -1.</returns>
         public int GetRoad(int firstTile, int secondTile)
         {
-            var key = new Tuple<int, int>(firstTile < secondTile ? firstTile : secondTile, firstTile < secondTile ? secondTile : firstTile);
+            var key = Get2Tuple(firstTile, secondTile);
             return roads.ContainsKey(key) ? roads[key] : -1;
         }
+
+        /// <summary>
+        /// Gives a (copy) of the dictionary holding all roads currently build on the board.
+        /// </summary>
+        /// <returns>A dictionary with all roads on the board.</returns>
+        public Dictionary<Tuple<int,int>,int> GetAllRoads()
+        {
+            return new Dictionary<Tuple<int, int>, int>(roads);
+        } 
 
         /// <summary>
         /// Gives the game piece at the vertex between three different tiles.
@@ -106,22 +124,26 @@ namespace AIsOfCatan
         /// it will return null.</returns>
         public Piece GetPiece(int firstTile, int secondTile, int thirdTile)
         {
-            List<int> tiles = new List<int>(3) { firstTile, secondTile, thirdTile };
-            tiles.Sort();
-
-            var key = new Tuple<int, int, int>(tiles[0], tiles[1], tiles[2]);
+            var key = Get3Tuple(firstTile, secondTile, thirdTile);
             return settlements.ContainsKey(key) ? settlements[key] : null;
         }
 
         /// <summary>
-        /// Get all pieces built on a given tile
+        /// Get all pieces built adjacent to the given tile index.
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">The location of the tile.</param>
+        /// <returns>A list of all the valid Pieces.</returns>
         public List<Piece> GetPieces(int index)
         {
-            throw new NotImplementedException(); //TODO: Please and thank you!
-        }
+            List<Piece> result = new List<Piece>();
+            AddPiece(result, index, index - 7, index - 1);
+            AddPiece(result, index, index - 7, index - 6);
+            AddPiece(result, index, index - 6, index + 1);
+            AddPiece(result, index, index + 1, index + 7);
+            AddPiece(result, index, index + 6, index + 7);
+            AddPiece(result, index, index + 6, index - 1);
+            return result;
+        } 
 
         /// <summary>
         /// This returns a dictionary of all the road placements
@@ -139,6 +161,111 @@ namespace AIsOfCatan
         public int GetRobberLocation()
         {
             return robberLocation;
+        }
+
+        /// <summary>
+        /// Gives the resulting Board from moving the robber to
+        /// the specified location.
+        /// </summary>
+        /// <param name="index">The index on the board to move the
+        /// robber.</param>
+        /// <returns>The resulting board.</returns>
+        public Board MoveRobber(int index)
+        {
+            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), 
+                new Dictionary<Tuple<int, int, int>, 
+                    Piece>(settlements), index);
+        }
+
+        /// <summary>
+        /// Places the given Piece on the specified position on the Board and
+        /// returns the resulting Board.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="index3">The third index of the tiles to look between.</param>
+        /// <param name="p">The Piece to place on the Board.</param>
+        /// <returns>The resulting Board from placing the Piece.</returns>
+        public Board PlacePiece(int index1, int index2, int index3, Piece p)
+        {
+            var newSettlements = new Dictionary<Tuple<int, int, int>, Piece>(settlements);
+            newSettlements.Add(Get3Tuple(index1, index2, index3), p);
+            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation);
+        }
+        
+        /// <summary>
+        /// Places a road on the specified position on the Board and
+        /// returns the resulting Board.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="playerID">The player who owns the road.</param>
+        /// <returns>The resulting Board from placing the road.</returns>
+        public Board PlaceRoad(int index1, int index2, int playerID)
+        {
+            var newRoads = new Dictionary<Tuple<int, int>, int>(roads);
+            newRoads.Add(Get2Tuple(index1, index2), playerID);
+            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation);
+        }
+
+        /// <summary>
+        /// Gives all edges (places to build roads) adjacent to the given intersection.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
+        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
+        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
+        /// <returns>An array of 2-int-tuples with the (up to three) edges next to the intersection.</returns>
+        public Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3)
+        {
+            var o = Get3Tuple(index1,index2,index3);
+            return new Tuple<int,int>[]{new Tuple<int,int>(o.Item1,o.Item2), new Tuple<int,int>(o.Item2,o.Item3), new Tuple<int,int>(o.Item1,o.Item3)};
+        }
+
+        /// <summary>
+        /// Gives all intersections (places to build settlements and cities)
+        /// adjacent to the give edge.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <returns>An array of 3-int-tuples with the (up to two) intersections at the ends of the edge.</returns>
+        public Tuple<int,int,int>[] GetAdjacentIntersections(int index1, int index2)
+        {
+            var n1 = GetAdjacentTiles(index1);
+            return GetAdjacentTiles(index2).Where(t => n1.Contains(t)).Select(t => new Tuple<int, int, int>(index1, index2, t)).ToArray();
+        }
+
+        /// <summary>
+        /// Gets all tiles that are adjacent to the given tile.
+        /// </summary>
+        /// <param name="index">The tile to look around.</param>
+        /// <returns>A list of all the (legal) adjacent tiles.</returns>
+        public List<int> GetAdjacentTiles(int index)
+        {
+            List<int> result = new List<int>();
+            if (index - 7 > 0) result.Add(index - 7);
+            if (index - 6 > 0) result.Add(index - 6);
+            if (index - 1 > 0) result.Add(index - 1);
+            if (index + 1 < 45) result.Add(index + 1);
+            if (index + 6 < 45) result.Add(index + 6);
+            if (index + 7 < 45) result.Add(index + 7);
+            return result;
+        }
+
+        /// <summary>
+        /// Checks if the given intersection has no pieces build at the
+        /// directly connected intersections (Distance Rule).
+        /// </summary>
+        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
+        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
+        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
+        /// <returns>Returns true if the given intersection has no direct neighboring intersections
+        /// containing settlements or cities, else false.</returns>
+        public bool HasNoNeighbors(int index1, int index2, int index3)
+        {
+            Tuple<int,int,int> tuple = Get3Tuple(index1,index2,index3);
+            return GetAdjacentEdges(tuple.Item1, tuple.Item2, tuple.Item3).
+                SelectMany(edge => GetAdjacentIntersections(edge.Item1, edge.Item2)).
+                All(inter => inter.Equals(tuple) || GetPiece(inter.Item1, inter.Item2, inter.Item3) == null);
         }
 
         public override string ToString()
@@ -236,6 +363,25 @@ namespace AIsOfCatan
                 list[n] = value;
             }
         }
+
+        private void AddPiece(List<Piece> list, int index1, int index2, int index3)
+        {
+            Piece hit = this.GetPiece(index1, index2, index3);
+            if(hit != null) list.Add(hit);
+        }
+
+        private Tuple<int,int> Get2Tuple(int first, int second)
+        {
+            return new Tuple<int, int>(first < second ? first : second, first < second ? second : first);
+        } 
+
+        private Tuple<int,int,int> Get3Tuple(int first, int second, int third)
+        {
+            List<int> tiles = new List<int>(3) { first, second, third };
+            tiles.Sort();
+
+            return new Tuple<int, int, int>(tiles[0], tiles[1], tiles[2]);
+        } 
 
         public class Tile
         {

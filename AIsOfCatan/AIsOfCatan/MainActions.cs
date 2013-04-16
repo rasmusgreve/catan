@@ -1,31 +1,35 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace AIsOfCatan
 {
     public class MainActions : GameActions
     {
-        private Player player;
-        private GameController controller;
+        private readonly Player player;
+        private readonly GameController controller;
         private bool valid;
         private bool hasPlayedDevCard;
         private bool isAfterDieRoll;
-        public MainActions(Player player, GameController controller, bool hasPlayedDevCard = false, bool isAfterDieRoll = false)
+        public MainActions(Player player, GameController controller)
         {
             this.player = player;
             this.controller = controller;
             valid = true;
-            this.hasPlayedDevCard = hasPlayedDevCard;
-            this.isAfterDieRoll = isAfterDieRoll;
+            this.hasPlayedDevCard = false;
+            this.isAfterDieRoll = false;
         }
 
+        /// <summary>
+        /// Allow the build actions to be called
+        /// </summary>
         public void DieRoll()
         {
             isAfterDieRoll = false;
         }
 
+        /// <summary>
+        /// Invalidate this action object making all methods throw IllegalActionExceptions if called
+        /// </summary>
         public void Invalidate()
         {
             valid = false;
@@ -40,16 +44,16 @@ namespace AIsOfCatan
             return controller.DrawDevelopmentCard(player);
         }
 
-        public void PlayKnight()
+        public GameState PlayKnight()
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (hasPlayedDevCard)
                 throw new IllegalActionException("Max one development card can be played each turn");
             hasPlayedDevCard = true;
-            controller.PlayKnight(player);
+            return controller.PlayKnight(player);
         }
 
-        public bool PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
+        public GameState PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (hasPlayedDevCard)
@@ -58,13 +62,13 @@ namespace AIsOfCatan
             return controller.PlayRoadBuilding(player, firstTile1, secondTile1, firstTile2, secondTile2);
         }
 
-        public void PlayYearOfPlenty(Resource resource1, Resource resource2)
+        public GameState PlayYearOfPlenty(Resource resource1, Resource resource2)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (hasPlayedDevCard)
                 throw new IllegalActionException("Max one development card can be played each turn");
             hasPlayedDevCard = true;
-            controller.PlayYearOfPlenty(player, resource1, resource2);
+            return controller.PlayYearOfPlenty(player, resource1, resource2);
         }
 
         public GameState PlayMonopoly(Resource resource)
@@ -78,37 +82,37 @@ namespace AIsOfCatan
 
         //Trading
 
-        public Trade[] ProposeTrade(Trade trade)
+        public Dictionary<int, Trade> ProposeTrade(Trade trade)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to propose trade before the die roll");
             return controller.ProposeTrade(player, trade);
         }
 
-        public void Trade(int otherPlayer)
+        public GameState Trade(int otherPlayer)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to trade before the die roll");
-            controller.CompleteTrade(player, otherPlayer);
+            return controller.CompleteTrade(player, otherPlayer);
         }
 
         //Building
 
-        public bool BuildHouse(int firstTile, int secondTile, int thirdTile)
+        public GameState BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
-            return controller.BuildHouse(player, firstTile, secondTile, thirdTile);
+            return controller.BuildSettlement(player, firstTile, secondTile, thirdTile);
         }
 
-        public bool BuildCity(int firstTile, int secondTile, int thirdTile)
+        public GameState BuildCity(int firstTile, int secondTile, int thirdTile)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
             return controller.BuildCity(player, firstTile, secondTile, thirdTile);
         }
 
-        public bool BuildRoad(int firstTile, int secondTile)
+        public GameState BuildRoad(int firstTile, int secondTile)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");

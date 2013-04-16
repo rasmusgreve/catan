@@ -90,9 +90,15 @@ namespace AIsOfCatan
             
         }
 
+<<<<<<< HEAD:AIsOfCatan/AIsOfCatan/GUITile.cs.orig
+<<<<<<< HEAD
+        private static bool IsTileNumbered(GameState.Tile tile)
 =======
         private static bool isTileNumbered(Board.Tile tile)
 >>>>>>> 328720c1cdabb371ceed157dc42f1833bc1d27ff
+=======
+        private static bool IsTileNumbered(Board.Tile tile)
+>>>>>>> 1eaf4aec3c0914bd37807069ac373c40158d367a:AIsOfCatan/AIsOfCatan/GUITile.cs
         {
             switch (tile.Terrain)
             {
