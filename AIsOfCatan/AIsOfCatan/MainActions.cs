@@ -10,20 +10,26 @@ namespace AIsOfCatan
         private bool valid;
         private bool hasPlayedDevCard;
         private bool isAfterDieRoll;
-        public MainActions(Player player, GameController controller, bool hasPlayedDevCard = false, bool isAfterDieRoll = false)
+        public MainActions(Player player, GameController controller)
         {
             this.player = player;
             this.controller = controller;
             valid = true;
-            this.hasPlayedDevCard = hasPlayedDevCard;
-            this.isAfterDieRoll = isAfterDieRoll;
+            this.hasPlayedDevCard = false;
+            this.isAfterDieRoll = false;
         }
 
+        /// <summary>
+        /// Allow the build actions to be called
+        /// </summary>
         public void DieRoll()
         {
             isAfterDieRoll = false;
         }
 
+        /// <summary>
+        /// Invalidate this action object making all methods throw IllegalActionExceptions if called
+        /// </summary>
         public void Invalidate()
         {
             valid = false;
@@ -47,14 +53,6 @@ namespace AIsOfCatan
             return controller.PlayKnight(player);
         }
 
-        /// <summary>
-        /// Play the RoadBuilding development card and place two roads for free
-        /// If you only have one road left to place (because you are out of pieces) give the position in firstTile1 and secondTile1
-        /// </summary>
-        /// <param name="firstTile1">The first tile that the first road must be along</param>
-        /// <param name="secondTile1">The second tile that the first road must be along</param>
-        /// <param name="firstTile2">The first tile that the second road must be along</param>
-        /// <param name="secondTile2">The second tile that the second road must be along</param>
         public GameState PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");

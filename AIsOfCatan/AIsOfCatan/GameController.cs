@@ -9,7 +9,6 @@ namespace AIsOfCatan
     {
         private Random diceRandom;
         private Random shuffleRandom;
-        //TODO: http://www.random.org/integers/?num=200&min=1&max=6&col=2&base=10&format=plain&rnd=new
         private Player[] players;
 
         private Board board;
@@ -120,10 +119,10 @@ namespace AIsOfCatan
         /// <summary>
         /// Executes all parts of a players turn
         ///     1. Allow the play of a development card before the dice are rolled
-        ///     2. Roll the dice (done automatically), hand out resources to all players, and move the robber if roll is 7
+        ///     2. Roll the dice, hand out resources to all players, and move the robber if roll is 7
         ///     3. Allow all actions according to the rules
         /// </summary>
-        /// <param name="player"></param>
+        /// <param name="player">The player whose turn it is</param>
         private void TakeTurn(Player player)
         {
             var actions = new MainActions(player, this);
@@ -259,14 +258,14 @@ namespace AIsOfCatan
         /// </summary>
         private void PlaceStarts()
         {
-            for (int i = 0; i < players.Length; i++)
+            foreach (Player p in players)
             {
                 var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 NextTurn();
             }
-            for (int i = 0; i < players.Length; i++)
+            foreach (Player p in players)
             {
                 PrevTurn();
                 var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
@@ -275,8 +274,7 @@ namespace AIsOfCatan
                 //Hand out resources
                 foreach (var pos in actions.GetSettlementPosition())
                 {
-                    var type = (Resource)board.GetTile(pos).Terrain;
-                    GetResource(players[turn], type);
+                    GetResource(players[turn], (Resource)board.GetTile(pos).Terrain);
                 }
             }
         }
@@ -437,7 +435,7 @@ namespace AIsOfCatan
         /// If the player doesn't have a RoadBuilding card on his hand a InsufficientResourcesException is thrown
         /// If the player doesn't have any road pieces left a IllegalActionException is thrown
         /// If the player tries to place a road at a position where a road is already present a IllegalBuildPositionException is thrown
-        /// If the player only has one road piece left, the position to place it must be passed as firstTile1, firstTile2 (the others are ignored)
+        /// If the player only has one road piece left, the position to place it must be passed as firstTile1, secondTile1 (the others are ignored)
         /// </summary>
         /// <param name="player">The player that plays the RoadBuilding development card</param>
         /// <param name="firstTile1">The first tile that the first road must be along</param>
@@ -561,7 +559,7 @@ namespace AIsOfCatan
         /// Let a player upgrade a settlement to a city
         /// If the player doesn't have enough resources to build a city a InsufficientResourcesException is thrown
         /// If the player tries to build at a position where he doesn't have a settlement a IllegalBuildPosition is thrown
-        /// If the player doesn't have any more settlement pieces left to place a IllegalActionException is thrown
+        /// If the player doesn't have any more city pieces left to place a IllegalActionException is thrown
         /// The required resources are taken from the player and placed back at the resource bank
         /// The settlement previously on the location is given back to the player
         /// </summary>
@@ -595,10 +593,9 @@ namespace AIsOfCatan
 
         /// <summary>
         /// Let a player build a road
-        /// If the player doesn't have enough resources to build a road a InsufficientResourcesException is thrown
-        /// If the player tries to build at a position not connected to another road, settlement or city a IllegalBuildPositionException is thrown
-        /// If the player doesn't have any more road pieces left to place a IllegalActionException is thrown
-        /// If the player
+        /// If the player doesn't have enough resources to build a road an InsufficientResourcesException is thrown
+        /// If the player tries to build at a position not connected to another road, settlement or city an IllegalBuildPositionException is thrown
+        /// If the player doesn't have any more road pieces left to place an IllegalActionException is thrown
         /// </summary>
         /// <param name="player">The player building a road</param>
         /// <param name="firstTile">The first tile that the road will be along</param>
