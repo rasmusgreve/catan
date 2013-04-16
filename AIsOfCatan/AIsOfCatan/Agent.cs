@@ -71,7 +71,7 @@ namespace AIsOfCatan
         /// </summary>
         void PerformTurn(GameState state, GameActions actions);
 
-        void HandleTrade(Trade offer); // Change the status of the Trade and return. In case of counter-
+        Trade HandleTrade(Trade offer); // Change the status of the Trade and return. In case of counter-
                                        // offer remove extra Resource from the trade Lists.
     }
 }
