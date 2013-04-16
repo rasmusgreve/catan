@@ -16,6 +16,14 @@ namespace AIsOfCatan
         }
 
         /// <summary>
+        /// Returns whether the start action has been completed
+        /// </summary>
+        public bool IsComplete()
+        {
+            return roadBuilt && settlementBuilt;
+        }
+
+        /// <summary>
         /// Internal method used for handing out resources
         /// </summary>
         public int[] GetSettlementPosition()
@@ -31,13 +39,12 @@ namespace AIsOfCatan
         /// <param name="secondTile"></param>
         /// <param name="thirdTile"></param>
         /// <returns></returns>
-        public bool BuildSettlement(int firstTile, int secondTile, int thirdTile)
+        public void BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
             if (settlementBuilt) throw new IllegalActionException("Only one settlement may be built in a turn during the startup");
             settlementPosition = new int[] { firstTile, secondTile, thirdTile};
             controller.BuildFirstSettlement(player, firstTile, secondTile, thirdTile);
             settlementBuilt = true;
-            return true;
         }
 
         /// <summary>
@@ -47,7 +54,7 @@ namespace AIsOfCatan
         /// <param name="firstTile"></param>
         /// <param name="secondTile"></param>
         /// <returns></returns>
-        public bool BuildRoad(int firstTile, int secondTile)
+        public void BuildRoad(int firstTile, int secondTile)
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");
             if (!settlementBuilt) throw new IllegalActionException("The settlement must be placed before the road");
@@ -55,7 +62,6 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The road must be placed next to the settlement");
             controller.BuildFirstRoad(player, firstTile,secondTile);
             roadBuilt = true;
-            return true;
         }
     }
 }

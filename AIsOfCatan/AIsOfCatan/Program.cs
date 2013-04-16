@@ -10,6 +10,9 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
+            var agent = new DebugAgent();
+            var controller = new GameController();
+            controller.StartGame(new Agent[] {agent}, 0, 0);
             using (Game1 game = new Game1())
             {
                 game.Run();
