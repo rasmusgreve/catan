@@ -23,6 +23,10 @@ namespace AIsOfCatan
         //private static readonly Vector2 S_WEST = new Vector2(TileShift, -TILE_WIDTH / 2);
         //private static readonly Vector2 N_WEST = new Vector2(-TileShift, -TILE_WIDTH / 2);
 
+
+
+        private readonly List<int> omitted = new List<int> { 0, 5, 6, 12, 32, 38, 39, 44 };
+
         private Vector2 numberPos;
         private Vector2 textPos;
         private readonly Color valueColour;
@@ -35,12 +39,17 @@ namespace AIsOfCatan
                 GetTexture(tile.Terrain)
             )
         {
+
             Tile = tile;
-            //Y = y;
-            //X = x;
+            Y = y;
+            X = x;
             NumAreaAndTextPos();
             valueColour = (Tile.Value == 6 || Tile.Value == 8 ? Color.Red : Color.Black);
+            
         }
+
+        private int X { get; set; }
+        private int Y { get; set; }
 
         private static Texture2D GetTexture(Terrain ter)
         {
@@ -49,7 +58,10 @@ namespace AIsOfCatan
 
         protected override void DoUpdate(GameTime time)
         {
-            //throw new NotImplementedException();
+            if (!OmittedTile(MapScreen.GetTerrainIndex(Y, X)))
+            {
+                Visible = false;
+            }
         }
 
         protected override void UpdateRect()
@@ -82,14 +94,18 @@ namespace AIsOfCatan
 
         protected override void Draw(SpriteBatch batch)
         {
-            //base.Draw(batch);
-            batch.Draw(Texture,Position,null,Color.Azure,Rotation,Origin,TXAGame.SCALE,SpriteEffects.None, 0f);
-            if (IsTileNumbered(Tile))
+            if (Visible)
             {
-                batch.Draw(TXAGame.TEXTURES["TO_Number"], numberPos, null, Color.Wheat, 0f, new Vector2(0,0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
-                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour, 0f, new Vector2(0,0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
+                //base.Draw(batch);
+                batch.Draw(Texture, Position, null, Color.Azure, Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
+                if (IsTileNumbered(Tile))
+                {
+                    batch.Draw(TXAGame.TEXTURES["TO_Number"], numberPos, null, Color.Wheat, 0f, new Vector2(0, 0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
+                    batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour, 0f, new Vector2(0, 0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
+                }
+                batch.Draw(TXAGame.WHITE_BASE, Position, Color.Red);
             }
-            batch.Draw(TXAGame.WHITE_BASE,Position,Color.Red);
+            
             
         }
 
@@ -107,6 +123,11 @@ namespace AIsOfCatan
                     return false;
             }
             //
+        }
+
+        private bool OmittedTile(int index)
+        {
+            return !omitted.Contains(index);
         }
     }
 }

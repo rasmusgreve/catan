@@ -29,6 +29,7 @@ namespace AIsOfCatan
 
                 for (int j = 0; j < board[i].Length; j++)
                 {
+
                     //Debug.WriteLine("SCALE " + TXAGame.SCALE);
                     GUITile tile = new GUITile(j, i, latestGameState.Board.GetTile(i, j));
                     AddDrawableComponent(tile);
@@ -36,7 +37,7 @@ namespace AIsOfCatan
                 }
             }
 
-            //Test Roads
+            //Test Roads and pieces
             UpdateGameState(initial);
         }
 
@@ -148,5 +149,19 @@ namespace AIsOfCatan
             }
             return new Tuple<int, int>(row, index);
         }
+
+        internal static int GetTerrainIndex(int row, int col)
+        {
+            int index = 0;
+            bool longrow = false;
+            while (row > 0)
+            {
+                row--;
+                index += longrow ? 7 : 6;
+                longrow = !longrow;
+            }
+            return index + col;
+        }
+
     }
 }
