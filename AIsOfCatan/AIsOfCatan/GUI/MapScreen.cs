@@ -41,25 +41,15 @@ namespace AIsOfCatan
 
         public void UpdateGameState(GameState state)
         {
-            
-
-
             latestGameState = state;
 
+            #region Roads
             Dictionary<Tuple<int,int>, int> allRoads = latestGameState.Board.GetAllRoads();
 
             foreach (KeyValuePair<Tuple<int, int>, int> road in allRoads)
             {
                 int tile1 = road.Key.Item1;
                 int tile2 = road.Key.Item2;
-
-                ////Swap so that tile1 < tile2
-                //if (tile1 > tile2)
-                //{
-                //    int temp = tile1;
-                //    tile1 = tile2;
-                //    tile2 = temp;
-                //}
 
                 if (roads.Exists(r => r.Tile1 == tile1 && r.Tile2 == tile2))
                 {
@@ -74,36 +64,30 @@ namespace AIsOfCatan
 
                 Vector2 placeVector = (board[t1coord.Item1][t1coord.Item2].Position/TXAGame.SCALE)+(diffVector/2);
 
-                //Vector2 placeVector = new Vector2(board[t1coord.Item1][t1coord.Item2].Position.X / TXAGame.SCALE + diffVector.X / 2,
-                //                                  board[t1coord.Item1][t1coord.Item2].Position.Y / TXAGame.SCALE + diffVector.Y / 2);
-                //Debug.WriteLine(string.Format("DiffVector: {0}", diffVector));
+                float rotation = 0;
 
-                float rotation = 0;//(float)Math.PI;
+                float value = (float) (Math.PI/3);
 
                 if (diffVector.X < 0)
                 {
-                    float value = (float) Math.PI;
-                    value /= 3;
-                    value *= 2;
-                    rotation = value;
+                    rotation = value*2;
                 }
                 else if (diffVector.X < diffVector.Y)
                 {
-                    float value = (float) Math.PI;
-                    value /= 3;
-                    value *= 1;
                     rotation = value; 
                 }
-
-                //Debug.WriteLine(string.Format("rotation: {0}, player {1}", rotation,road.Value));
-
-                //Color color = GetPlayerColor(road.Value);
 
                 GUIRoad newRoad = new GUIRoad(placeVector,rotation,road.Value, tile1, tile2);
 
                 AddDrawableComponent(newRoad);
 
             }
+            #endregion
+
+            #region Pieces
+
+
+            #endregion
 
 
             //TODO: update board with new info

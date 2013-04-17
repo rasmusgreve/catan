@@ -35,7 +35,7 @@ namespace AIsOfCatan
         }
 
 
-        private Color GetPlayerColor(int i)
+        internal static Color GetPlayerColor(int i)
         {
             switch (i)
             {
