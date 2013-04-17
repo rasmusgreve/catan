@@ -26,7 +26,7 @@ namespace AIsOfCatan
         /// <param name="boardSeed">The seed for the board generator, used to shuffle development cards, and for drawing a random card after moving the robber</param>
         /// <param name="diceSeed">The seed for the dice</param>
         /// <returns>The id of the winner of the game</returns>
-        public int StartGame(Agent[] agents, int boardSeed, int diceSeed)
+        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed)
         {
             //Initialize random number generators
             diceRandom = new Random(diceSeed);
@@ -173,7 +173,7 @@ namespace AIsOfCatan
             int robberPosition = player.Agent.MoveRobber(gameState);
             if (board.GetTile(robberPosition).Terrain == Terrain.Water || robberPosition == board.GetRobberLocation())
             {
-                Console.WriteLine("Agent " + player.Agent.GetType().Name + " moved robber illegally");
+                Console.WriteLine("IAgent " + player.Agent.GetType().Name + " moved robber illegally");
                 return;
             }
             board = board.MoveRobber(robberPosition);
@@ -190,7 +190,7 @@ namespace AIsOfCatan
             int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
-                Console.WriteLine("Agent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
+                Console.WriteLine("IAgent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
                 return;
             }
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    public interface GameActions
+    public interface IGameActions
     {
         /// <summary>
         /// Play a knight development card

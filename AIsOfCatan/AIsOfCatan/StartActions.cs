@@ -2,7 +2,7 @@
 
 namespace AIsOfCatan
 {
-    public class StartActions : IStartActions
+    public class StartActions// : IStartActions
     {
         private readonly Player player;
         private readonly GameController controller;

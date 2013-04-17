@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AIsOfCatan
 {
-    public class MainActions : GameActions
+    public class MainActions : IGameActions
     {
         private readonly Player player;
         private readonly GameController controller;

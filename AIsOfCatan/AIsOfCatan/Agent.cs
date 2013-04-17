@@ -1,7 +1,7 @@
 ﻿
 namespace AIsOfCatan
 {
-    public interface Agent
+    public interface IAgent
     {
         /// <summary>
         /// Reset the agent, getting it ready for a new game
@@ -17,7 +17,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game when the agent is to place its pieces</param>
         /// <param name="actions">An action object where methods for placing a settlement and a road is</param>
-        void PlaceStart(GameState state, StartActions actions);
+        void PlaceStart(GameState state, IStartActions actions);
 
         /// <summary>
         /// In your agents turn, before the dice roll you have a chance of playing a development card. (rules p. 16 - #4)
@@ -27,7 +27,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game when the agent is to decide whether or not to play a development card</param>
         /// <param name="actions">An action obejct where methods for playing development cards are. There are also methods for building which may not be called at this time</param>
-        void BeforeDiceRoll(GameState state, GameActions actions);
+        void BeforeDiceRoll(GameState state, IGameActions actions);
 
         /// <summary>
         /// If the dice roll comes out as 7 or you play a knight you must move the robber to a new location
@@ -63,13 +63,13 @@ namespace AIsOfCatan
         /// <summary>
         /// After the dice roll and resources have been handed out or the robber moved you can perform any number of actions
         /// This method is supplied a GameState which is where the current state of the game is located
-        /// The supplied GameActions object contains methods for doing various things that are possible during the turn
+        /// The supplied IGameActions object contains methods for doing various things that are possible during the turn
         /// Note that you may play at most 1 development card in each turn. This also includes in the BeforeDiceRoll method.
         /// When you are done with your turn simply return from the function and the next player will have his turn.
         /// </summary>
         /// <param name="state">The state of the game as the main part of your turn begins</param>
         /// <param name="actions">The actions you can perform during your turn. Note that performing actions doesn't update the GameState but most methods return a new updated version</param>
-        void PerformTurn(GameState state, GameActions actions);
+        void PerformTurn(GameState state, IGameActions actions);
 
         /// <summary>
         /// During a players turn it is possible to propose a trade with the other players

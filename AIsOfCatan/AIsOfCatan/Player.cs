@@ -10,7 +10,7 @@ namespace AIsOfCatan
     /// </summary>
     public class Player
     {
-        public Player(Agent agent, int id)
+        public Player(IAgent agent, int id)
         {
             agent.Reset(id);
 
@@ -48,7 +48,7 @@ namespace AIsOfCatan
         /// <summary>
         /// The agent deciding actions for this player
         /// </summary>
-        public Agent Agent { get; private set; }
+        public IAgent Agent { get; private set; }
 
         /// <summary>
         /// The Id of this player
