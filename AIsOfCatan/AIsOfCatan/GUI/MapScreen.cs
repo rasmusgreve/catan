@@ -17,6 +17,7 @@ namespace AIsOfCatan
         private GUITile[][] board = new GUITile[7][];
 
         private List<GUIRoad> roads = new List<GUIRoad>();
+        private List<GUIPiece> pieces = new List<GUIPiece>();
 
         public MapScreen(GameState initial)
         {
@@ -86,12 +87,37 @@ namespace AIsOfCatan
 
             #region Pieces
 
+            Dictionary<Tuple<int, int, int>, Board.Piece> piecelist = state.Board.GetAllPieces();
+
+            foreach (KeyValuePair<Tuple<int, int, int>, Board.Piece> piece in piecelist)
+            {
+                int t1 = piece.Key.Item1;
+                int t2 = piece.Key.Item2;
+                int t3 = piece.Key.Item3;
+
+                GUIPiece alreadyPiece = pieces.First(e => e.tile1 = t1 && e.tile2 = t2 && e.tile3 = t3);
+
+                if (alreadyPiece != null)
+                {
+                    if (alreadyPiece.Type == Token.Settlement && piece.Value.Token == Token.City)
+                    {
+                        alreadyPiece.Type = Token.City;
+                    }
+                    continue;
+                }
+
+                pieces.Add(new GUIPiece(placePos, piece.Value.Player, piece.Value.Token,t1,t2,t3));
+            }
+
+
 
             #endregion
 
 
             //TODO: update board with new info
         }
+
+
 
         public override void Draw(SpriteBatch batch)
         {
