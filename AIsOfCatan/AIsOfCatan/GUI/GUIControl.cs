@@ -78,6 +78,8 @@ namespace AIsOfCatan
             TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
             TEXTURES.Add("TO_Number", Content.Load<Texture2D>("NumberTile"));
             TEXTURES.Add("TO_Road", Content.Load<Texture2D>("RoadToken"));
+            TEXTURES.Add("TO_Settle", Content.Load<Texture2D>("HouseToken"));
+            TEXTURES.Add("TO_City", Content.Load<Texture2D>("CityToken"));
 
             base.LoadContent();
 
