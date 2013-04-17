@@ -30,8 +30,10 @@ namespace AIsOfCatan
         protected override void Draw(SpriteBatch batch)
         {
             //Debug.WriteLine(string.Format("Drawing at {0}", Position));
-
-            batch.Draw(Texture,Position,null,GetPlayerColor(PlayerId),Rotation,Origin,TXAGame.SCALE,SpriteEffects.None, 0f);
+            if (Visible)
+            {
+                batch.Draw(Texture, Position, null, GetPlayerColor(PlayerId), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
+            }
         }
 
 
@@ -44,7 +46,7 @@ namespace AIsOfCatan
                 case 2:
                     return Color.Red;
                 case 3:
-                    return Color.Yellow;
+                    return Color.Orange;
                 case 4:
                     return Color.White;
                 default:

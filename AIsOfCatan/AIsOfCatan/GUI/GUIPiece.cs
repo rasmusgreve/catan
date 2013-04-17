@@ -55,9 +55,10 @@ namespace AIsOfCatan
 
         protected override void Draw(SpriteBatch batch)
         {
-            batch.Draw(Texture,Position,null,GUIRoad.GetPlayerColor(Player), Rotation,Origin,TXAGame.SCALE, SpriteEffects.None, 0f);
-
-            //base.Draw(batch);
+            if (Visible)
+            {
+                batch.Draw(Texture, Position, null, GUIRoad.GetPlayerColor(Player), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
+            }
         }
 
         protected override void DoUpdate(GameTime time)

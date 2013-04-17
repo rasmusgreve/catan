@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.GUI;
 using MS.Internal.Xml.XPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,10 +15,12 @@ namespace AIsOfCatan
     {
         private GameState latestGameState;
 
-        private GUITile[][] board = new GUITile[7][];
+        private readonly GUITile[][] board = new GUITile[7][];
 
-        private List<GUIRoad> roads = new List<GUIRoad>();
-        private List<GUIPiece> pieces = new List<GUIPiece>();
+        private readonly List<GUIRoad> roads = new List<GUIRoad>();
+        private readonly List<GUIPiece> pieces = new List<GUIPiece>();
+
+        private GUIRobber robber;
 
         public MapScreen(GameState initial)
         {
@@ -36,6 +39,10 @@ namespace AIsOfCatan
                     board[i][j] = tile;
                 }
             }
+
+            robber = new GUIRobber(GetRobberPos());
+
+            AddDrawableComponent(robber);
 
             //Test Roads and pieces
             UpdateGameState(initial);
@@ -58,17 +65,17 @@ namespace AIsOfCatan
                     continue;
                 }
 
-                Tuple<int, int> t1coord = GetTerrainCoords(tile1);
-                Tuple<int, int> t2coord = GetTerrainCoords(tile2);
+                Tuple<int, int> t1Coord = GetTerrainCoords(tile1);
+                Tuple<int, int> t2Coord = GetTerrainCoords(tile2);
 
-                Vector2 diffVector = board[t2coord.Item1][t2coord.Item2].Position / TXAGame.SCALE -
-                                     board[t1coord.Item1][t1coord.Item2].Position / TXAGame.SCALE;
+                Vector2 diffVector = board[t2Coord.Item1][t2Coord.Item2].Position / TXAGame.SCALE -
+                                     board[t1Coord.Item1][t1Coord.Item2].Position / TXAGame.SCALE;
 
-                Vector2 placeVector = (board[t1coord.Item1][t1coord.Item2].Position/TXAGame.SCALE)+(diffVector/2);
+                Vector2 placeVector = (board[t1Coord.Item1][t1Coord.Item2].Position/TXAGame.SCALE)+(diffVector/2);
 
                 float rotation = 0;
 
-                float value = (float) (Math.PI/3);
+                const float value = (float) (Math.PI/3);
 
                 if (diffVector.X < 0)
                 {
@@ -87,7 +94,6 @@ namespace AIsOfCatan
             #endregion
 
             #region Pieces
-
             Dictionary<Tuple<int, int, int>, Board.Piece> piecelist = state.Board.GetAllPieces();
 
             foreach (KeyValuePair<Tuple<int, int, int>, Board.Piece> piece in piecelist)
@@ -123,13 +129,19 @@ namespace AIsOfCatan
 
                 AddDrawableComponent(newPiece);
             }
-
-
-
             #endregion
 
+            #region Robber
+            robber.UpdateRobberPosition(GetRobberPos());
+            #endregion
+        }
 
-            //TODO: update board with new info
+        private Vector2 GetRobberPos()
+        {
+            int robberTile = latestGameState.Board.GetRobberLocation();
+            Tuple<int, int> robberCoord = GetTerrainCoords(robberTile);
+
+            return board[robberCoord.Item1][robberCoord.Item2].Position/TXAGame.SCALE;
         }
 
         public override void Draw(SpriteBatch batch)
@@ -162,6 +174,5 @@ namespace AIsOfCatan
             }
             return index + col;
         }
-
     }
 }

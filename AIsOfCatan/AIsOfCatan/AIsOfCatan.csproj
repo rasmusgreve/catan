@@ -118,6 +118,7 @@
     <Compile Include="GameController.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GUI\GUIRoad.cs" />
+    <Compile Include="GUI\GUIRobber.cs" />
     <Compile Include="GUI\GUITile.cs" />
     <Compile Include="Exceptions\IllegalActionException.cs" />
     <Compile Include="Exceptions\IllegalBuildPositionException.cs" />
