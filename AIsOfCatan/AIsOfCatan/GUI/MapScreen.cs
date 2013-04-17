@@ -95,7 +95,7 @@ namespace AIsOfCatan
                 int t2 = piece.Key.Item2;
                 int t3 = piece.Key.Item3;
 
-                GUIPiece alreadyPiece = pieces.First(e => e.tile1 = t1 && e.tile2 = t2 && e.tile3 = t3);
+                GUIPiece alreadyPiece = pieces.FirstOrDefault(e => e.Tile1 == t1 && e.Tile2 == t2 && e.Tile3 == t3);
 
                 if (alreadyPiece != null)
                 {
@@ -106,7 +106,21 @@ namespace AIsOfCatan
                     continue;
                 }
 
-                pieces.Add(new GUIPiece(placePos, piece.Value.Player, piece.Value.Token,t1,t2,t3));
+                //Tuple<int, int> t2C = GetTerrainCoords(2);
+
+                Vector2 diffVector = t1 + 1 == t2
+                                         ? new Vector2(GUITile.TileWidth()/2, GUITile.TileHeight()/4)
+                                         : new Vector2(0, GUITile.TileHeight()/2);
+
+                Tuple<int, int> t1C = GetTerrainCoords(t1);
+
+                Vector2 placePos = board[t1C.Item1][t1C.Item2].Position/TXAGame.SCALE + diffVector;
+
+                GUIPiece newPiece = new GUIPiece(placePos, piece.Value.Player, piece.Value.Token, t1, t2, t3);
+
+                pieces.Add(newPiece);
+
+                AddDrawableComponent(newPiece);
             }
 
 
@@ -116,8 +130,6 @@ namespace AIsOfCatan
 
             //TODO: update board with new info
         }
-
-
 
         public override void Draw(SpriteBatch batch)
         {
