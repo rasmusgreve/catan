@@ -22,7 +22,7 @@ namespace AIsOfCatan
 
         public Trade Reverse()
         {
-            return new Trade(DeepClone(Want),DeepClone(Give)) {status = status};
+            return new Trade(DeepClone(Want),DeepClone(Give)) {Status = Status};
         }
 
         public void Accept()
