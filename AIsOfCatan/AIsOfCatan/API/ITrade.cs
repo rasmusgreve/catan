@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    interface ITrade
+    public interface ITrade
     {
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    interface IGameState
+    public interface IGameState
     {
     }
 }

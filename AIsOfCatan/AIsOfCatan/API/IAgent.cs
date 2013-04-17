@@ -1,6 +1,36 @@
 ﻿
 namespace AIsOfCatan
 {
+    /// <summary>
+    /// To make an artificial intelligence capable of playing catan you need to implement this interface.
+    /// The methods are called in the following order:
+    ///     * Reset
+    ///     * PlaceStart
+    ///     * PlaceStart
+    ///     Repeated until the end of the game:
+    ///         * BeforeDiceRoll
+    ///         * PerformTurn
+    /// 
+    /// At any point the methods
+    ///     1 MoveRobber
+    ///     2 ChoosePlayerToDrawFrom
+    ///     3 DiscardCards
+    ///     4 HandleTrade
+    /// can be called. 
+    ///     #1, #2 and #3 if you roll 7. 
+    ///     #3 if someone else rolls 7. 
+    ///     #1 and #2 if you play a knight.
+    ///     #4 if another player proposes a trade
+    /// 
+    /// The players of the game are referred to by an integer id.
+    /// The id of your agent will be given when the method Reset is called. This value should be stored.
+    /// Additional game rules and conditions can be found in the rest of the API interfaces:
+    ///     * IGameState    - Contains the board, count of remaining resources and development cards + count of other players resource cards
+    ///     * IBoard        - Tile types, numbers and roads, settlements and cities can be found here.
+    ///     * IStartAction  - Methods to place your first settlements and roads before the game begins
+    ///     * IGameActions  - Methods for taking actions during your turn. (Place road/settlement/city, play dev. card, propose trade, etc.)
+    ///     * ITrade        - Information regarding a trade proposal and methods for reversing or counterproposing
+    /// </summary>
     public interface IAgent
     {
         /// <summary>
@@ -17,7 +47,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game when the agent is to place its pieces</param>
         /// <param name="actions">An action object where methods for placing a settlement and a road is</param>
-        void PlaceStart(GameState state, IStartActions actions);
+        void PlaceStart(IGameState state, IStartActions actions);
 
         /// <summary>
         /// In your agents turn, before the dice roll you have a chance of playing a development card. (rules p. 16 - #4)
@@ -27,7 +57,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game when the agent is to decide whether or not to play a development card</param>
         /// <param name="actions">An action obejct where methods for playing development cards are. There are also methods for building which may not be called at this time</param>
-        void BeforeDiceRoll(GameState state, IGameActions actions);
+        void BeforeDiceRoll(IGameState state, IGameActions actions);
 
         /// <summary>
         /// If the dice roll comes out as 7 or you play a knight you must move the robber to a new location
@@ -38,7 +68,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game when the agent is to decide where to place the robber</param>
         /// <returns>The index of the hex where the robber will move to</returns>
-        int MoveRobber(GameState state);
+        int MoveRobber(IGameState state);
         
         /// <summary>
         /// After moving the robber you must choose which player you want to draw a card from
@@ -58,7 +88,7 @@ namespace AIsOfCatan
         /// <param name="state">The state of the game when cards must be discarded</param>
         /// <param name="toDiscard">The amount of cards to discard</param>
         /// <returns>An array of resource types telling which cards to discard (duplicates allowed)</returns>
-        Resource[] DiscardCards(GameState state, int toDiscard);
+        Resource[] DiscardCards(IGameState state, int toDiscard);
 
         /// <summary>
         /// After the dice roll and resources have been handed out or the robber moved you can perform any number of actions
@@ -69,7 +99,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="state">The state of the game as the main part of your turn begins</param>
         /// <param name="actions">The actions you can perform during your turn. Note that performing actions doesn't update the GameState but most methods return a new updated version</param>
-        void PerformTurn(GameState state, IGameActions actions);
+        void PerformTurn(IGameState state, IGameActions actions);
 
         /// <summary>
         /// During a players turn it is possible to propose a trade with the other players
@@ -81,6 +111,6 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="offer">The proposing players trade offer</param>
         /// <returns>Either the same offer accepted or declined, or a counteroffer</returns>
-        Trade HandleTrade(Trade offer);
+        ITrade HandleTrade(ITrade offer);
     }
 }
