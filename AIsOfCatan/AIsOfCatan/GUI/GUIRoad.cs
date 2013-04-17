@@ -29,31 +29,10 @@ namespace AIsOfCatan
 
         protected override void Draw(SpriteBatch batch)
         {
-            //Debug.WriteLine(string.Format("Drawing at {0}", Position));
             if (Visible)
             {
-                batch.Draw(Texture, Position, null, GetPlayerColor(PlayerId), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
+                batch.Draw(Texture, Position, null, MapScreen.GetPlayerColor(PlayerId), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
             }
-        }
-
-
-        internal static Color GetPlayerColor(int i)
-        {
-            switch (i)
-            {
-                case 1:
-                    return Color.RoyalBlue;
-                case 2:
-                    return Color.Red;
-                case 3:
-                    return Color.Orange;
-                case 4:
-                    return Color.White;
-                default:
-                    return Color.Black;
-            }
-            
-            //TODO: update with correct colors
         }
     }
 }

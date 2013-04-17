@@ -8,11 +8,11 @@ namespace AIsOfCatan
     class DebugAgent : IAgent
     {
         private int id;
-        private int[] start1 = new[] { 8, 9, 15};
+        private int[] start1 = new[] { 8, 9, 15 };
         private bool firstStartPlaced = false;
-        private int[] start2 = new[] { 9, 10, 16};
-        private int[] tooClose = new[] {9, 15, 16};
-        private int[] farRoad = new[] {34, 35};
+        private int[] start2 = new[] { 9, 10, 16 };
+        private int[] tooClose = new[] { 9, 15, 16 };
+        private int[] farRoad = new[] { 34, 35 };
         public void Reset(int assignedId)
         {
             id = assignedId;
@@ -99,7 +99,7 @@ namespace AIsOfCatan
             var resources = state.GetOwnResources();
             int[] resCount = new int[5];
             foreach (var r in resources)
-                resCount[(int) r]++;
+                resCount[(int)r]++;
             Console.Write(id + ": Resources: ( ");
             foreach (var i in resCount)
                 Console.Write(i + " ");

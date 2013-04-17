@@ -18,15 +18,6 @@ namespace AIsOfCatan.GUI
         {
         }
 
-        protected override void Draw(SpriteBatch batch)
-        {
-            if (Visible)
-            {
-                batch.Draw(Texture,Position,null,Color.White,Rotation,Origin,TXAGame.SCALE,SpriteEffects.None, 0f);
-            }
-            //base.Draw(batch);
-        }
-
         public void UpdateRobberPosition(Vector2 pos)
         {
             Position = pos;

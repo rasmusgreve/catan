@@ -14,7 +14,7 @@ namespace AIsOfCatan
             {
                 var agent = new DebugAgent();
                 var controller = new GameController();
-                controller.StartGame(new IAgent[] {agent}, 0, 0);
+                controller.StartGame(new IAgent[] { agent }, 0, 0);
             }
 
             using (GUIControl game = new GUIControl())

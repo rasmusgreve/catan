@@ -57,7 +57,7 @@ namespace AIsOfCatan
         {
             if (Visible)
             {
-                batch.Draw(Texture, Position, null, GUIRoad.GetPlayerColor(Player), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
+                batch.Draw(Texture, Position, null, MapScreen.GetPlayerColor(Player), Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
             }
         }
 
