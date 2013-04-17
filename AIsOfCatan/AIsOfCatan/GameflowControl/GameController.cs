@@ -16,6 +16,7 @@ namespace AIsOfCatan
         private int[] resourceBank;
         private int turn;
         private int largestArmySize = 2; //One less than the minimum for getting the largest army card
+        private int longestRoadLength = 2; //One less than the minimum for getting the longest road card
         private int largestArmyId = -1;
         private int longestRoadId = -1;
 
@@ -159,6 +160,8 @@ namespace AIsOfCatan
             }
             var afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
             player.Agent.PerformTurn(afterResourcesState, actions);
+
+            player.NewDevelopmentCards.Clear(); //Reset new development cards
         }
 
         /// <summary>
@@ -377,6 +380,37 @@ namespace AIsOfCatan
                      .Any(edge => board.GetRoad(edge.Item1, edge.Item2) == playerId);
         }
 
+        /// <summary>
+        /// Update the player who has the longest road to be able to determine who has how many points
+        /// </summary>
+        private void UpdateLongestRoad()
+        {
+            int currentLongestPlayer;
+            int currentLongestLength;
+            board.GetLongestRoad(out currentLongestPlayer, out currentLongestLength);
+            if (currentLongestLength > longestRoadLength)
+            {
+                longestRoadLength = currentLongestLength;
+                longestRoadId = currentLongestPlayer;
+            }
+        }
+
+        private List<DevelopmentCard> GetPlayableDevelopmentCards(Player player)
+        {
+            var playable = new List<DevelopmentCard>();
+            foreach (var card in player.DevelopmentCards)
+            {
+                if (player.NewDevelopmentCards.Contains(card))
+                {
+                    player.NewDevelopmentCards.Remove(card);
+                }
+                else
+                {
+                    playable.Add(card);
+                }
+            }
+            return playable;
+        }
 
         /*
          * ACTIONS
@@ -389,6 +423,7 @@ namespace AIsOfCatan
         /// Resources to pay for the card are removed from the player hand and returned to the resource bank
         /// </summary>
         /// <param name="player">The player drawing a development card</param>
+        /// <param name="drawnCard">The card that was drawn (used internally)</param>
         /// <returns>The drawn development card</returns>
         public GameState DrawDevelopmentCard(Player player)
         {
@@ -406,8 +441,10 @@ namespace AIsOfCatan
             PayResource(player, Resource.Ore);
 
             var last = developmentCardStack.Last();
-            developmentCardStack.RemoveAt(developmentCardStack.Count);
+            developmentCardStack.RemoveAt(developmentCardStack.Count-1);
+
             player.DevelopmentCards.Add(last);
+            player.NewDevelopmentCards.Add(last);
             return CurrentGamestate();
         }
 
@@ -418,7 +455,7 @@ namespace AIsOfCatan
             var dict = new Dictionary<int, Trade>();
             foreach (var other in players)
             {
-                dict[other.Id] = other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
+                dict[other.Id] = (Trade)other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
             }
             proposedTrades[player.Id] = dict;
             return dict;
@@ -439,7 +476,8 @@ namespace AIsOfCatan
         /// <param name="player">The player playing a knight</param>
         public GameState PlayKnight(Player player)
         {
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.Knight))
+            var playable = GetPlayableDevelopmentCards(player);
+            if (!playable.Contains(DevelopmentCard.Knight))
                 throw new InsufficientResourcesException("No knight found in hand");
 
             player.DevelopmentCards.Remove(DevelopmentCard.Knight);
@@ -468,7 +506,8 @@ namespace AIsOfCatan
         /// <param name="secondTile2">The second tile that the second road must be along</param>
         public GameState PlayRoadBuilding(Player player, int firstTile1, int secondTile1, int firstTile2, int secondTile2)
         {
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
+            var playable = GetPlayableDevelopmentCards(player);
+            if (!playable.Contains(DevelopmentCard.RoadBuilding)) throw new InsufficientResourcesException("No Road building found in hand");
 
             player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
 
@@ -511,9 +550,10 @@ namespace AIsOfCatan
         /// <param name="resource2">The type of resource for the second card</param>
         public GameState PlayYearOfPlenty(Player player, Resource resource1, Resource resource2)
         {
-            if (resourceBank[(int)resource1] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource1.ToString());
-            if (resourceBank[(int)resource2] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource2.ToString());
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.YearOfPlenty)) throw new InsufficientResourcesException("No Year of Plenty found in hand");
+            var playable = GetPlayableDevelopmentCards(player);
+            if (resourceBank[(int)resource1] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource1);
+            if (resourceBank[(int)resource2] == 0) throw new NoMoreCardsException("Resource bank is out of " + resource2);
+            if (!playable.Contains(DevelopmentCard.YearOfPlenty)) throw new InsufficientResourcesException("No Year of Plenty found in hand");
 
             player.DevelopmentCards.Remove(DevelopmentCard.YearOfPlenty);
             GetResource(player, resource1);
@@ -531,7 +571,8 @@ namespace AIsOfCatan
         /// <returns></returns>
         public GameState PlayMonopoly(Player player, Resource resource)
         {
-            if (!player.DevelopmentCards.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
+            var playable = GetPlayableDevelopmentCards(player);
+            if (!playable.Contains(DevelopmentCard.Monopoly)) throw new InsufficientResourcesException("No Monopoly in hand");
             player.DevelopmentCards.Remove(DevelopmentCard.Monopoly);
             //Take all resources of the given type out of all hands
             int count = players.Sum(t => t.Resources.RemoveAll(c => c == resource));
@@ -578,7 +619,7 @@ namespace AIsOfCatan
 
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
-            //TODO: Update longest road!
+            UpdateLongestRoad();
             return CurrentGamestate();
         }
 
@@ -645,7 +686,7 @@ namespace AIsOfCatan
 
             player.RoadsLeft--;
             board = board.PlaceRoad(firstTile, secondTile, player.Id);
-            //TODO: Update longest road
+            UpdateLongestRoad();
             return CurrentGamestate();
         }
 

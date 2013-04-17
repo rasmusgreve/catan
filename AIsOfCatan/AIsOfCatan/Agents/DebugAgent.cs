@@ -19,7 +19,7 @@ namespace AIsOfCatan
             Console.WriteLine("IAgent reset with id " + id);
         }
 
-        public void PlaceStart(GameState state, IStartActions actions)
+        public void PlaceStart(IGameState state, IStartActions actions)
         {
             Console.WriteLine(id + ": Place starts");
             if (!firstStartPlaced)
@@ -66,17 +66,17 @@ namespace AIsOfCatan
             }
         }
 
-        public void BeforeDiceRoll(GameState state, IGameActions actions)
+        public void BeforeDiceRoll(IGameState state, IGameActions actions)
         {
             Console.WriteLine(id + ": Before dice roll");
             System.Threading.Thread.Sleep(100);
         }
 
-        public int MoveRobber(GameState state)
+        public int MoveRobber(IGameState state)
         {
             Console.WriteLine(id + ": Move robber");
             System.Threading.Thread.Sleep(1000);
-            return state.Board.GetRobberLocation() == 8 ? 9 : 8;
+            return ((GameState)state).Board.GetRobberLocation() == 8 ? 9 : 8;
         }
 
         public int ChoosePlayerToDrawFrom(int[] validOpponents)
@@ -86,17 +86,17 @@ namespace AIsOfCatan
             return validOpponents[0];
         }
 
-        public Resource[] DiscardCards(GameState state, int toDiscard)
+        public Resource[] DiscardCards(IGameState state, int toDiscard)
         {
             Console.WriteLine(id + ": Choosing cards to discard");
             System.Threading.Thread.Sleep(1000);
-            return state.GetOwnResources().Take(toDiscard).ToArray();
+            return ((GameState)state).GetOwnResources().Take(toDiscard).ToArray();
         }
 
-        public void PerformTurn(GameState state, IGameActions actions)
+        public void PerformTurn(IGameState state, IGameActions actions)
         {
             Console.WriteLine(id + ": Performing main turn");
-            var resources = state.GetOwnResources();
+            var resources = ((GameState)state).GetOwnResources();
             int[] resCount = new int[5];
             foreach (var r in resources)
                 resCount[(int)r]++;
@@ -107,7 +107,7 @@ namespace AIsOfCatan
             System.Threading.Thread.Sleep(1000);
         }
 
-        public Trade HandleTrade(Trade offer)
+        public ITrade HandleTrade(ITrade offer)
         {
             Console.WriteLine(id + ": Handling trade");
             return offer;
