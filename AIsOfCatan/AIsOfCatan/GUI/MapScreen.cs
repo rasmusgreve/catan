@@ -28,6 +28,7 @@ namespace AIsOfCatan
 
                 for (int j = 0; j < board[i].Length; j++)
                 {
+                    //Debug.WriteLine("SCALE " + TXAGame.SCALE);
                     GUITile tile = new GUITile(j, i, latestGameState.Board.GetTile(i, j));
                     AddDrawableComponent(tile);
                     board[i][j] = tile;
@@ -68,13 +69,14 @@ namespace AIsOfCatan
                 Tuple<int, int> t1coord = GetTerrainCoords(tile1);
                 Tuple<int, int> t2coord = GetTerrainCoords(tile2);
 
-                Vector2 diffVector = board[t2coord.Item1][t2coord.Item2].Position -
-                                     board[t1coord.Item1][t1coord.Item2].Position;
+                Vector2 diffVector = board[t2coord.Item1][t2coord.Item2].Position / TXAGame.SCALE -
+                                     board[t1coord.Item1][t1coord.Item2].Position / TXAGame.SCALE;
 
-                Vector2 placeVector = new Vector2(board[t1coord.Item1][t1coord.Item2].Position.X*2 + diffVector.X/2,
-                                                  board[t1coord.Item1][t1coord.Item2].Position.Y*2 + diffVector.Y/2);
+                Vector2 placeVector = (board[t1coord.Item1][t1coord.Item2].Position/TXAGame.SCALE)+(diffVector/2);
 
-                Debug.WriteLine(string.Format("DiffVector: {0}", diffVector));
+                //Vector2 placeVector = new Vector2(board[t1coord.Item1][t1coord.Item2].Position.X / TXAGame.SCALE + diffVector.X / 2,
+                //                                  board[t1coord.Item1][t1coord.Item2].Position.Y / TXAGame.SCALE + diffVector.Y / 2);
+                //Debug.WriteLine(string.Format("DiffVector: {0}", diffVector));
 
                 float rotation = 0;//(float)Math.PI;
 
@@ -93,7 +95,7 @@ namespace AIsOfCatan
                     rotation = value; 
                 }
 
-                Debug.WriteLine(string.Format("rotation: {0}, player {1}", rotation,road.Value));
+                //Debug.WriteLine(string.Format("rotation: {0}, player {1}", rotation,road.Value));
 
                 //Color color = GetPlayerColor(road.Value);
 

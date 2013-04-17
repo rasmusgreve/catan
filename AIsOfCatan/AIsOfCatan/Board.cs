@@ -63,13 +63,6 @@ namespace AIsOfCatan
             InitTerrain(terrainSeed, 0, false);
         }
 
-        internal Board(string test) : this() //Used to test GUI
-        {
-            InitTerrain(0,0,false);
-            roads.Add(new Tuple<int, int>(16, 22), 1);
-            roads.Add(new Tuple<int, int>(28, 35), 2);
-            roads.Add(new Tuple<int, int>(23, 24), 3);
-        }
 
         /// <summary>
         /// Gives the type of terrain and dice value for a given index of the board.

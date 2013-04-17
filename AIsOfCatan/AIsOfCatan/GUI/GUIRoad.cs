@@ -11,19 +11,15 @@ namespace AIsOfCatan
 {
     class GUIRoad : TXADrawableComponent
     {
-        private float Rotation { get; set; }
         private int PlayerId { get; set; }
         public int Tile1 { get; private set; }
         public int Tile2 { get; private set; }
-        private Vector2 Origin;
 
-        public GUIRoad(Vector2 position, float rotation, int playerId, int tile1, int tile2) : base(position, TXAGame.TEXTURES["TO_Road"])
+        public GUIRoad(Vector2 position, float rotation, int playerId, int tile1, int tile2) : base(position, TXAGame.TEXTURES["TO_Road"],rotation)
         {
-            Rotation = rotation;
             PlayerId = playerId;
             Tile1 = tile1;
             Tile2 = tile2;
-            Origin = new Vector2(TXAGame.TEXTURES["TO_Road"].Width/2,TXAGame.TEXTURES["TO_Road"].Height/2);
         }
 
         protected override void DoUpdate(GameTime time)
@@ -33,9 +29,9 @@ namespace AIsOfCatan
 
         protected override void Draw(SpriteBatch batch)
         {
-            Debug.WriteLine(string.Format("Drawing at {0}", Position));
+            //Debug.WriteLine(string.Format("Drawing at {0}", Position));
 
-            batch.Draw(Texture,Position,null,GetPlayerColor(PlayerId),Rotation,Origin,GUIControl.SCALE,SpriteEffects.None, 0.3f);
+            batch.Draw(Texture,Position,null,GetPlayerColor(PlayerId),Rotation,Origin,TXAGame.SCALE,SpriteEffects.None, 0f);
         }
 
 

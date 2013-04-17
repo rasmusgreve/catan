@@ -20,9 +20,9 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
-        GameState state = new GameState(new Board(""),null,null,null,0);
+        Board board;
 
-        public const float SCALE = 0.5f;
+        GameState state;
 
         private TXAScreen startScreen;
 
@@ -41,8 +41,17 @@ namespace AIsOfCatan
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            board = new Board(0);
+            board = board.PlaceRoad(16, 22, 1);
+            board = board.PlaceRoad(23, 24, 2);
+            board = board.PlaceRoad(28, 35, 3);
+            state = new GameState(board, null, null, null, 0);
+
+            SCALE = 0.5f;
 
             base.Initialize();
+
+            //SCALE = 0.5f;
 
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
@@ -71,6 +80,7 @@ namespace AIsOfCatan
             TEXTURES.Add("TO_Road", Content.Load<Texture2D>("RoadToken"));
 
             base.LoadContent();
+
 
             startScreen = new MapScreen(state);
 

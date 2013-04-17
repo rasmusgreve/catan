@@ -12,9 +12,9 @@ namespace AIsOfCatan
 {
     class GUITile : TXADrawableComponent
     {
-        public const int TILE_WIDTH = (int) (222 * GUIControl.SCALE);
-        public const int TILE_HEIGHT = (int) (255*GUIControl.SCALE);
-        private static readonly float TileShift = (float)Math.Sqrt(Math.Pow(TILE_WIDTH, 2) - Math.Pow((TILE_WIDTH / 2), 2));
+        public static int TileWidth() { return 222; }
+        public static int TileHeight() { return 255; }
+        private static float TileShift() { return (float)Math.Sqrt(Math.Pow(TileWidth(), 2) - Math.Pow((TileWidth() / 2), 2)); }
 
         //private static readonly Vector2 EAST = new Vector2(0, TILE_WIDTH);
         //private static readonly Vector2 WEST = new Vector2(0, -TILE_WIDTH);
@@ -31,7 +31,7 @@ namespace AIsOfCatan
 
         public GUITile(int x, int y, Board.Tile tile) : 
             base(
-                new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TILE_WIDTH), (float) ((0.66+y)*TileShift)),
+                new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TileWidth()), (float) ((0.66+y)*TileShift())),
                 GetTexture(tile.Terrain)
             )
         {
@@ -54,39 +54,42 @@ namespace AIsOfCatan
 
         protected override void UpdateRect()
         {
-            int width = (int)Math.Round(Texture.Width * GUIControl.SCALE);
-            int height = (int)Math.Round(Texture.Height * GUIControl.SCALE);
+            //TODO: use in TXA
+            float width = Texture.Width * TXAGame.SCALE;
+            float height = Texture.Height * TXAGame.SCALE;
+            //Debug.WriteLine(string.Format("UpdateRect: width {0}, height: {1}"));
 
             Area = new Rectangle(
-                ((int)Math.Round(Position.X)) - (width / 2),
-                ((int)Math.Round(Position.Y)) - (height / 2),
-                width,
-                height);
-            
+                (int)(Math.Round(Position.X - (width / 2))),
+                (int)(Math.Round(Position.Y - (height / 2))),
+                (int)(Math.Round(width)),
+                (int)(Math.Round(height)));
         }
 
         private void NumAreaAndTextPos()
         {
-            int width = TXAGame.TEXTURES["TO_Number"].Width;
-            int height = TXAGame.TEXTURES["TO_Number"].Height;
+            int width = (int)(TXAGame.TEXTURES["TO_Number"].Width * TXAGame.SCALE);
+            int height = (int)(TXAGame.TEXTURES["TO_Number"].Height * TXAGame.SCALE);
 
             numberPos = new Vector2(
-                (Position.X/GUIControl.SCALE) - (width/2),
-                (Position.Y / GUIControl.SCALE) - (height / 2));
+                (Position.X) - (width / 2),
+                (Position.Y) - (height / 2));
 
-            Vector2 measurementValue = TXAGame.ARIAL.MeasureString(Tile.Value.ToString(CultureInfo.InvariantCulture));
+            Vector2 measurementValue = TXAGame.ARIAL.MeasureString(Tile.Value.ToString(CultureInfo.InvariantCulture))* TXAGame.SCALE;
 
-            textPos = new Vector2((Position.X / GUIControl.SCALE - (measurementValue.X / 2)), (Position.Y / GUIControl.SCALE - (measurementValue.Y / 2)));
+            textPos = Position - (measurementValue/2);
         }
 
         protected override void Draw(SpriteBatch batch)
         {
-            base.Draw(batch);
+            //base.Draw(batch);
+            batch.Draw(Texture,Position,null,Color.Azure,Rotation,Origin,TXAGame.SCALE,SpriteEffects.None, 0f);
             if (IsTileNumbered(Tile))
             {
-                batch.Draw(TXAGame.TEXTURES["TO_Number"],numberPos,null,Color.Wheat,0f,numberPos,GUIControl.SCALE,SpriteEffects.None,0.5f);
-                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour,0f,textPos,GUIControl.SCALE,SpriteEffects.None, 0.45f);
+                batch.Draw(TXAGame.TEXTURES["TO_Number"], numberPos, null, Color.Wheat, 0f, new Vector2(0,0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
+                batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour, 0f, new Vector2(0,0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
             }
+            batch.Draw(TXAGame.WHITE_BASE,Position,Color.Red);
             
         }
 
