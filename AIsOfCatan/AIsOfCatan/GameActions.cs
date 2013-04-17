@@ -68,7 +68,7 @@ namespace AIsOfCatan
         /// Resources to pay for the card are removed from your hand and returned to the resource bank
         /// </summary>
         /// <returns>The drawn development card</returns>
-        DevelopmentCard DrawDevelopmentCard(); //TODO: Should this return GameState?
+        GameState DrawDevelopmentCard();
 
         /// <summary>
         /// Build a settlement on the board at the cost of (1 x Lumber, 1 x Brick, 1 x Wool, 1 x Grain)
