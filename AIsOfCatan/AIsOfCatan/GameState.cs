@@ -16,7 +16,7 @@ namespace AIsOfCatan
 
     //----------------------------------------------------------------------------------------//
 
-    public class GameState
+    public class GameState : IGameState
     {
         public Board Board { get; private set; }
         public int DevelopmentCards { get; private set; }

@@ -111,7 +111,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Agent.cs" />
+    <Compile Include="API\IAgent.cs" />
+    <Compile Include="API\IStartActions.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="DebugAgent.cs" />
     <Compile Include="GameActions.cs" />
@@ -124,6 +125,8 @@
     <Compile Include="Exceptions\IllegalBuildPositionException.cs" />
     <Compile Include="Exceptions\InsufficientResourcesException.cs" />
     <Compile Include="GUI\GUIPiece.cs" />
+    <Compile Include="IAgent.cs" />
+    <Compile Include="IStartActions.cs" />
     <Compile Include="MainActions.cs" />
     <Compile Include="GUI\MapScreen.cs" />
     <Compile Include="Exceptions\NoMoreCardsException.cs" />
@@ -175,6 +178,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

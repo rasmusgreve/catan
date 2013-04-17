@@ -7,7 +7,7 @@ namespace AIsOfCatan
 {
     public enum TradeStatus {Declined, Accepted, Countered};
 
-    public class Trade
+    public class Trade : ITrade
     {
         // For a Wildcard put several Resource in the same inner list.
         public List<List<Resource>> Give { get; private set; }
