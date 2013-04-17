@@ -63,6 +63,16 @@ namespace AIsOfCatan
             InitTerrain(terrainSeed, 0, false);
         }
 
+        /// <summary>
+        /// Get the longest road on this board
+        /// </summary>
+        /// <param name="playerId">The id of the player with the longest road</param>
+        /// <param name="length">The length of the longest road</param>
+        public void GetLongestRoad(out int playerId, out int length)
+        {
+            playerId = 0; //TODO: Sorry about littering your code, but I needed the signature
+            length = 5;
+        }
 
         /// <summary>
         /// Gives the type of terrain and dice value for a given index of the board.
