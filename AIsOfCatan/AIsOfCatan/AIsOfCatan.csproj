@@ -105,9 +105,9 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
-    <Reference Include="TroyXnaAPI, Version=0.1.1.2, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="TroyXnaAPI, Version=0.1.0.2, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Stuff\Project\Randomstuff\TroyXnaAPI\TroyXnaAPI\bin\x86\Debug\TroyXnaAPI.dll</HintPath>
+      <HintPath>.\TroyXnaAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

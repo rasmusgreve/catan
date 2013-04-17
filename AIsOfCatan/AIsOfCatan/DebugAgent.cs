@@ -69,7 +69,7 @@ namespace AIsOfCatan
         public void BeforeDiceRoll(GameState state, GameActions actions)
         {
             Console.WriteLine(id + ": Before dice roll");
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(100);
         }
 
         public int MoveRobber(GameState state)
@@ -96,6 +96,14 @@ namespace AIsOfCatan
         public void PerformTurn(GameState state, GameActions actions)
         {
             Console.WriteLine(id + ": Performing main turn");
+            var resources = state.GetOwnResources();
+            int[] resCount = new int[5];
+            foreach (var r in resources)
+                resCount[(int) r]++;
+            Console.Write(id + ": Resources: ( ");
+            foreach (var i in resCount)
+                Console.Write(i + " ");
+            Console.WriteLine(")");
             System.Threading.Thread.Sleep(1000);
         }
 

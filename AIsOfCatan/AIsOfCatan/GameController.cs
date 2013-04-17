@@ -186,6 +186,7 @@ namespace AIsOfCatan
                 if (opponents.Contains(piece.Player)) continue;
                 opponents.Add(piece.Player);
             }
+            if (opponents.Count == 0) return; //No opponents to draw from
             int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
@@ -302,7 +303,10 @@ namespace AIsOfCatan
         /// <returns>The sum of the roll</returns>
         private int RollDice()
         {
-            return diceRandom.Next(6) + diceRandom.Next(6) + 2;
+            int d1 = diceRandom.Next(1,7);
+            int d2 = diceRandom.Next(1,7);
+            Console.WriteLine("Rolled " + d1 + ", " + d2 + " = " + (d1+d2));
+            return d1+d2;
         }
 
         /// <summary>
@@ -386,7 +390,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="player">The player drawing a development card</param>
         /// <returns>The drawn development card</returns>
-        public DevelopmentCard DrawDevelopmentCard(Player player)
+        public GameState DrawDevelopmentCard(Player player)
         {
             var r = player.Resources;
             if (!(r.Contains(Resource.Grain) && r.Contains(Resource.Wool) && r.Contains(Resource.Ore)))
@@ -395,13 +399,16 @@ namespace AIsOfCatan
             if (developmentCardStack.Count == 0)
                 throw new NoMoreCardsException("Development card stack is empty");
 
+            //TODO: The player may not play the card immediately
+
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
             PayResource(player, Resource.Ore);
 
             var last = developmentCardStack.Last();
             developmentCardStack.RemoveAt(developmentCardStack.Count);
-            return last;
+            player.DevelopmentCards.Add(last);
+            return CurrentGamestate();
         }
 
         Dictionary<int, Dictionary<int, Trade>> proposedTrades = new Dictionary<int, Dictionary<int, Trade>>(); //TODO: Move this
@@ -556,10 +563,10 @@ namespace AIsOfCatan
                 throw new InsufficientResourcesException("Not enough resources to buy a settlement");
             if (player.SettlementsLeft == 0)
                 throw new IllegalActionException("No more settlement pieces left of your color");
-            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
-                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
+            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
+                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetRoad(firstTile, secondTile) != player.Id && board.GetRoad(firstTile, thirdTile) != player.Id && board.GetRoad(secondTile, thirdTile) != player.Id)
                 throw new IllegalBuildPositionException("The chosen position has no road leading to it");
             //TODO: Check that tiles are next to each other
@@ -652,10 +659,10 @@ namespace AIsOfCatan
         /// <param name="thirdTile">The index of the third tile in the intersection</param>
         public GameState BuildFirstSettlement(Player player, int firstTile, int secondTile, int thirdTile)
         {
-            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
-                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
+            if (!board.HasNoNeighbors(firstTile, secondTile, thirdTile))
+                throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             //TODO: Check that tiles are next to each other
 
             player.SettlementsLeft--;
