@@ -395,6 +395,12 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Get a list of playable development cards for a given player
+        /// Newly bought development cards cannot be played in the same round
+        /// </summary>
+        /// <param name="player">The player for whom to get the list of playable development cards</param>
+        /// <returns>The list of playable development cards</returns>
         private List<DevelopmentCard> GetPlayableDevelopmentCards(Player player)
         {
             var playable = new List<DevelopmentCard>();
@@ -423,7 +429,6 @@ namespace AIsOfCatan
         /// Resources to pay for the card are removed from the player hand and returned to the resource bank
         /// </summary>
         /// <param name="player">The player drawing a development card</param>
-        /// <param name="drawnCard">The card that was drawn (used internally)</param>
         /// <returns>The drawn development card</returns>
         public GameState DrawDevelopmentCard(Player player)
         {
@@ -433,8 +438,6 @@ namespace AIsOfCatan
 
             if (developmentCardStack.Count == 0)
                 throw new NoMoreCardsException("Development card stack is empty");
-
-            //TODO: The player may not play the card immediately
 
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
@@ -448,14 +451,15 @@ namespace AIsOfCatan
             return CurrentGamestate();
         }
 
-        Dictionary<int, Dictionary<int, Trade>> proposedTrades = new Dictionary<int, Dictionary<int, Trade>>(); //TODO: Move this
+        private readonly Dictionary<int, Dictionary<int, Trade>> proposedTrades = new Dictionary<int, Dictionary<int, Trade>>(); //TODO: Move this
 
         public Dictionary<int, Trade> ProposeTrade(Player player, Trade trade)
         {
             var dict = new Dictionary<int, Trade>();
             foreach (var other in players)
             {
-                dict[other.Id] = (Trade)other.Agent.HandleTrade(trade); //TODO: Reversal of trades?
+                if (other.Id == player.Id) continue; //No need to propose a trade with yourself
+                dict[other.Id] = (Trade)other.Agent.HandleTrade(trade.Reverse(), player.Id);
             }
             proposedTrades[player.Id] = dict;
             return dict;
@@ -463,6 +467,25 @@ namespace AIsOfCatan
 
         public GameState CompleteTrade(Player player, int playerid)
         {
+            if (!proposedTrades.ContainsKey(player.Id))
+                throw new IllegalActionException("Tried to complete a trade, but no trade proposed");
+            if (!proposedTrades[player.Id].ContainsKey(playerid) || playerid < 0 || playerid >= players.Length)
+                throw new IllegalActionException("Tried to complete a trade with an illegal player Id");
+            
+            var trade = proposedTrades[player.Id][playerid]; //remember that the trade is as seen from the opponents pov
+            var opponent = players[playerid];
+            if (trade.Status == TradeStatus.Declined)
+                throw new IllegalActionException("Tried to complete a declined trade");
+
+            //Complete trade
+            //TODO: Wildcards needs to be resolved
+            /*
+            foreach (var res in trade.Give)
+            {
+                opponent.Resources.Remove(res);
+                player.Resources.Add(res);
+            }
+            */
 
             throw new NotImplementedException();
         }

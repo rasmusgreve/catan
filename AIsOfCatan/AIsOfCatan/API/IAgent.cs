@@ -110,7 +110,8 @@ namespace AIsOfCatan
         /// to choose which player he want to trade with, and if he wants to trade at all
         /// </summary>
         /// <param name="offer">The proposing players trade offer</param>
+        /// <param name="proposingPlayerId">The id of the player who proposed the trade</param>
         /// <returns>Either the same offer accepted or declined, or a counteroffer</returns>
-        ITrade HandleTrade(ITrade offer);
+        ITrade HandleTrade(ITrade offer, int proposingPlayerId);
     }
 }

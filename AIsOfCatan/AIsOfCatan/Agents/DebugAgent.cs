@@ -107,7 +107,7 @@ namespace AIsOfCatan
             System.Threading.Thread.Sleep(1000);
         }
 
-        public ITrade HandleTrade(ITrade offer)
+        public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
         {
             Console.WriteLine(id + ": Handling trade");
             return offer;
