@@ -2,7 +2,7 @@
 
 namespace AIsOfCatan
 {
-    public class StartActions
+    public class StartActions : IStartActions
     {
         private readonly Player player;
         private readonly GameController controller;
@@ -31,14 +31,15 @@ namespace AIsOfCatan
             return settlementPosition.ToArray();
         }
 
+
         /// <summary>
-        /// IMPORTANT! May only be called once!
-        /// Must be called before BuildRoad
+        /// Build a settlement on the board
+        /// If you try to build too close to another building a IllegalBuildPosition is thrown
+        /// Must be called before BuildRoad, otherwise an IllegalActionException is thrown
         /// </summary>
-        /// <param name="firstTile"></param>
-        /// <param name="secondTile"></param>
-        /// <param name="thirdTile"></param>
-        /// <returns></returns>
+        /// <param name="firstTile">The index of the first tile in the intersection</param>
+        /// <param name="secondTile">The index of the second tile in the intersection</param>
+        /// <param name="thirdTile">The index of the third tile in the intersection</param>
         public void BuildSettlement(int firstTile, int secondTile, int thirdTile)
         {
             if (settlementBuilt) throw new IllegalActionException("Only one settlement may be built in a turn during the startup");
@@ -48,12 +49,12 @@ namespace AIsOfCatan
         }
 
         /// <summary>
-        /// IMPORTANT! May only be called once!
-        /// Must be called after BuildSettlement
+        /// Build a road on the board
+        /// If you try to build at a position not connected to the newly placed settlement an IllegalBuildPositionException is thrown
+        /// If you try to build more than one road an IllegalActionException is thrown
         /// </summary>
-        /// <param name="firstTile"></param>
-        /// <param name="secondTile"></param>
-        /// <returns></returns>
+        /// <param name="firstTile">The first tile that the road will be along</param>
+        /// <param name="secondTile">The second tile that the road will be along</param>
         public void BuildRoad(int firstTile, int secondTile)
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");

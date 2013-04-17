@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    class DebugAgent : Agent
+    class DebugAgent : IAgent
     {
         private int id;
         private int[] start1 = new[] { 8, 9, 15};
@@ -16,10 +16,10 @@ namespace AIsOfCatan
         public void Reset(int assignedId)
         {
             id = assignedId;
-            Console.WriteLine("Agent reset with id " + id);
+            Console.WriteLine("IAgent reset with id " + id);
         }
 
-        public void PlaceStart(GameState state, StartActions actions)
+        public void PlaceStart(GameState state, IStartActions actions)
         {
             Console.WriteLine(id + ": Place starts");
             if (!firstStartPlaced)
@@ -66,7 +66,7 @@ namespace AIsOfCatan
             }
         }
 
-        public void BeforeDiceRoll(GameState state, GameActions actions)
+        public void BeforeDiceRoll(GameState state, IGameActions actions)
         {
             Console.WriteLine(id + ": Before dice roll");
             System.Threading.Thread.Sleep(100);
@@ -93,7 +93,7 @@ namespace AIsOfCatan
             return state.GetOwnResources().Take(toDiscard).ToArray();
         }
 
-        public void PerformTurn(GameState state, GameActions actions)
+        public void PerformTurn(GameState state, IGameActions actions)
         {
             Console.WriteLine(id + ": Performing main turn");
             var resources = state.GetOwnResources();

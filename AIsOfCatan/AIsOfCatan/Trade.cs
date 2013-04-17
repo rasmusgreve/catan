@@ -9,15 +9,15 @@ namespace AIsOfCatan
 
     public class Trade
     {
-        private TradeStatus status = TradeStatus.Declined;
-
         // For a Wildcard put several Resource in the same inner list.
         public List<List<Resource>> Give { get; private set; }
         public List<List<Resource>> Want { get; private set; }
+        public TradeStatus Status { get; private set; }
 
         public Trade(List<List<Resource>> give, List<List<Resource>> want){
             this.Give = give;
             this.Want = want;
+            Status = TradeStatus.Declined;
         }
 
         public Trade Reverse()
@@ -27,17 +27,12 @@ namespace AIsOfCatan
 
         public void Accept()
         {
-            status = TradeStatus.Accepted;
+            Status = TradeStatus.Accepted;
         }
 
         public void CounterOffer()
         {
-            status = TradeStatus.Countered;
-        }
-
-        public TradeStatus GetStatus()
-        {
-            return status;
+            Status = TradeStatus.Countered;
         }
 
         private List<List<Resource>> DeepClone(List<List<Resource>> list)
