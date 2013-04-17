@@ -40,18 +40,17 @@ namespace AIsOfCatan
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             board = new Board(0);
             board = board.PlaceRoad(16, 22, 1);
             board = board.PlaceRoad(23, 24, 2);
             board = board.PlaceRoad(28, 35, 3);
+            board = board.PlacePiece(8, 14, 15, new Board.Piece(Token.Settlement, 2));
+            board = board.PlacePiece(28, 29, 35, new Board.Piece(Token.City, 3));
             state = new GameState(board, null, null, null, 0);
 
             SCALE = 0.5f;
 
             base.Initialize();
-
-            //SCALE = 0.5f;
 
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
@@ -78,6 +77,8 @@ namespace AIsOfCatan
             TEXTURES.Add("T_Water", Content.Load<Texture2D>("WaterTile"));
             TEXTURES.Add("TO_Number", Content.Load<Texture2D>("NumberTile"));
             TEXTURES.Add("TO_Road", Content.Load<Texture2D>("RoadToken"));
+            TEXTURES.Add("TO_Settle", Content.Load<Texture2D>("HouseToken"));
+            TEXTURES.Add("TO_City", Content.Load<Texture2D>("CityToken"));
 
             base.LoadContent();
 
@@ -85,7 +86,6 @@ namespace AIsOfCatan
             startScreen = new MapScreen(state);
 
             screenManager.AddScreen("start", startScreen);
-            //screenManager.SetScreen("start");
         }
 
         /// <summary>

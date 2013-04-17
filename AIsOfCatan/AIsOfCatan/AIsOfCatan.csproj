@@ -122,6 +122,7 @@
     <Compile Include="Exceptions\IllegalActionException.cs" />
     <Compile Include="Exceptions\IllegalBuildPositionException.cs" />
     <Compile Include="Exceptions\InsufficientResourcesException.cs" />
+    <Compile Include="GUI\GUIPiece.cs" />
     <Compile Include="MainActions.cs" />
     <Compile Include="GUI\MapScreen.cs" />
     <Compile Include="Exceptions\NoMoreCardsException.cs" />
