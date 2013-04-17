@@ -28,6 +28,10 @@ namespace AIsOfCatan
         /// <returns>The id of the winner of the game</returns>
         public int StartGame(Agent[] agents, int boardSeed, int diceSeed)
         {
+            //Initialize random number generators
+            diceRandom = new Random(diceSeed);
+            shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
+               
             //Build player list
             players = new Player[agents.Length];
             for (int i = 0; i < agents.Length; i++)
@@ -40,12 +44,8 @@ namespace AIsOfCatan
             PopulateDevelopmentCardStack();
             resourceBank = new int[] { 19, 19, 19, 19, 19 };
 
-            //Initialize random number generators
-            diceRandom = new Random(diceSeed);
-            shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
-            
             //Start the game!
-            turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE ID's ARE ASSIGNED!
+            turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
             PlaceStarts();
             return GameLoop();
         }
@@ -67,9 +67,9 @@ namespace AIsOfCatan
             }
 
             //Shuffle!
-            for (int n = developmentCardStack.Count; n > 1; n--)
+            for (int n = developmentCardStack.Count-1; n > 1; n--)
             {
-                int k = shuffleRandom.Next(n + 1);
+                int k = shuffleRandom.Next(n);
                 var aux = developmentCardStack[k];
                 developmentCardStack[k] = developmentCardStack[n];
                 developmentCardStack[n] = aux;
@@ -79,7 +79,7 @@ namespace AIsOfCatan
         /// <summary>
         /// Executes the game, each player turn by turn until a player wins
         /// </summary>
-        /// <returns>The ID of the winning player</returns>
+        /// <returns>The Id of the winning player</returns>
         private int GameLoop()
         {
             while (true)
@@ -215,8 +215,14 @@ namespace AIsOfCatan
             //Map from PlayerID to dictionary that maps resource to amount
             var handouts = new Dictionary<int, Dictionary<Resource, int>>();
             var handoutSums = new Dictionary<Resource, int>();
-            for (int i = 0; i < players.Length; i++) handouts[i] = new Dictionary<Resource,int>();
-
+            for (int i = 0; i < players.Length; i++)
+            {
+                handouts[i] = new Dictionary<Resource, int>();
+                foreach (Resource r in Enum.GetValues(typeof(Resource)))
+                    handouts[i][r] = 0;
+            }
+            foreach (Resource r in Enum.GetValues(typeof(Resource)))
+                handoutSums[r] = 0;
             //Count how many resources to be dealt
             for (int i = 0; i <= 44; i++)
             {
@@ -263,6 +269,11 @@ namespace AIsOfCatan
                 var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
+                if (!actions.IsComplete())
+                {
+                    Console.WriteLine("An agent did not place the correct amount of start pieces");
+                    //TODO: What to do?
+                }
                 NextTurn();
             }
             foreach (Player p in players)
@@ -271,6 +282,12 @@ namespace AIsOfCatan
                 var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
+                if (!actions.IsComplete())
+                {
+                    Console.WriteLine("An agent did not place the correct amount of start pieces");
+                    //TODO: What to do?
+                }
+
                 //Hand out resources
                 foreach (var pos in actions.GetSettlementPosition())
                 {
@@ -455,6 +472,7 @@ namespace AIsOfCatan
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
                 if (!RoadConnected(firstTile2, secondTile2, player.Id))
                     throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
+                //TODO: Check that tiles are next to each other
                 
                 board = board.PlaceRoad(firstTile2, secondTile2, player.Id);
             }
@@ -465,7 +483,8 @@ namespace AIsOfCatan
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
                 if (!RoadConnected(firstTile1, secondTile1, player.Id))
                     throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
-                
+                //TODO: Check that tiles are next to each other
+
                 board = board.PlaceRoad(firstTile1, secondTile1, player.Id);
             }
             else
@@ -543,6 +562,7 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
             if (board.GetRoad(firstTile, secondTile) != player.Id && board.GetRoad(firstTile, thirdTile) != player.Id && board.GetRoad(secondTile, thirdTile) != player.Id)
                 throw new IllegalBuildPositionException("The chosen position has no road leading to it");
+            //TODO: Check that tiles are next to each other
 
             PayResource(player, Resource.Grain);
             PayResource(player, Resource.Wool);
@@ -580,7 +600,6 @@ namespace AIsOfCatan
             if (piece == null || piece.Player != player.Id || piece.Token != Token.Settlement)
                 throw new IllegalBuildPositionException("The chosen position does not contain one of your settlements");
 
-
             PayResource(player, Resource.Ore, 3);
             PayResource(player, Resource.Grain, 2);
 
@@ -612,7 +631,8 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position is occupied by another road");
             if (!RoadConnected(firstTile,secondTile, player.Id))
                 throw new IllegalBuildPositionException("The chosen position is not connected to any of your pieces");
-            
+            //TODO: Check that tiles are next to each other
+
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
@@ -636,6 +656,7 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetPiece(firstTile, secondTile, thirdTile) != null)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another building");
+            //TODO: Check that tiles are next to each other
 
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
@@ -654,6 +675,8 @@ namespace AIsOfCatan
         {
             if (board.GetRoad(firstTile, secondTile) != -1)
                 throw new IllegalBuildPositionException("The chosen position is occupied by another road");
+            //TODO: Check that tiles are next to each other
+
             player.RoadsLeft--;
             board = board.PlaceRoad(firstTile, secondTile, player.Id);
             return CurrentGamestate();

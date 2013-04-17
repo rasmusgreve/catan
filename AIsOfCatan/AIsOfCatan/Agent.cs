@@ -5,9 +5,9 @@ namespace AIsOfCatan
     {
         /// <summary>
         /// Reset the agent, getting it ready for a new game
-        /// The agent should store the assigned ID for later in the game
+        /// The agent should store the assigned Id for later in the game
         /// </summary>
-        /// <param name="assignedId">The ID assigned to this player</param>
+        /// <param name="assignedId">The Id assigned to this player</param>
         void Reset(int assignedId);
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace AIsOfCatan
         /// <summary>
         /// After moving the robber you must choose which player you want to draw a card from
         /// The array validOptions contains IDs of players with buildings on hex where the robber was placed
-        /// If an invalid player ID is returned you will receive no resources
+        /// If an invalid player Id is returned you will receive no resources
         /// </summary>
         /// <param name="validOpponents">IDs of players with buildings on hex where the robber was placed</param>
-        /// <returns>The chosen ID from the list</returns>
+        /// <returns>The chosen Id from the list</returns>
         int ChoosePlayerToDrawFrom(int[] validOpponents); //You must choose an opponent to draw a card from (called after you move the robber)
 
         /// <summary>

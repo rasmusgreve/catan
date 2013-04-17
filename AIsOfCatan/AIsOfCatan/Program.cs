@@ -10,6 +10,11 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
+            var agent = new DebugAgent();
+            var controller = new GameController();
+            if (!true) //Set to false if you wanna see the GUI
+                controller.StartGame(new Agent[] { agent }, 0, 0);
+
             using (GUIControl game = new GUIControl())
             {
                 game.Run();

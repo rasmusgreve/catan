@@ -113,6 +113,7 @@
   <ItemGroup>
     <Compile Include="Agent.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="DebugAgent.cs" />
     <Compile Include="GameActions.cs" />
     <Compile Include="GameController.cs" />
     <Compile Include="GameState.cs" />
