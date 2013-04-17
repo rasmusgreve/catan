@@ -23,9 +23,7 @@ namespace AIsOfCatan
         //private static readonly Vector2 S_WEST = new Vector2(TileShift, -TILE_WIDTH / 2);
         //private static readonly Vector2 N_WEST = new Vector2(-TileShift, -TILE_WIDTH / 2);
 
-
-
-        private readonly List<int> omitted = new List<int> { 0, 5, 6, 12, 32, 38, 39, 44 };
+        private bool Omitted { get; set; }
 
         private Vector2 numberPos;
         private Vector2 textPos;
@@ -33,23 +31,21 @@ namespace AIsOfCatan
 
         private Board.Tile Tile { get; set; }
 
-        public GUITile(int x, int y, Board.Tile tile) : 
+        public GUITile(int x, int y, Board.Tile tile, bool omit) : 
             base(
                 new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TileWidth()), (float) ((0.66+y)*TileShift())),
                 GetTexture(tile.Terrain)
             )
         {
-
             Tile = tile;
-            Y = y;
-            X = x;
+            Omitted = omit;
             NumAreaAndTextPos();
             valueColour = (Tile.Value == 6 || Tile.Value == 8 ? Color.Red : Color.Black);
             
         }
 
-        private int X { get; set; }
-        private int Y { get; set; }
+        //private int X { get; set; }
+        //private int Y { get; set; }
 
         private static Texture2D GetTexture(Terrain ter)
         {
@@ -58,24 +54,11 @@ namespace AIsOfCatan
 
         protected override void DoUpdate(GameTime time)
         {
-            if (!OmittedTile(MapScreen.GetTerrainIndex(Y, X)))
+            if (Omitted && Visible)
             {
+                //!OmittedTile(MapScreen.GetTerrainIndex(Y, X))
                 Visible = false;
             }
-        }
-
-        protected override void UpdateRect()
-        {
-            //TODO: use in TXA
-            float width = Texture.Width * TXAGame.SCALE;
-            float height = Texture.Height * TXAGame.SCALE;
-            //Debug.WriteLine(string.Format("UpdateRect: width {0}, height: {1}"));
-
-            Area = new Rectangle(
-                (int)(Math.Round(Position.X - (width / 2))),
-                (int)(Math.Round(Position.Y - (height / 2))),
-                (int)(Math.Round(width)),
-                (int)(Math.Round(height)));
         }
 
         private void NumAreaAndTextPos()
@@ -94,19 +77,15 @@ namespace AIsOfCatan
 
         protected override void Draw(SpriteBatch batch)
         {
+            base.Draw(batch);
             if (Visible)
             {
-                //base.Draw(batch);
-                batch.Draw(Texture, Position, null, Color.Azure, Rotation, Origin, TXAGame.SCALE, SpriteEffects.None, 0f);
                 if (IsTileNumbered(Tile))
                 {
                     batch.Draw(TXAGame.TEXTURES["TO_Number"], numberPos, null, Color.Wheat, 0f, new Vector2(0, 0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
                     batch.DrawString(TXAGame.ARIAL, Tile.Value.ToString(CultureInfo.InvariantCulture), textPos, valueColour, 0f, new Vector2(0, 0), TXAGame.SCALE, SpriteEffects.None, 0.0f);
                 }
-                batch.Draw(TXAGame.WHITE_BASE, Position, Color.Red);
             }
-            
-            
         }
 
         private static bool IsTileNumbered(Board.Tile tile)
@@ -125,9 +104,5 @@ namespace AIsOfCatan
             //
         }
 
-        private bool OmittedTile(int index)
-        {
-            return !omitted.Contains(index);
-        }
     }
 }

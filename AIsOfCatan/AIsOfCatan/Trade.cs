@@ -38,7 +38,7 @@ namespace AIsOfCatan
         private List<List<Resource>> DeepClone(List<List<Resource>> list)
         {
             var result = new List<List<Resource>>(list.Count);
-            foreach (List<Resource> l in list) result.Add(new List<Resource>(l));
+            result.AddRange(list.Select(l => new List<Resource>(l)));
             return result;
         }
     }

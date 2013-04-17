@@ -17,10 +17,12 @@ namespace AIsOfCatan
 
         private readonly GUITile[][] board = new GUITile[7][];
 
+        private readonly List<int> omitted = new List<int> { 0, 5, 6, 12, 32, 38, 39, 44 };
+
         private readonly List<GUIRoad> roads = new List<GUIRoad>();
         private readonly List<GUIPiece> pieces = new List<GUIPiece>();
 
-        private GUIRobber robber;
+        private readonly GUIRobber robber;
 
         public MapScreen(GameState initial)
         {
@@ -32,9 +34,8 @@ namespace AIsOfCatan
 
                 for (int j = 0; j < board[i].Length; j++)
                 {
-
-                    //Debug.WriteLine("SCALE " + TXAGame.SCALE);
-                    GUITile tile = new GUITile(j, i, latestGameState.Board.GetTile(i, j));
+                    bool omit = OmittedTile(GetTerrainIndex(i, j));
+                    GUITile tile = new GUITile(j, i, latestGameState.Board.GetTile(i, j), omit);
                     AddDrawableComponent(tile);
                     board[i][j] = tile;
                 }
@@ -53,7 +54,7 @@ namespace AIsOfCatan
             latestGameState = state;
 
             #region Roads
-            Dictionary<Tuple<int,int>, int> allRoads = latestGameState.Board.GetAllRoads();
+            Dictionary<Tuple<int, int>, int> allRoads = latestGameState.Board.GetAllRoads();
 
             foreach (KeyValuePair<Tuple<int, int>, int> road in allRoads)
             {
@@ -113,8 +114,6 @@ namespace AIsOfCatan
                     continue;
                 }
 
-                //Tuple<int, int> t2C = GetTerrainCoords(2);
-
                 Vector2 diffVector = t1 + 1 == t2
                                          ? new Vector2(GUITile.TileWidth()/2, GUITile.TileHeight()/4)
                                          : new Vector2(0, GUITile.TileHeight()/2);
@@ -144,11 +143,6 @@ namespace AIsOfCatan
             return board[robberCoord.Item1][robberCoord.Item2].Position/TXAGame.SCALE;
         }
 
-        public override void Draw(SpriteBatch batch)
-        {
-            base.Draw(batch);
-        }
-
         private Tuple<int, int> GetTerrainCoords(int index)
         {
             int row = 0;
@@ -173,6 +167,28 @@ namespace AIsOfCatan
                 longrow = !longrow;
             }
             return index + col;
+        }
+
+        private bool OmittedTile(int index)
+        {
+            return omitted.Contains(index);
+        }
+
+        internal static Color GetPlayerColor(int i)
+        {
+            switch (i)
+            {
+                case 1:
+                    return Color.RoyalBlue;
+                case 2:
+                    return Color.Red;
+                case 3:
+                    return Color.Orange;
+                case 4:
+                    return Color.White;
+                default:
+                    return Color.Black;
+            }
         }
     }
 }
