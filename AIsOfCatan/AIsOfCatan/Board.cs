@@ -124,6 +124,16 @@ namespace AIsOfCatan
         }
 
         /// <summary>
+        /// Gives a (copy) of the dictionary holding all settlements and cities 
+        /// currently build on the board.
+        /// </summary>
+        /// <returns>A dictionary with all settlements and cities on the board.</returns>
+        public Dictionary<Tuple<int,int,int>,Piece> GetAllPieces()
+        {
+            return new Dictionary<Tuple<int, int, int>, Piece>(settlements);
+        } 
+
+        /// <summary>
         /// Get all pieces built adjacent to the given tile index.
         /// </summary>
         /// <param name="index">The location of the tile.</param>
