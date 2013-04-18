@@ -50,6 +50,17 @@ actions in the game, this includes:
 <img src="https://docs.google.com/drawings/d/1RH69Vucy1VBqW0YaUUklK9THl8kOxvpyc3Oe4-oKl4g/pub?w=960&amp;h=720">
 
 ----------------------------------------------------------
+                           GUI                       
+----------------------------------------------------------
+First proposal for a completed GUI:
+
+https://www.dropbox.com/s/my9ca3re0werlwr/Udkast%20til%20GUI.pdn
+
+Requires Paint.net.
+The 'Tab' layers are meant for viewing seperately from the rest
+
+
+----------------------------------------------------------
                          TRADING
 ----------------------------------------------------------
 
