@@ -22,6 +22,7 @@ namespace AIsOfCatan
             Agent = agent;
             Id = id;
             DevelopmentCards = new List<DevelopmentCard>();
+            NewDevelopmentCards = new List<DevelopmentCard>();
             Resources = new List<Resource>();
         }
 
@@ -59,6 +60,11 @@ namespace AIsOfCatan
         /// The development cards that this player has in his hand
         /// </summary>
         public List<DevelopmentCard> DevelopmentCards { get; private set; }
+
+        /// <summary>
+        /// The development cards that this player has drawn in this turn (and cannot play until next turn)
+        /// </summary>
+        public List<DevelopmentCard> NewDevelopmentCards { get; private set; }
 
         /// <summary>
         /// The resource cards that this player has in his hand

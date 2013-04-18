@@ -63,6 +63,16 @@ namespace AIsOfCatan
             InitTerrain(terrainSeed, 0, false);
         }
 
+        /// <summary>
+        /// Get the longest road on this board
+        /// </summary>
+        /// <param name="playerId">The id of the player with the longest road</param>
+        /// <param name="length">The length of the longest road</param>
+        public void GetLongestRoad(out int playerId, out int length)
+        {
+            playerId = 0; //TODO: Sorry about littering your code, but I needed the signature
+            length = 5;
+        }
 
         /// <summary>
         /// Gives the type of terrain and dice value for a given index of the board.
@@ -88,6 +98,22 @@ namespace AIsOfCatan
         }
 
         /// <summary>
+        /// Tells if a specific intersection is free for building.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="index3">The third index of the tiles to look between.</param>
+        /// <returns>True if the intersections if free, else false.</returns>
+        public bool CanBuildPiece(int index1, int index2, int index3)
+        {
+            Tuple<int, int, int> tuple = Get3Tuple(index1, index2, index3);
+            if (GetTile(index1).Terrain == Terrain.Water && GetTile(index2).Terrain == Terrain.Water && GetTile(index3).Terrain == Terrain.Water)
+                return false;
+
+            return !settlements.ContainsKey(tuple);
+        }
+
+        /// <summary>
         /// Gives the id of the player who has build a road at the requested edge.
         /// </summary>
         /// <param name="firstTile">The first index of the tiles to look between.</param>
@@ -106,7 +132,22 @@ namespace AIsOfCatan
         public Dictionary<Tuple<int,int>,int> GetAllRoads()
         {
             return new Dictionary<Tuple<int, int>, int>(roads);
-        } 
+        }
+
+        /// <summary>
+        /// Tells if a specific edge contains no road.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <returns>True if there is no road on the given edge, else false.</returns>
+        public bool CanBuildRoad(int index1, int index2)
+        {
+            Tuple<int, int> tuple = Get2Tuple(index1, index2);
+            if (GetTile(index1).Terrain == Terrain.Water && GetTile(index2).Terrain == Terrain.Water)
+                return false;
+
+            return !roads.ContainsKey(tuple);
+        }
 
         /// <summary>
         /// Gives the game piece at the vertex between three different tiles.
@@ -148,7 +189,47 @@ namespace AIsOfCatan
             AddPiece(result, index, index + 6, index + 7);
             AddPiece(result, index, index + 6, index - 1);
             return result;
-        } 
+        }
+
+        /// <summary>
+        /// Gives a list of all legal intersections on the board. If this method
+        /// proves too slow it should be modified to only calculate the intersections
+        /// once.
+        /// </summary>
+        /// <returns>A list containing all intersections entirely or partly on land.</returns>
+        public List<Tuple<int, int, int>> GetAllIntersections()
+        {
+            List<Tuple<int, int, int>> result = new List<Tuple<int, int, int>>(22);
+            for (int r = 0; r < 7; r++)
+            {
+                for (int c = 0; c < Board.GetRowLength(r); c++)
+                {
+                    Tuple<int, int, int> south = null;
+                    Tuple<int,int,int> southeast = null;
+
+                    if (r % 2 == 0)
+                    {
+                        if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1)) 
+                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
+                        if (r + 1 < 7 && c + 1 < Board.GetRowLength(r)) 
+                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
+                    }
+                    else
+                    {
+                        if (r + 1 < 7 && c - 1 >= 0 && c < 6)
+                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
+                        if (r + 1 < 7 && c < 6)
+                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
+                    }
+
+                    if (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water)
+                        result.Add(south);
+                    if (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water)
+                        result.Add(southeast);
+                }
+            }
+            return result;
+        }
 
         /// <summary>
         /// Gives the current location of the Robber token.
