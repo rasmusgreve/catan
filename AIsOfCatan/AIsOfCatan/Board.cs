@@ -158,7 +158,47 @@ namespace AIsOfCatan
             AddPiece(result, index, index + 6, index + 7);
             AddPiece(result, index, index + 6, index - 1);
             return result;
-        } 
+        }
+
+        /// <summary>
+        /// Gives a list of all legal intersections on the board. If this method
+        /// proves too slow it should be modified to only calculate the intersections
+        /// once.
+        /// </summary>
+        /// <returns>A list containing all intersections entirely or partly on land.</returns>
+        public List<Tuple<int, int, int>> GetAllIntersections()
+        {
+            List<Tuple<int, int, int>> result = new List<Tuple<int, int, int>>(22);
+            for (int r = 0; r < 7; r++)
+            {
+                for (int c = 0; c < Board.GetRowLength(r); c++)
+                {
+                    Tuple<int, int, int> south = null;
+                    Tuple<int,int,int> southeast = null;
+
+                    if (r % 2 == 0)
+                    {
+                        if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1)) 
+                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
+                        if (r + 1 < 7 && c + 1 < Board.GetRowLength(r)) 
+                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
+                    }
+                    else
+                    {
+                        if (r + 1 < 7 && c - 1 >= 0 && c < 6)
+                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
+                        if (r + 1 < 7 && c < 6)
+                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
+                    }
+
+                    if (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water)
+                        result.Add(south);
+                    if (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water)
+                        result.Add(southeast);
+                }
+            }
+            return result;
+        }
 
         /// <summary>
         /// Gives the current location of the Robber token.
