@@ -8,7 +8,7 @@ namespace AIsOfCatan
     /// <summary>
     /// Thrown when a build fails because it's in an illegal position
     /// </summary>
-    class IllegalBuildPositionException : Exception
+    class IllegalBuildPositionException : AgentActionException
     {
         public IllegalBuildPositionException()
         {

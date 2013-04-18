@@ -8,7 +8,7 @@ namespace AIsOfCatan
     /// <summary>
     /// Thrown when a player tries to buy something but haven't got sufficient resources
     /// </summary>
-    class InsufficientResourcesException : Exception
+    class InsufficientResourcesException : AgentActionException
     {
         public InsufficientResourcesException()
         {
