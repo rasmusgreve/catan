@@ -98,6 +98,22 @@ namespace AIsOfCatan
         }
 
         /// <summary>
+        /// Tells if a specific intersection is free for building.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="index3">The third index of the tiles to look between.</param>
+        /// <returns>True if the intersections if free, else false.</returns>
+        public bool CanBuildPiece(int index1, int index2, int index3)
+        {
+            Tuple<int, int, int> tuple = Get3Tuple(index1, index2, index3);
+            if (GetTile(index1).Terrain == Terrain.Water && GetTile(index2).Terrain == Terrain.Water && GetTile(index3).Terrain == Terrain.Water)
+                return false;
+
+            return !settlements.ContainsKey(tuple);
+        }
+
+        /// <summary>
         /// Gives the id of the player who has build a road at the requested edge.
         /// </summary>
         /// <param name="firstTile">The first index of the tiles to look between.</param>
@@ -116,7 +132,22 @@ namespace AIsOfCatan
         public Dictionary<Tuple<int,int>,int> GetAllRoads()
         {
             return new Dictionary<Tuple<int, int>, int>(roads);
-        } 
+        }
+
+        /// <summary>
+        /// Tells if a specific edge contains no road.
+        /// </summary>
+        /// <param name="index1">The first index of the tiles to look between.</param>
+        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <returns>True if there is no road on the given edge, else false.</returns>
+        public bool CanBuildRoad(int index1, int index2)
+        {
+            Tuple<int, int> tuple = Get2Tuple(index1, index2);
+            if (GetTile(index1).Terrain == Terrain.Water && GetTile(index2).Terrain == Terrain.Water)
+                return false;
+
+            return !roads.ContainsKey(tuple);
+        }
 
         /// <summary>
         /// Gives the game piece at the vertex between three different tiles.
