@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using AIsOfCatan.GUI;
 using MS.Internal.Xml.XPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
