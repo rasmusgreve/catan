@@ -477,17 +477,24 @@ namespace AIsOfCatan
             if (trade.Status == TradeStatus.Declined)
                 throw new IllegalActionException("Tried to complete a declined trade");
 
-            //Complete trade
-            //TODO: Wildcards needs to be resolved
-            /*
-            foreach (var res in trade.Give)
+            //Validate trade
+            if (trade.Give.Any(res => res.Count > 1) || trade.Take.Any(res => res.Count > 1))
             {
-                opponent.Resources.Remove(res);
-                player.Resources.Add(res);
+                throw new IllegalActionException("Tried to complete a trade containing wildcards");
             }
-            */
 
-            throw new NotImplementedException();
+            //Complete trade
+            foreach (var res in trade.Give.Where(res => res.Count != 0))
+            {
+                opponent.Resources.Remove(res[0]);
+                player.Resources.Add(res[0]);
+            }
+            foreach (var res in trade.Take.Where(res => res.Count != 0))
+            {
+                player.Resources.Remove(res[0]);
+                opponent.Resources.Add(res[0]);
+            }
+            return CurrentGamestate();
         }
 
         /// <summary>
