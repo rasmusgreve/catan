@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{FD128C9F-A79C-41E9-885F-1CCF24849060}</ProjectGuid>
@@ -123,6 +123,7 @@
     <Compile Include="API\ITrade.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="ActionLog.cs" />
+    <Compile Include="Exceptions\AgentActionException.cs" />
     <Compile Include="GameflowControl\GameController.cs" />
     <Compile Include="GameflowControl\MainActions.cs" />
     <Compile Include="GameflowControl\Player.cs" />

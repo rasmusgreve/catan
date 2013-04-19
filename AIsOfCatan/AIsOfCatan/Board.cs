@@ -10,6 +10,11 @@ namespace AIsOfCatan
         private static readonly int[] WaterTiles = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 18, 19, 25, 26, 31, 32, 33, 37, 38, 39, 40, 41, 42, 43, 44 };
         private static readonly int[] placementOrder = new int[] { 8, 14, 20, 27, 34, 35, 36, 30, 24, 17, 10, 9, 15, 21, 28, 29, 23, 16, 22 };
         private static readonly int[] valueOrder = new int[] { 5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11 };
+        private static readonly Tuple<int, int>[] harborEdges = new Tuple<int, int>[] { new Tuple<int, int>(1, 8), new Tuple<int, int>(3, 9),
+                                                                                        new Tuple<int, int>(11, 17), new Tuple<int, int>(24, 25),
+                                                                                        new Tuple<int, int>(30, 37), new Tuple<int, int>(35, 42),
+                                                                                        new Tuple<int, int>(34, 40), new Tuple<int, int>(26, 27),
+                                                                                        new Tuple<int, int>(13, 14)};
 
         public static int GetRowLength(int row)
         {
@@ -17,6 +22,7 @@ namespace AIsOfCatan
         }
 
         private Tile[][] terrain;
+        private Harbor[] harbors;
         private Dictionary<Tuple<int, int>, int> roads;
         private Dictionary<Tuple<int, int, int>, Piece> settlements;
         private int robberLocation;
@@ -35,6 +41,7 @@ namespace AIsOfCatan
             // initialize fields
             roads = new Dictionary<Tuple<int, int>, int>(22);
             settlements = new Dictionary<Tuple<int, int, int>, Piece>(22);
+            harbors = new Harbor[9];
 
             // create board
             terrain = new Tile[7][];
@@ -354,6 +361,16 @@ namespace AIsOfCatan
                 All(inter => inter.Equals(tuple) || GetPiece(inter.Item1, inter.Item2, inter.Item3) == null);
         }
 
+        /// <summary>
+        /// Gives an array (size 9) of Harbors containing positions (edges) and
+        /// HarborType's for those positions.
+        /// </summary>
+        /// <returns>The array of Harbors on the board.</returns>
+        public Harbor[] GetHarbors()
+        {
+            return this.harbors.ToArray();
+        }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -387,8 +404,10 @@ namespace AIsOfCatan
             }
             terrainPool.Add(Terrain.Desert);
             List<int> numberPool = new List<int>(valueOrder);
+            List<HarborType> harborPool = new List<HarborType>(9);
 
             Shuffle(terrainPool, terrainSeed); // shuffle
+            Shuffle(harborPool, terrainSeed);
             if (randomNumbers) Shuffle(numberPool, numberSeed);
 
             // place randomized tiles
@@ -408,6 +427,9 @@ namespace AIsOfCatan
                     terrain[coords.Item1][coords.Item2] = new Tile(terrainPool[i], numberPool[i - (desertFound ? 1 : 0)]);
                 }
             }
+
+            // place harbors random at positions
+            for (int i = 0; i < 9; i++) harbors[i] = new Harbor(harborPool[i], harborEdges[i]);
         }
 
         private Tuple<int, int> GetTerrainCoords(int index)
@@ -495,6 +517,17 @@ namespace AIsOfCatan
             {
                 this.Token = token;
                 this.Player = player;
+            }
+        }
+
+        public class Harbor
+        {
+            public HarborType Type { get; private set; }
+            public Tuple<int,int> Position { get; private set; }
+
+            public Harbor(HarborType type, Tuple<int,int> position){
+                this.Type = type;
+                this.Position = position;
             }
         }
     }

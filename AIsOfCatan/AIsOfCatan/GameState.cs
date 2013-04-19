@@ -14,6 +14,8 @@ namespace AIsOfCatan
 
     public enum Token {Settlement, City};
 
+    public enum HarborType { Brick, Lumber, Wool, Grain, Ore, ThreeForOne };
+
     //----------------------------------------------------------------------------------------//
 
     public class GameState : IGameState
