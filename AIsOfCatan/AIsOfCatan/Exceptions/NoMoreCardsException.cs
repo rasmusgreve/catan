@@ -8,7 +8,7 @@ namespace AIsOfCatan
     /// <summary>
     /// Thrown on attempts to draw cards from an empty pile
     /// </summary>
-    class NoMoreCardsException : Exception
+    class NoMoreCardsException : AgentActionException
     {
         public NoMoreCardsException()
         {

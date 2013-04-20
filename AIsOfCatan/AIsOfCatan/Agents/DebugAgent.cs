@@ -7,11 +7,13 @@ namespace AIsOfCatan
 {
     class DebugAgent : IAgent
     {
+        private bool hasDevcardToPlay = false;
+        private DevelopmentCard nextToPlay;
         private int id;
-        private int[] start1 = new[] { 8, 9, 15 };
+        private int[] start1 = new[] { 21, 27, 28 };
         private bool firstStartPlaced = false;
-        private int[] start2 = new[] { 9, 10, 16 };
-        private int[] tooClose = new[] { 9, 15, 16 };
+        private int[] start2 = new[] { 9, 15, 16 };
+        private int[] tooClose = new[] { 21, 22, 28 };
         private int[] farRoad = new[] { 34, 35 };
         public void Reset(int assignedId)
         {
@@ -104,6 +106,66 @@ namespace AIsOfCatan
             foreach (var i in resCount)
                 Console.Write(i + " ");
             Console.WriteLine(")");
+
+            if (hasDevcardToPlay)
+            {
+                hasDevcardToPlay = false;
+                Console.WriteLine("-----------");
+                Console.WriteLine("Has a dev card to play: " + nextToPlay);
+                switch (nextToPlay)
+                {
+                    case DevelopmentCard.Knight:
+                        Console.WriteLine("Play knight");
+                        state = ((MainActions) actions).PlayKnight();
+                        break;
+
+                    case DevelopmentCard.Monopoly:
+                        Console.WriteLine("Play monopoly");
+                        state = ((MainActions)actions).PlayMonopoly(Resource.Ore);
+                        break;
+
+                    case DevelopmentCard.RoadBuilding:
+                        Console.WriteLine("Play road building");
+                        state = ((MainActions)actions).PlayRoadBuilding(27,28, 28, 34);
+                        break;
+
+                    case DevelopmentCard.YearOfPlenty:
+                        Console.WriteLine("Play year of plenty");
+                        state = ((MainActions)actions).PlayYearOfPlenty(Resource.Grain, Resource.Wool);
+                        break;
+                }
+                Console.WriteLine("-----------");
+            }
+            resources = ((GameState)state).GetOwnResources();
+
+            if (resources.Contains(Resource.Grain) && resources.Contains(Resource.Ore) &&
+                resources.Contains(Resource.Wool))
+            {
+                var prevCards = ((GameState) state).GetOwnDevelopmentCards();
+                state = actions.DrawDevelopmentCard();
+                Console.WriteLine("Drawn developmentcard successfully");
+                hasDevcardToPlay = true;
+                var cards = ((GameState) state).GetOwnDevelopmentCards().ToList();
+                foreach (var developmentCard in prevCards)
+                {
+                    cards.Remove(developmentCard);
+                }
+                nextToPlay = cards.ToArray()[0];
+            }
+            else
+            {
+                try
+                {
+                    actions.DrawDevelopmentCard();
+                    Console.WriteLine("WARNING! Was able to buy a development card with not enough resources");
+                }
+                catch (InsufficientResourcesException e)
+                {
+                    Console.WriteLine("exceptions was thrown as excpected");
+                }
+            }
+
+
             System.Threading.Thread.Sleep(1000);
         }
 

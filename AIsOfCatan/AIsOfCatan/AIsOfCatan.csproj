@@ -123,6 +123,7 @@
     <Compile Include="API\ITrade.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="ActionLog.cs" />
+    <Compile Include="Exceptions\AgentActionException.cs" />
     <Compile Include="GameflowControl\GameController.cs" />
     <Compile Include="GameflowControl\MainActions.cs" />
     <Compile Include="GameflowControl\Player.cs" />

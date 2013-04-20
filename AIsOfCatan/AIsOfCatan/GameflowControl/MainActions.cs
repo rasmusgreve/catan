@@ -24,7 +24,7 @@ namespace AIsOfCatan
         /// </summary>
         public void DieRoll()
         {
-            isAfterDieRoll = false;
+            isAfterDieRoll = true;
         }
 
         /// <summary>
