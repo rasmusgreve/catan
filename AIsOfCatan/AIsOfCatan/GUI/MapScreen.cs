@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using MS.Internal.Xml.XPath;
@@ -21,6 +22,8 @@ namespace AIsOfCatan
         private readonly List<GUIRoad> roads = new List<GUIRoad>();
         private readonly List<GUIPiece> pieces = new List<GUIPiece>();
 
+        private readonly GUILogList<GUIBufferTextBlock> gamelog;
+
         private readonly GUIRobber robber;
 
         public MapScreen(GameState initial)
@@ -40,12 +43,38 @@ namespace AIsOfCatan
                 }
             }
 
+            //Entire Screen size: GraphicsAdapter.DefaultAdapter.CurrentDisplayMode
+
+
+            const int logWidth = 350;
+
+            //int gameH = graphics.Viewport.Height;
+            //int gameW = graphics.Viewport.Width;
+            const int screenWidth = 1280;
+            const int screenHeight = 720;
+
+            //Debug.WriteLine(string.Format("width {0}, height {1}", gameW, gameH));
+
+            gamelog = new GUILogList<GUIBufferTextBlock>(new Vector2((screenWidth-logWidth)/TXAGame.SCALE, 1/TXAGame.SCALE),screenHeight-2, logWidth-1);
+
+            AddButton(new TXAButton(new Vector2(750 / TXAGame.SCALE, 50 / TXAGame.SCALE), "Debug Log"), InsertText);
+
+            AddDrawableComponent(gamelog);
+
             robber = new GUIRobber(GetRobberPos());
 
             AddDrawableComponent(robber);
 
             //Test Roads and pieces
             UpdateGameState(initial);
+        }
+
+        private int counter = 0;
+
+        private void InsertText()
+        {
+            GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0, -25)) { Text = counter++.ToString(CultureInfo.InvariantCulture)};
+            gamelog.AddToList(textB);
         }
 
         public void UpdateGameState(GameState state)

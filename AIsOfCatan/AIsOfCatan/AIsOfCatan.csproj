@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{FD128C9F-A79C-41E9-885F-1CCF24849060}</ProjectGuid>
@@ -110,7 +110,7 @@
     </Reference>
     <Reference Include="TroyXnaAPI, Version=0.1.1.3, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\TroyXnaAPI.dll</HintPath>
+      <HintPath>..\..\..\TroyXnaAPI\bin\x86\Debug\TroyXnaAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +128,8 @@
     <Compile Include="GameflowControl\Player.cs" />
     <Compile Include="GameflowControl\StartActions.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="GUI\GUIBufferTextBlock.cs" />
+    <Compile Include="GUI\GUILogList.cs" />
     <Compile Include="GUI\GUIRoad.cs" />
     <Compile Include="GUI\GUIRobber.cs" />
     <Compile Include="GUI\GUITile.cs" />
