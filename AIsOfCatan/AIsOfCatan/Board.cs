@@ -105,6 +105,20 @@ namespace AIsOfCatan
             }
         }
 
+        public int GetPlayersLongestRoad(int playerID)
+        {
+            int highest = 0;
+            foreach (var road in roads.Where(r => r.Value == playerID))
+            {
+                int result = CountRoadLengthFromEdge(road.Key, new HashSet<Tuple<int, int>>());
+                if (highest < result)
+                {
+                    highest = result;
+                }
+            }
+            return highest;
+        }
+
         private int CountRoadLengthFromEdge(Tuple<int, int> curRoad, HashSet<Tuple<int, int>> visited)
         {
             // find connections
