@@ -77,8 +77,59 @@ namespace AIsOfCatan
         /// <param name="length">The length of the longest road</param>
         public void GetLongestRoad(out int playerId, out int length)
         {
-            playerId = 0; //TODO: Sorry about littering your code, but I needed the signature
-            length = 5;
+            // find longest road for each player
+            //      player, length
+            Dictionary<int, int> playersLongest = new Dictionary<int, int>(4);
+
+            // floodfill from each road segment to see if it constitutes the longest road.
+            // Probably not the most effective way to do it
+            foreach (var road in roads)
+            {
+                int result = CountRoadLengthFromEdge(road.Key, new HashSet<Tuple<int, int>>());
+                if (!playersLongest.ContainsKey(road.Value) || playersLongest[road.Value] < result)
+                {
+                    playersLongest[road.Value] = result;
+                }
+            }
+
+            // select longest
+            if (playersLongest.Count == 0) // no players on the board
+            {
+                playerId = -1;
+                length = -1;
+            }
+            else
+            {
+                playerId = playersLongest.OrderByDescending(p => p.Value).First().Key;
+                length = playersLongest[playerId];
+            }
+        }
+
+        private int CountRoadLengthFromEdge(Tuple<int, int> curRoad, HashSet<Tuple<int, int>> visited)
+        {
+            // find connections
+            var connections = GetAdjacentIntersections(curRoad.Item1, curRoad.Item2)
+                .SelectMany(i => this.GetAdjacentEdges(i.Item1,i.Item2,i.Item3))
+                .Where(r => this.GetRoad(r.Item1,r.Item2) == this.GetRoad(curRoad.Item1,curRoad.Item2) 
+                    && !curRoad.Equals(r)
+                    && !visited.Contains(r));
+
+            // add self to visited
+            visited.Add(curRoad);
+
+            // depth search
+            int highest = 0;
+            foreach (var conn in connections)
+            {
+                int curHighest = CountRoadLengthFromEdge(conn, visited);
+                if (curHighest > highest) highest = curHighest;
+            }
+
+            // remove self from visited
+            visited.Remove(curRoad);
+
+            // return highest result
+            return highest + 1;
         }
 
         /// <summary>
