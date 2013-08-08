@@ -68,7 +68,7 @@ namespace AIsOfCatan
         /// If you don't have enough resources a InsufficientResourcesException is thrown
         /// </summary>
         /// <param name="giving">The resource to pay</param>
-        /// <param name="recieving">The resource to receive</param>
+        /// <param name="receiving">The resource to receive</param>
         /// <returns>The new state of the game after the resources have been paid and received</returns>
         GameState TradeBank(Resource giving, Resource receiving);
 
