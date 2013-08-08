@@ -105,6 +105,11 @@ namespace AIsOfCatan
             }
         }
 
+        /// <summary>
+        /// Gets the length of the given player's longest road.
+        /// </summary>
+        /// <param name="playerID">The player's ID.</param>
+        /// <returns>The length of the player's longest road.</returns>
         public int GetPlayersLongestRoad(int playerID)
         {
             int highest = 0;
@@ -117,33 +122,6 @@ namespace AIsOfCatan
                 }
             }
             return highest;
-        }
-
-        private int CountRoadLengthFromEdge(Tuple<int, int> curRoad, HashSet<Tuple<int, int>> visited)
-        {
-            // find connections
-            var connections = GetAdjacentIntersections(curRoad.Item1, curRoad.Item2)
-                .SelectMany(i => this.GetAdjacentEdges(i.Item1,i.Item2,i.Item3))
-                .Where(r => this.GetRoad(r.Item1,r.Item2) == this.GetRoad(curRoad.Item1,curRoad.Item2) 
-                    && !curRoad.Equals(r)
-                    && !visited.Contains(r));
-
-            // add self to visited
-            visited.Add(curRoad);
-
-            // depth search
-            int highest = 0;
-            foreach (var conn in connections)
-            {
-                int curHighest = CountRoadLengthFromEdge(conn, visited);
-                if (curHighest > highest) highest = curHighest;
-            }
-
-            // remove self from visited
-            visited.Remove(curRoad);
-
-            // return highest result
-            return highest + 1;
         }
 
         /// <summary>
@@ -436,6 +414,27 @@ namespace AIsOfCatan
             return this.harbors.ToArray();
         }
 
+        /// <summary>
+        /// Gives an array of Harbors that the given player has a settlement or
+        /// city adjacent to.
+        /// </summary>
+        /// <param name="playerID">The player's ID.</param>
+        /// <returns>An array of (unique) HarborTypes that the given player has.</returns>
+        public HarborType[] GetPlayersHarbors(int playerID)
+        {
+            HashSet<HarborType> result = new HashSet<HarborType>();
+            foreach (var h in harbors)
+            {
+                var corners = GetAdjacentIntersections(h.Position.Item1, h.Position.Item2);
+                foreach (Tuple<int, int, int> pos in corners)
+                {
+                    Piece curPiece = GetPiece(pos.Item1,pos.Item2,pos.Item3);
+                    if (curPiece != null && curPiece.Player == playerID) result.Add(h.Type);
+                }
+            }
+            return result.ToArray();
+        }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -470,8 +469,15 @@ namespace AIsOfCatan
             terrainPool.Add(Terrain.Desert);
             List<int> numberPool = new List<int>(valueOrder);
             List<HarborType> harborPool = new List<HarborType>(9);
+            harborPool.Add(HarborType.Brick);
+            harborPool.Add(HarborType.Grain);
+            harborPool.Add(HarborType.Lumber);
+            harborPool.Add(HarborType.Ore);
+            harborPool.Add(HarborType.Wool);
+            for(int i = 0; i < 4; i++) harborPool.Add(HarborType.ThreeForOne);
 
-            Shuffle(terrainPool, terrainSeed); // shuffle
+            // shuffles
+            Shuffle(terrainPool, terrainSeed);
             Shuffle(harborPool, terrainSeed);
             if (randomNumbers) Shuffle(numberPool, numberSeed);
 
@@ -554,7 +560,34 @@ namespace AIsOfCatan
             tiles.Sort();
 
             return new Tuple<int, int, int>(tiles[0], tiles[1], tiles[2]);
-        } 
+        }
+
+        private int CountRoadLengthFromEdge(Tuple<int, int> curRoad, HashSet<Tuple<int, int>> visited)
+        {
+            // find connections
+            var connections = GetAdjacentIntersections(curRoad.Item1, curRoad.Item2)
+                .SelectMany(i => this.GetAdjacentEdges(i.Item1, i.Item2, i.Item3))
+                .Where(r => this.GetRoad(r.Item1, r.Item2) == this.GetRoad(curRoad.Item1, curRoad.Item2)
+                    && !curRoad.Equals(r)
+                    && !visited.Contains(r));
+
+            // add self to visited
+            visited.Add(curRoad);
+
+            // depth search
+            int highest = 0;
+            foreach (var conn in connections)
+            {
+                int curHighest = CountRoadLengthFromEdge(conn, visited);
+                if (curHighest > highest) highest = curHighest;
+            }
+
+            // remove self from visited
+            visited.Remove(curRoad);
+
+            // return highest result
+            return highest + 1;
+        }
 
         public class Tile
         {
