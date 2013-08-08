@@ -792,5 +792,35 @@ namespace AIsOfCatan
             board = board.PlaceRoad(firstTile, secondTile, player.Id);
             return CurrentGamestate();
         }
+
+        /// <summary>
+        /// Trade resources with the bank
+        /// If no harbor is owned trading is 4 : 1
+        /// If a general harbor is owned trading is 3 : 1
+        /// Special harbors trade a specific resource 2 : 1
+        /// </summary>
+        /// <param name="player">The player wanting to trade</param>
+        /// <param name="giving">The resource that the player want to give</param>
+        /// <param name="receiving">The resource that the player want to receive</param>
+        /// <returns>The updated gamestate after trading</returns>
+        public GameState TradeBank(Player player, Resource giving, Resource receiving)
+        {
+            if (resourceBank[(int)receiving] == 0)
+                throw new NoMoreCardsException("Resource bank has no more resources of type " + receiving);
+
+            var harbors = board.GetPlayersHarbors(player.Id);
+            var hasSpecific = harbors.Contains((HarborType) giving);
+            var hasGeneral = harbors.Contains(HarborType.ThreeForOne);
+
+            var amountToGive = (hasSpecific) ? 2 : ((hasGeneral) ? 3 : 4);
+
+            if (player.Resources.Count(r => r == receiving) < amountToGive)
+                throw new InsufficientResourcesException("Player hasn't got enough resources to trade");
+            
+            PayResource(player,giving,amountToGive);
+            GetResource(player,receiving);
+
+            return CurrentGamestate();
+        }
     }
 }
