@@ -62,6 +62,17 @@ namespace AIsOfCatan
         GameState Trade(int otherPlayer);
 
         /// <summary>
+        /// Trades resources with the bank for the specific wanted resource at fixed rates.
+        /// The player needs to have 4 of the resource (3 if he has a 3for1 harbor or 2 if he has the specific resource's harbor)
+        /// in order for the trade to be valid.
+        /// If you don't have enough resources a InsufficientResourcesException is thrown
+        /// </summary>
+        /// <param name="giving">The resource to pay</param>
+        /// <param name="recieving">The resource to receive</param>
+        /// <returns>The new state of the game after the resources have been paid and received</returns>
+        GameState TradeBank(Resource giving, Resource receiving);
+
+        /// <summary>
         /// Draw a development card from the pile at the cost of (1 x Grain, 1 x Wool, 1 x Ore)
         /// If you don't have enough resources a InsufficientResourcesException is thrown
         /// If the development card stack is empty a NoMoreCardsException is thrown
@@ -108,6 +119,5 @@ namespace AIsOfCatan
         /// <param name="secondTile">The second tile that the road will be along</param>
         /// <returns>The state of the game after the road has been built</returns>
         GameState BuildRoad(int firstTile, int secondTile);
-
     }
 }
