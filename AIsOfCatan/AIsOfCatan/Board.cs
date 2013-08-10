@@ -82,10 +82,20 @@ namespace AIsOfCatan
             Dictionary<int, int> playersLongest = new Dictionary<int, int>(4);
 
             // floodfill from each road segment to see if it constitutes the longest road.
-            // Probably not the most effective way to do it
+            HashSet<Tuple<int, int>> visited = new HashSet<Tuple<int, int>>();
             foreach (var road in roads)
             {
-                int result = CountRoadLengthFromEdge(road.Key, new HashSet<Tuple<int, int>>());
+                if (visited.Contains(road.Key)) continue; // already explored
+                visited.Add(road.Key);
+
+                // get ends 
+                Tuple<int,int,int>[] ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
+                HashSet<Tuple<int,int>> tempVisited = new HashSet<Tuple<int, int>>();
+                tempVisited.Add(road.Key);
+                int first  = CountRoadLengthFromIntersection(road.Value, ends[0], tempVisited, visited);
+                int second = CountRoadLengthFromIntersection(road.Value, ends[1], tempVisited, visited);
+
+                int result = first + 1 + second;
                 if (!playersLongest.ContainsKey(road.Value) || playersLongest[road.Value] < result)
                 {
                     playersLongest[road.Value] = result;
@@ -113,9 +123,21 @@ namespace AIsOfCatan
         public int GetPlayersLongestRoad(int playerID)
         {
             int highest = 0;
-            foreach (var road in roads.Where(r => r.Value == playerID))
+            // floodfill from each road segment to see if it constitutes the longest road.
+            HashSet<Tuple<int, int>> visited = new HashSet<Tuple<int, int>>();
+            foreach (var road in roads.Where(r => GetRoad(r.Key.Item1,r.Key.Item2) == playerID))
             {
-                int result = CountRoadLengthFromEdge(road.Key, new HashSet<Tuple<int, int>>());
+                if (visited.Contains(road.Key)) continue; // already explored
+                visited.Add(road.Key);
+
+                // get ends 
+                Tuple<int, int, int>[] ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
+                HashSet<Tuple<int, int>> tempVisited = new HashSet<Tuple<int, int>>();
+                tempVisited.Add(road.Key);
+                int first = CountRoadLengthFromIntersection(road.Value, ends[0], tempVisited, visited);
+                int second = CountRoadLengthFromIntersection(road.Value, ends[1], tempVisited, visited);
+
+                int result = first + 1 + second;
                 if (highest < result)
                 {
                     highest = result;
@@ -366,7 +388,7 @@ namespace AIsOfCatan
             return GetAdjacentTiles(index2)
                 .Where(t => n1.Contains(t))
                 .Where(t => GetTile(index1).Terrain != Terrain.Water || GetTile(index2).Terrain != Terrain.Water || GetTile(t).Terrain != Terrain.Water)
-                .Select(t => new Tuple<int, int, int>(index1, index2, t))
+                .Select(t => Get3Tuple(index1,index2,t))
                 .ToArray();
         }
 
@@ -562,31 +584,31 @@ namespace AIsOfCatan
             return new Tuple<int, int, int>(tiles[0], tiles[1], tiles[2]);
         }
 
-        private int CountRoadLengthFromEdge(Tuple<int, int> curRoad, HashSet<Tuple<int, int>> visited)
+        private int CountRoadLengthFromIntersection(int playerID, Tuple<int, int,int> curInt, HashSet<Tuple<int, int>> visited, HashSet<Tuple<int,int>> globalVisited)
         {
+            // check for break
+            Piece curPiece = GetPiece(curInt.Item1,curInt.Item2,curInt.Item3);
+            if(curPiece != null && curPiece.Player != playerID) return 0; // no more edges this direction
+
             // find connections
-            var connections = GetAdjacentIntersections(curRoad.Item1, curRoad.Item2)
-                .SelectMany(i => this.GetAdjacentEdges(i.Item1, i.Item2, i.Item3))
-                .Where(r => this.GetRoad(r.Item1, r.Item2) == this.GetRoad(curRoad.Item1, curRoad.Item2)
-                    && !curRoad.Equals(r)
-                    && !visited.Contains(r));
+            var edgesOut = GetAdjacentEdges(curInt.Item1, curInt.Item2, curInt.Item3).Where(e => !visited.Contains(e) && GetRoad(e.Item1,e.Item2) == playerID).ToArray(); // temp array
 
-            // add self to visited
-            visited.Add(curRoad);
-
-            // depth search
             int highest = 0;
-            foreach (var conn in connections)
+            foreach (var edge in edgesOut)
             {
-                int curHighest = CountRoadLengthFromEdge(conn, visited);
-                if (curHighest > highest) highest = curHighest;
+                // add edges to visited
+                visited.Add(edge);
+                globalVisited.Add(edge);
+
+                Tuple<int,int,int> otherEnd = GetAdjacentIntersections(edge.Item1, edge.Item2).First(i => !i.Equals(curInt));
+                int depthSearch = CountRoadLengthFromIntersection(playerID, otherEnd, visited, globalVisited);
+
+                if (1 + depthSearch > highest) highest = 1 + depthSearch;
+
+                visited.Remove(edge);
             }
 
-            // remove self from visited
-            visited.Remove(curRoad);
-
-            // return highest result
-            return highest + 1;
+            return highest;
         }
 
         public class Tile
