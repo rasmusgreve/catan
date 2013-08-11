@@ -36,6 +36,7 @@ namespace AIsOfCatan
             ResourceBank = resourceBank == null ? null : resourceBank.ToArray();
             this.players = players;
             this.curPlayer = curPlayer;
+            this.log = log;
         }
 
         public int GetResourceCount(int playerID)

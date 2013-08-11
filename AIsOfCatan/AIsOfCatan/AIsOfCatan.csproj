@@ -147,6 +147,7 @@
     <Compile Include="Log\CounterTradeLogEvent.cs" />
     <Compile Include="Log\LogEvent.cs" />
     <Compile Include="Log\PlayMonopolyLogEvent.cs" />
+    <Compile Include="Log\PlayYearOfPlentyLogEvent.cs" />
     <Compile Include="Log\ProposeTradeLogEvent.cs" />
     <Compile Include="Log\RollLogEvent.cs" />
     <Compile Include="Log\TradeBankLogEvent.cs" />
