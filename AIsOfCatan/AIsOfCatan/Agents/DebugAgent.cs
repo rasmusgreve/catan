@@ -21,6 +21,16 @@ namespace AIsOfCatan
             Console.WriteLine("IAgent reset with id " + id);
         }
 
+        public string GetName()
+        {
+            return "Debug Agent";
+        }
+
+        public string GetDescription()
+        {
+            return "";
+        }
+
         public void PlaceStart(IGameState state, IStartActions actions)
         {
             Console.WriteLine(id + ": Place starts");

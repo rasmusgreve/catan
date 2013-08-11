@@ -7,6 +7,8 @@ namespace AIsOfCatan
 {
     class HumanAgent : IAgent
     {
+        private int assignedID;
+
         private Tuple<int, int, int> getSettlementPosition()
         {
             Console.WriteLine("Enter 3 id's (each followed by enter) for tiles describing where to place the settlement");
@@ -33,6 +35,17 @@ namespace AIsOfCatan
         public void Reset(int assignedId)
         {
             Console.WriteLine("You are playing as player id #" + assignedId);
+            this.assignedID = assignedId;
+        }
+
+        public string GetName()
+        {
+            return "Human agent " + assignedID;
+        }
+
+        public string GetDescription()
+        {
+            return "Cogito ergo sum";
         }
 
         public void PlaceStart(IGameState state, IStartActions actions)
