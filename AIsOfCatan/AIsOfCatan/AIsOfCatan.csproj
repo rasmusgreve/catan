@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Agents\DebugAgent.cs" />
+    <Compile Include="Agents\HumanAgent.cs" />
     <Compile Include="API\IAgent.cs" />
     <Compile Include="API\IBoard.cs" />
     <Compile Include="API\IGameActions.cs" />

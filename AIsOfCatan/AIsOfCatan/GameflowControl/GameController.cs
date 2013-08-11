@@ -29,7 +29,7 @@ namespace AIsOfCatan
         /// <param name="agents">The competing agents (The order in which they are submitted is irrelevant)</param>
         /// <param name="boardSeed">The seed for the board generator, used to shuffle development cards, and for drawing a random card after moving the robber</param>
         /// <param name="diceSeed">The seed for the dice</param>
-        /// <returns>The id of the winner of the game</returns>
+        /// <returns>The id of the winner of the game (-1 in case of error)</returns>
         public int StartGame(IAgent[] agents, int boardSeed, int diceSeed)
         {
             //Initialize random number generators
@@ -96,6 +96,11 @@ namespace AIsOfCatan
                 {
                     Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
                     Console.WriteLine("       -> Message: " + e.Message);
+                    if (e.StopGame)
+                    {
+                        Console.WriteLine("This is game breaking, and the game ends now.");
+                        return -1;
+                    }
                 }
                 if (HasWon(players[turn])) return players[turn].Id;
 
@@ -187,7 +192,7 @@ namespace AIsOfCatan
             if (board.GetTile(robberPosition).Terrain == Terrain.Water || robberPosition == board.GetRobberLocation())
             {
                 Console.WriteLine("IAgent " + player.Agent.GetType().Name + " moved robber illegally");
-                return;
+                throw new AgentActionException("Agent " + player.Agent.GetType().Name + " moved robber illegally", true);
             }
             board = board.MoveRobber(robberPosition);
 
@@ -285,8 +290,7 @@ namespace AIsOfCatan
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
                 {
-                    Console.WriteLine("An agent did not place the correct amount of start pieces");
-                    //TODO: What to do?
+                    throw new AgentActionException("Agent " + p.Agent.GetType().Name + " did not place the correct amount of start pieces (1/2)", true);
                 }
                 NextTurn();
             }
@@ -298,8 +302,7 @@ namespace AIsOfCatan
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
                 {
-                    Console.WriteLine("An agent did not place the correct amount of start pieces");
-                    //TODO: What to do?
+                    throw new AgentActionException("Agent " + p.Agent.GetType().Name + " did not place the correct amount of start piece (2/2)", true);
                 }
 
                 //Hand out resources
@@ -574,6 +577,8 @@ namespace AIsOfCatan
                 if (board.GetRoad(road2Tile1, road2Tile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
 
+                //TODO: What if the agent passes the same segment twice (for road 1 and 2?)
+
                 //Place the connected road first (to be able to check that both are connected in the end
                 if (RoadConnected(board, road1Tile1, road1Tile2, player.Id))
                 {
@@ -599,6 +604,7 @@ namespace AIsOfCatan
                 }
             }
             player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
+            UpdateLongestRoad();
             return CurrentGamestate();
         }
 

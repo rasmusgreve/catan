@@ -41,6 +41,22 @@ namespace AIsOfCatan
         void Reset(int assignedId);
 
         /// <summary>
+        /// Return a human readable name for this agent
+        /// This name should never change and should be implemented by just returning a string constant
+        /// For information regarding strategy or behaviour use the getDescription() method
+        /// </summary>
+        /// <returns>A human readable name for this agent</returns>
+        string GetName();
+
+        /// <summary>
+        /// Return a description of this agent
+        /// The description can be anything you want it to be
+        /// Intended usages include debugging of agents and reporting current strategy
+        /// </summary>
+        /// <returns>A human readable description for this agent</returns>
+        string GetDescription();
+
+        /// <summary>
         /// This method is called twice at the beginning of the game and is where
         /// the agent is to decide where to place the initial settlements and roads before the game begins
         /// Players receive resources from the last settlement placed in the beginning of the game
