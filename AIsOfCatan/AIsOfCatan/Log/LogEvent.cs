@@ -7,5 +7,7 @@ namespace AIsOfCatan.Log
 {
     public class LogEvent
     {
+        private DateTime time = DateTime.Now;
+        public DateTime TimeStamp { get { return time; } }
     }
 }

@@ -7,9 +7,9 @@ namespace AIsOfCatan.Log
 {
     class BuildRoadLogEvent : LogEvent
     {
-        private int Player { get; private set; }
+        public int Player { get; private set; }
         private Tuple<int, int> position;
-        private Tuple<int, int> Position { get{ return new Tuple<int,int>(position.Item1, position.Item2); } }
+        public Tuple<int, int> Position { get{ return new Tuple<int,int>(position.Item1, position.Item2); } }
 
         public BuildRoadLogEvent(int player, Tuple<int, int> position)
         {

@@ -7,11 +7,11 @@ namespace AIsOfCatan.Log
 {
     class ProposeTradeLogEvent : LogEvent
     {
-        private int Player { get; private set; }
+        public int Player { get; private set; }
         private List<List<Resource>> give;
-        private List<List<Resource>> Give { get { return DeepClone(give); } }
+        public List<List<Resource>> Give { get { return DeepClone(give); } }
         private List<List<Resource>> take;
-        private List<List<Resource>> Take { get { return DeepClone(take); } }
+        public List<List<Resource>> Take { get { return DeepClone(take); } }
 
         public ProposeTradeLogEvent(int player, List<List<Resource>> give, List<List<Resource>> take)
         {
@@ -29,7 +29,20 @@ namespace AIsOfCatan.Log
 
         private static string ListToString(List<List<Resource>> list)
         {
-            return "";
+            StringBuilder builder = new StringBuilder("[");
+            foreach (List<Resource> outer in list)
+            {
+                builder.Append("[");
+                foreach (Resource res in outer)
+                {
+                    builder.Append(res + "/"); 
+                }
+                builder.Remove(builder.Length - 2, 1); // remove last slash
+                builder.Append("]");
+            }
+            builder.Append("]");
+
+            return builder.ToString();
         }
 
         public override string ToString()
