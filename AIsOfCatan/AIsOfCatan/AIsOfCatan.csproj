@@ -145,13 +145,16 @@
     <Compile Include="Log\BuildRoadLogEvent.cs" />
     <Compile Include="Log\BuyDevLogEvent.cs" />
     <Compile Include="Log\CounterTradeLogEvent.cs" />
+    <Compile Include="Log\DiscardCardsLogEvent.cs" />
     <Compile Include="Log\LogEvent.cs" />
+    <Compile Include="Log\MoveRobberLogEvent.cs" />
     <Compile Include="Log\PlayKnightLogEvent.cs" />
     <Compile Include="Log\PlayMonopolyLogEvent.cs" />
     <Compile Include="Log\PlayRoadBuildingLogEvent.cs" />
     <Compile Include="Log\PlayYearOfPlentyLogEvent.cs" />
     <Compile Include="Log\ProposeTradeLogEvent.cs" />
     <Compile Include="Log\RollLogEvent.cs" />
+    <Compile Include="Log\StealCardLogEvent.cs" />
     <Compile Include="Log\TradeBankLogEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
