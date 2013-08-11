@@ -7,13 +7,16 @@ namespace AIsOfCatan
 {
     class AgentActionException : Exception
     {
-        public AgentActionException ()
+        public bool StopGame { get; private set; }
+
+        public AgentActionException(bool stopGame = false)
         {
-            
+            StopGame = stopGame;
         }
-        public AgentActionException(string msg) : base(msg)
+        public AgentActionException(string msg, bool stopGame = false)
+            : base(msg)
         {
-            
+            StopGame = stopGame;
         }
     }
 }
