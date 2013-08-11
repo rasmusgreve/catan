@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.Log;
 
 namespace AIsOfCatan
 {
@@ -10,6 +11,8 @@ namespace AIsOfCatan
         private Random diceRandom;
         private Random shuffleRandom;
         private Player[] players;
+
+        private List<LogEvent> log = new List<LogEvent>(); // Here you go Rasmus
 
         private Board board;
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
@@ -139,7 +142,7 @@ namespace AIsOfCatan
         private void TakeTurn(Player player)
         {
             var actions = new MainActions(player, this);
-            player.Agent.BeforeDiceRoll(new GameState(board, developmentCardStack, resourceBank, players, turn), actions);
+            player.Agent.BeforeDiceRoll(new GameState(board, developmentCardStack, resourceBank, players, turn, log), actions);
             
             int roll = RollDice();
             actions.DieRoll();
@@ -147,7 +150,7 @@ namespace AIsOfCatan
             if (roll == 7)
             {
                 //Discard if over 7 cards
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
                 foreach (var p in players)
                 {
                     if (p.Resources.Count > 7)
@@ -164,13 +167,13 @@ namespace AIsOfCatan
                         }
                     }
                 }
-                MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
+                MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
             }
             else
             {
                 HandOutResources(roll);
             }
-            var afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn);
+            var afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
             player.Agent.PerformTurn(afterResourcesState, actions);
 
             player.NewDevelopmentCards.Clear(); //Reset new development cards
@@ -282,7 +285,7 @@ namespace AIsOfCatan
         {
             foreach (Player p in players)
             {
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
@@ -294,7 +297,7 @@ namespace AIsOfCatan
             foreach (Player p in players)
             {
                 PrevTurn();
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn);
+                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
@@ -375,7 +378,7 @@ namespace AIsOfCatan
 
         private GameState CurrentGamestate()
         {
-            return new GameState(board, developmentCardStack, resourceBank, players, turn);
+            return new GameState(board, developmentCardStack, resourceBank, players, turn, log);
         }
 
         /// <summary>
@@ -530,7 +533,7 @@ namespace AIsOfCatan
                 largestArmyId = player.Id;
             }
 
-            MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn));
+            MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
             return CurrentGamestate();
         }
 

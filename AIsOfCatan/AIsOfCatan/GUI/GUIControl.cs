@@ -47,7 +47,7 @@ namespace AIsOfCatan
             board = board.PlacePiece(8, 14, 15, new Board.Piece(Token.Settlement, 2));
             board = board.PlacePiece(28, 29, 35, new Board.Piece(Token.City, 3));
             board = board.MoveRobber(23);
-            state = new GameState(board, null, null, null, 0);
+            state = new GameState(board, null, null, null, 0, null);
 
             SCALE = 0.5f;
 

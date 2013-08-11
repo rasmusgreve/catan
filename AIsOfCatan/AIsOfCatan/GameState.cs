@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.Log;
 
 namespace AIsOfCatan
 {
@@ -26,14 +27,16 @@ namespace AIsOfCatan
 
         private Player[] players;
         private int curPlayer;
+        private List<LogEvent> log;
 
-        public GameState(Board board, List<DevelopmentCard> deck, int[] resourceBank, Player[] players, int curPlayer)
+        public GameState(Board board, List<DevelopmentCard> deck, int[] resourceBank, Player[] players, int curPlayer, List<LogEvent> log)
         {
             Board = board;
             DevelopmentCards = deck == null ? 0 : deck.Count;
             ResourceBank = resourceBank == null ? null : resourceBank.ToArray();
             this.players = players;
             this.curPlayer = curPlayer;
+            this.log = log;
         }
 
         public int GetResourceCount(int playerID)
@@ -64,6 +67,16 @@ namespace AIsOfCatan
         public int GetResourceBank(Resource res)
         {
             return ResourceBank[(int)res];
+        }
+
+        public List<LogEvent> GetLatestEvents(int amount)
+        {
+            return log.Skip(Math.Max(0, log.Count() - amount)).Take(amount).ToList();
+        }
+
+        public List<LogEvent> GetEventsSince(DateTime time)
+        {
+            return log.Where(e => e.TimeStamp.CompareTo(time) > 0).ToList();
         }
     }
 }
