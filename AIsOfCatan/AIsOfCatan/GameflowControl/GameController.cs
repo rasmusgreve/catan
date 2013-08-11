@@ -584,8 +584,7 @@ namespace AIsOfCatan
 
                 player.RoadsLeft--;
                 board = board.PlaceRoad(road1Tile1, road1Tile2, player.Id);
-                var pos = new Tuple<int, int>(road1Tile1, road1Tile2);
-                log.Add(new PlayRoadBuildingLogEvent(player.Id, pos , pos));
+                log.Add(new PlayRoadBuildingLogEvent(player.Id, new Tuple<int, int>(road1Tile1, road1Tile2)));
             }
             else
             {

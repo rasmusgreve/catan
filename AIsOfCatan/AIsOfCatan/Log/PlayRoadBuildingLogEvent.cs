@@ -12,7 +12,7 @@ namespace AIsOfCatan.Log
         public Tuple<int, int> First { get { return new Tuple<int, int>(first.Item1, first.Item2); } }
         public Tuple<int, int> Second { get { return new Tuple<int, int>(second.Item1, second.Item2); } }
 
-        public PlayRoadBuildingLogEvent(int player, Tuple<int, int> first, Tuple<int, int> second)
+        public PlayRoadBuildingLogEvent(int player, Tuple<int, int> first, Tuple<int, int> second = null)
         {
             Player = player;
             this.first = first;
@@ -21,7 +21,10 @@ namespace AIsOfCatan.Log
 
         public override string ToString()
         {
-            return "Player " + Player + " plays Road Building and builds on [" + First.Item1 + ", " + First.Item2 + "] and [" + Second.Item1 + ", " + Second.Item2 + "]";
+            if (second == null)
+                return "Player " + Player + " plays Road Building and builds on [" + First.Item1 + ", " + First.Item2 + "] (out of roads)";
+            else
+                return "Player " + Player + " plays Road Building and builds on [" + First.Item1 + ", " + First.Item2 + "] and [" + Second.Item1 + ", " + Second.Item2 + "]";
         }
     }
 }
