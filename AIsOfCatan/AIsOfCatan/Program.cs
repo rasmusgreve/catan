@@ -10,7 +10,7 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
-            if (true) //Set to false if you wanna see the GUI
+            if (false) //Set to false if you wanna see the GUI
             {
                 var agent = new DebugAgent();
                 var controller = new GameController();
