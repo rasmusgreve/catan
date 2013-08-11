@@ -12,9 +12,10 @@ namespace AIsOfCatan
         {
             if (true) //Set to false if you wanna see the GUI
             {
-                /*var agent = new DebugAgent();
+                var agent1 = new DebugAgent();
+                var agent2 = new HumanAgent();
                 var controller = new GameController();
-                controller.StartGame(new IAgent[] { agent }, 0, 0);*/
+                controller.StartGame(new IAgent[] { agent1, agent2 }, 0, 0);
 
                 Board b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(14, 21, 1);
                 DateTime start = DateTime.Now;
