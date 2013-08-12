@@ -19,9 +19,12 @@ namespace AIsOfCatan
         private int[] resourceBank;
         private int turn;
         private int largestArmySize = 2; //One less than the minimum for getting the largest army card
-        private int longestRoadLength = 2; //One less than the minimum for getting the longest road card
+        private int longestRoadLength = 0;
         private int largestArmyId = -1;
         private int longestRoadId = -1;
+
+        private const int LargestArmyMinimum = 3;
+        private const int LongestRoadMinimum = 5;
 
         /// <summary>
         /// Start the game. This method will run for the length of the game and returns the id of the winner
@@ -399,14 +402,40 @@ namespace AIsOfCatan
         /// </summary>
         private void UpdateLongestRoad()
         {
-            int currentLongestPlayer;
-            int currentLongestLength;
-            board.GetLongestRoad(out currentLongestPlayer, out currentLongestLength);
-            if (currentLongestLength > longestRoadLength)
+            var playersLongest = board.GetLongestRoad();
+            var newLength = playersLongest.OrderByDescending(p => p.Value).First().Value;
+            if (newLength < LongestRoadMinimum) //Don't hand out the card if road is too short
             {
-                longestRoadLength = currentLongestLength;
-                longestRoadId = currentLongestPlayer;
+                longestRoadId = -1;
+                return;
             }
+            var ids = playersLongest.Where(p => p.Value == newLength).Select(p => p.Key);
+            var newId = (ids.Count()) > 1 ? -1 : ids.First();
+            /*
+            if (newLength > longestRoadLength) //Road is longer than previously (can only happen with a valid player ID)
+            {
+                longestRoadLength = newLength;
+                longestRoadId = newId;
+            }
+            else if (newLength < longestRoadLength && newId != -1) //Previously longest must have been divided but someone has a longest road
+            {
+                longestRoadLength = newLength;
+                longestRoadId = newId;
+            }
+            else if (newLength < longestRoadLength && newId == -1) //Previously longest must have been divided and others are tied
+            {
+                longestRoadLength = newLength;
+                longestRoadId = -1;
+            }
+            else if (newLength == longestRoadLength)
+            {
+                //Do nothing
+            }
+             * */
+            //Reduced to:
+            if (newLength == longestRoadLength) return;
+            longestRoadLength = newLength;
+            longestRoadId = newId;
         }
 
         /// <summary>
@@ -479,7 +508,13 @@ namespace AIsOfCatan
             {
                 if (other.Id == player.Id) continue; //No need to propose a trade with yourself
                 dict[other.Id] = (Trade)other.Agent.HandleTrade(trade.Reverse(), player.Id);
-                //TODO: Log this shizzle (fix issue #27 first though)
+                if (dict[other.Id].Status == TradeStatus.Countered)
+                {
+                    //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
+                    var give = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                    var take = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                    log.Add(new CounterTradeLogEvent(other.Id, give, take));
+                }
             }
             proposedTrades[player.Id] = dict;
 
@@ -520,7 +555,7 @@ namespace AIsOfCatan
                 give.Add(res[0]);
             }
 
-            log.Add(new AcceptTradeLogEvent(player.Id, playerid, give, take)); //TODO: After issue #27 is resolved look if this is still right
+            log.Add(new AcceptTradeLogEvent(player.Id, playerid, give, take));
 
             return CurrentGamestate();
         }
@@ -594,7 +629,9 @@ namespace AIsOfCatan
                 if (board.GetRoad(road2Tile1, road2Tile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
 
-                //TODO: What if the agent passes the same segment twice (for road 1 and 2?)
+                //Can't build the same road twice
+                if ((road1Tile1 == road2Tile1 && road1Tile2 == road2Tile2) || (road1Tile1 == road2Tile2 && road1Tile2 == road2Tile1))
+                    throw new IllegalBuildPositionException("Can't build the same road twice (roadbuilding dev. card)");
 
                 //Place the connected road first (to be able to check that both are connected in the end
                 if (RoadConnected(board, road1Tile1, road1Tile2, player.Id))
