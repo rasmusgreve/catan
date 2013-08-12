@@ -73,24 +73,23 @@ namespace AIsOfCatan
         /// <summary>
         /// Get the longest road on this board
         /// </summary>
-        /// <param name="playerId">The id of the player with the longest road</param>
-        /// <param name="length">The length of the longest road</param>
-        public void GetLongestRoad(out int playerId, out int length)
+        /// <returns>Dictionary of playerID -> longest road length of that player</returns>
+        public Dictionary<int, int> GetLongestRoad()
         {
             // find longest road for each player
             //      player, length
-            Dictionary<int, int> playersLongest = new Dictionary<int, int>(4);
+            var playersLongest = new Dictionary<int, int>(4);
 
             // floodfill from each road segment to see if it constitutes the longest road.
-            HashSet<Tuple<int, int>> visited = new HashSet<Tuple<int, int>>();
+            var visited = new HashSet<Tuple<int, int>>();
             foreach (var road in roads)
             {
                 if (visited.Contains(road.Key)) continue; // already explored
                 visited.Add(road.Key);
 
                 // get ends 
-                Tuple<int,int,int>[] ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
-                HashSet<Tuple<int,int>> tempVisited = new HashSet<Tuple<int, int>>();
+                var ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
+                var tempVisited = new HashSet<Tuple<int, int>>();
                 tempVisited.Add(road.Key);
                 int first  = CountRoadLengthFromIntersection(road.Value, ends[0], tempVisited, visited);
                 int second = CountRoadLengthFromIntersection(road.Value, ends[1], tempVisited, visited);
@@ -102,17 +101,7 @@ namespace AIsOfCatan
                 }
             }
 
-            // select longest
-            if (playersLongest.Count == 0) // no players on the board
-            {
-                playerId = -1;
-                length = -1;
-            }
-            else
-            {
-                playerId = playersLongest.OrderByDescending(p => p.Value).First().Key;
-                length = playersLongest[playerId];
-            }
+            return playersLongest;
         }
 
         /// <summary>
