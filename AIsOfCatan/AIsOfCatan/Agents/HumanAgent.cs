@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace AIsOfCatan
 {
     class HumanAgent : IAgent
     {
-        private int assignedID;
-
+        private int assignedId;
+        
         private Tuple<int, int, int> getSettlementPosition()
         {
             Console.WriteLine("Enter 3 id's (each followed by enter) for tiles describing where to place the settlement");
@@ -24,7 +23,7 @@ namespace AIsOfCatan
         private Resource selectResource()
         {
             Console.WriteLine("Select a resource:");
-            Resource[] res = new Resource[] {Resource.Lumber, Resource.Brick, Resource.Grain, Resource.Ore, Resource.Wool};
+            var res = new Resource[] {Resource.Lumber, Resource.Brick, Resource.Grain, Resource.Ore, Resource.Wool};
             for (var i = 0; i < res.Length; i++)
             {
                 Console.WriteLine((i+1)+")" + res[i]);
@@ -35,12 +34,12 @@ namespace AIsOfCatan
         public void Reset(int assignedId)
         {
             Console.WriteLine("You are playing as player id #" + assignedId);
-            this.assignedID = assignedId;
+            this.assignedId = assignedId;
         }
 
         public string GetName()
         {
-            return "Human agent " + assignedID;
+            return "Human agent " + assignedId;
         }
 
         public string GetDescription()
@@ -61,43 +60,43 @@ namespace AIsOfCatan
         public void BeforeDiceRoll(IGameState state, IGameActions actions)
         {
             GameState gs = (GameState) state;
+            if (!gs.GetOwnDevelopmentCards().Any(dc => dc != DevelopmentCard.VictoryPoint))
+                return; //No cards to play
             Console.WriteLine("Do you want to use a Development Card before roling the dice? Y/N");
-            var r = Console.ReadLine();
-            if (r.ToLower().StartsWith("y"))
+            var r = Console.ReadLine() ?? "";
+            if (!r.ToLower().StartsWith("y")) return;
+            Console.WriteLine("Which development card do you wish to play:");
+            Console.WriteLine("0) None");
+            int i = 1;
+            var cards = new Dictionary<int, DevelopmentCard>();
+            foreach (var c in gs.GetOwnDevelopmentCards().Where(c => c != DevelopmentCard.VictoryPoint))
             {
-                Console.WriteLine("Which development card do you wish to play:");
-                Console.WriteLine("0) None");
-                int i = 1;
-                var cards = new Dictionary<int, DevelopmentCard>();
-                foreach (var c in gs.GetOwnDevelopmentCards().Where(c => c != DevelopmentCard.VictoryPoint))
-                {
-                    Console.WriteLine(i + ") " + c);
-                    cards.Add(i,c);
-                    i++;
-                }
-                int selection = int.Parse(Console.ReadLine());
-                if (selection == 0) return;
-                Console.WriteLine("You played the card " + cards[selection]);
-                switch (cards[selection])
-                {
-                    case DevelopmentCard.Knight:
-                        actions.PlayKnight();
-                        break;
-                    case DevelopmentCard.Monopoly:
-                        Console.WriteLine("Choose the resource type to get monopoly on");
-                        actions.PlayMonopoly(selectResource());
-                        break;
-                    case DevelopmentCard.RoadBuilding:
-                        Console.WriteLine("Decide where to build the two roads");
-                        var road1 = getRoadPosition();
-                        var road2 = getRoadPosition();
-                        actions.PlayRoadBuilding(road1.Item1, road1.Item2, road2.Item1, road2.Item2);
-                        break;
-                    case DevelopmentCard.YearOfPlenty:
-                        Console.WriteLine("Choose which two resources you want to draw");
-                        actions.PlayYearOfPlenty(selectResource(),selectResource());
-                        break;
-                }
+                Console.WriteLine(i + ") " + c);
+                cards.Add(i,c);
+                i++;
+            }
+            int selection = int.Parse(Console.ReadLine() ?? "0");
+            if (selection == 0) return;
+            Console.WriteLine("You played the card " + cards[selection]);
+            switch (cards[selection])
+            {
+                case DevelopmentCard.Knight:
+                    actions.PlayKnight();
+                    break;
+                case DevelopmentCard.Monopoly:
+                    Console.WriteLine("Choose the resource type to get monopoly on");
+                    actions.PlayMonopoly(selectResource());
+                    break;
+                case DevelopmentCard.RoadBuilding:
+                    Console.WriteLine("Decide where to build the two roads");
+                    var road1 = getRoadPosition();
+                    var road2 = getRoadPosition();
+                    actions.PlayRoadBuilding(road1.Item1, road1.Item2, road2.Item1, road2.Item2);
+                    break;
+                case DevelopmentCard.YearOfPlenty:
+                    Console.WriteLine("Choose which two resources you want to draw");
+                    actions.PlayYearOfPlenty(selectResource(),selectResource());
+                    break;
             }
         }
 
