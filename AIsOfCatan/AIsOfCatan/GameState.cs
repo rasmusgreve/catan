@@ -6,25 +6,8 @@ using AIsOfCatan.Log;
 
 namespace AIsOfCatan
 {
-        //                     19 of each in bank
-    public enum Resource {Brick, Lumber, Wool, Grain, Ore}; // names from wikipedia
-    //                   3      4       4        4       3          1       X
-    public enum Terrain {Hills, Forest, Pasture, Fields, Mountains, Desert, Water} 
-    //                            14      5             2             2             2
-    public enum DevelopmentCard {Knight, VictoryPoint, RoadBuilding, YearOfPlenty, Monopoly}
-
-    public enum Token {Settlement, City};
-
-    public enum HarborType { Brick, Lumber, Wool, Grain, Ore, ThreeForOne };
-
-    //----------------------------------------------------------------------------------------//
-
     public class GameState : IGameState
     {
-        public Board Board { get; private set; }
-        public int DevelopmentCards { get; private set; }
-        public int[] ResourceBank { get; private set; }
-
         private Player[] players;
         private int curPlayer;
         private List<LogEvent> log;
@@ -37,7 +20,13 @@ namespace AIsOfCatan
             this.players = players;
             this.curPlayer = curPlayer;
             this.log = log;
+            AllPlayerIds = players.Select(p => p.Id).ToArray();
         }
+
+        public Board Board { get; private set; }
+        public int DevelopmentCards { get; private set; }
+        public int[] ResourceBank { get; private set; }
+        public int[] AllPlayerIds { get; private set; }
 
         public int GetResourceCount(int playerID)
         {
