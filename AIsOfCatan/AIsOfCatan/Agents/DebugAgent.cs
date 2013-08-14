@@ -7,6 +7,8 @@ namespace AIsOfCatan
 {
     class DebugAgent : IAgent
     {
+        private const bool silent = true;
+
         private bool hasDevcardToPlay = false;
         private DevelopmentCard nextToPlay;
         private int id;
@@ -18,7 +20,8 @@ namespace AIsOfCatan
         public void Reset(int assignedId)
         {
             id = assignedId;
-            Console.WriteLine("IAgent reset with id " + id);
+            if (!silent)
+                Console.WriteLine("IAgent reset with id " + id);
         }
 
         public string GetName()
@@ -33,118 +36,139 @@ namespace AIsOfCatan
 
         public void PlaceStart(IGameState state, IStartActions actions)
         {
-            Console.WriteLine(id + ": Place starts");
+            if (!silent)
+                Console.WriteLine(id + ": Place starts");
             if (!firstStartPlaced)
             {
                 firstStartPlaced = true;
                 actions.BuildSettlement(start1[0], start1[1], start1[2]);
-                Console.WriteLine(id + ": First settlement built succesfully");
+                if (!silent)
+                    Console.WriteLine(id + ": First settlement built succesfully");
                 actions.BuildRoad(start1[0], start1[1]);
-                Console.WriteLine(id + ": First road built succesfully");
+                if (!silent)
+                    Console.WriteLine(id + ": First road built succesfully");
             }
             else
             {
                 try
                 {
                     actions.BuildSettlement(start1[0], start1[1], start1[2]);
-                    Console.WriteLine(id + ": Controller allowed a building on top of another");
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller allowed a building on top of another");
                 }
                 catch (IllegalBuildPositionException e)
                 {
-                    Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
                 }
                 try
                 {
                     actions.BuildSettlement(tooClose[0], tooClose[1], tooClose[2]);
-                    Console.WriteLine(id + ": Controller allowed a building too close");
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller allowed a building too close");
                 }
                 catch (IllegalBuildPositionException e)
                 {
-                    Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
                 }
                 actions.BuildSettlement(start2[0], start2[1], start2[2]);
                 Console.WriteLine(id + ": Second settlement built succesfully");
                 try
                 {
                     actions.BuildRoad(farRoad[0], farRoad[1]);
-                    Console.WriteLine(id + ": Controller allowed a building disconnected road");
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller allowed a building disconnected road");
                 }
                 catch (IllegalBuildPositionException e)
                 {
-                    Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
+                    if (!silent)
+                        Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
                 }
                 actions.BuildRoad(start2[0], start2[1]);
-                Console.WriteLine(id + ": Second road built succesfully");
+                if (!silent)
+                    Console.WriteLine(id + ": Second road built succesfully");
             }
         }
 
         public void BeforeDiceRoll(IGameState state, IGameActions actions)
         {
-            Console.WriteLine(id + ": Before dice roll");
-            System.Threading.Thread.Sleep(100);
+            if (!silent)
+                Console.WriteLine(id + ": Before dice roll");
         }
 
         public int MoveRobber(IGameState state)
         {
-            Console.WriteLine(id + ": Move robber");
-            System.Threading.Thread.Sleep(1000);
+            if (!silent)
+                Console.WriteLine(id + ": Move robber");
             return ((GameState)state).Board.GetRobberLocation() == 8 ? 9 : 8;
         }
 
         public int ChoosePlayerToDrawFrom(int[] validOpponents)
         {
-            Console.WriteLine(id + ": Choosing opponent to draw from");
-            System.Threading.Thread.Sleep(1000);
+            if (!silent)
+                Console.WriteLine(id + ": Choosing opponent to draw from");
             return validOpponents[0];
         }
 
         public Resource[] DiscardCards(IGameState state, int toDiscard)
         {
-            Console.WriteLine(id + ": Choosing cards to discard");
-            System.Threading.Thread.Sleep(1000);
+            if (!silent)
+                Console.WriteLine(id + ": Choosing cards to discard");
             return ((GameState)state).GetOwnResources().Take(toDiscard).ToArray();
         }
 
         public void PerformTurn(IGameState state, IGameActions actions)
         {
-            Console.WriteLine(id + ": Performing main turn");
+            if (!silent)
+                Console.WriteLine(id + ": Performing main turn");
             var resources = ((GameState)state).GetOwnResources();
             int[] resCount = new int[5];
             foreach (var r in resources)
                 resCount[(int)r]++;
-            Console.Write(id + ": Resources: ( ");
+            if (!silent)
+                Console.Write(id + ": Resources: ( ");
             foreach (var i in resCount)
-                Console.Write(i + " ");
-            Console.WriteLine(")");
+                if (!silent)
+                    Console.Write(i + " ");
+            if (!silent)
+                Console.WriteLine(")");
 
             if (hasDevcardToPlay)
             {
                 hasDevcardToPlay = false;
-                Console.WriteLine("-----------");
-                Console.WriteLine("Has a dev card to play: " + nextToPlay);
+                if (!silent)
+                    Console.WriteLine("-----------");
+                if (!silent)
+                    Console.WriteLine("Has a dev card to play: " + nextToPlay);
                 switch (nextToPlay)
                 {
                     case DevelopmentCard.Knight:
-                        Console.WriteLine("Play knight");
+                        if (!silent)
+                            Console.WriteLine("Play knight");
                         state = ((MainActions) actions).PlayKnight();
                         break;
 
                     case DevelopmentCard.Monopoly:
-                        Console.WriteLine("Play monopoly");
+                        if (!silent)
+                            Console.WriteLine("Play monopoly");
                         state = ((MainActions)actions).PlayMonopoly(Resource.Ore);
                         break;
 
                     case DevelopmentCard.RoadBuilding:
-                        Console.WriteLine("Play road building");
+                        if (!silent)
+                            Console.WriteLine("Play road building");
                         state = ((MainActions)actions).PlayRoadBuilding(27,28, 28, 34);
                         break;
 
                     case DevelopmentCard.YearOfPlenty:
-                        Console.WriteLine("Play year of plenty");
+                        if (!silent)
+                            Console.WriteLine("Play year of plenty");
                         state = ((MainActions)actions).PlayYearOfPlenty(Resource.Grain, Resource.Wool);
                         break;
                 }
-                Console.WriteLine("-----------");
+                if (!silent)
+                    Console.WriteLine("-----------");
             }
             resources = ((GameState)state).GetOwnResources();
 
@@ -153,7 +177,8 @@ namespace AIsOfCatan
             {
                 var prevCards = ((GameState) state).GetOwnDevelopmentCards();
                 state = actions.DrawDevelopmentCard();
-                Console.WriteLine("Drawn developmentcard successfully");
+                if (!silent)
+                    Console.WriteLine("Drawn developmentcard successfully");
                 hasDevcardToPlay = true;
                 var cards = ((GameState) state).GetOwnDevelopmentCards().ToList();
                 foreach (var developmentCard in prevCards)
@@ -167,21 +192,23 @@ namespace AIsOfCatan
                 try
                 {
                     actions.DrawDevelopmentCard();
-                    Console.WriteLine("WARNING! Was able to buy a development card with not enough resources");
+                    if (!silent)
+                        Console.WriteLine("WARNING! Was able to buy a development card with not enough resources");
                 }
                 catch (InsufficientResourcesException e)
                 {
-                    Console.WriteLine("exceptions was thrown as excpected");
+                    if (!silent)
+                        Console.WriteLine("exceptions was thrown as excpected");
                 }
             }
 
 
-            System.Threading.Thread.Sleep(1000);
         }
 
         public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
         {
-            Console.WriteLine(id + ": Handling trade");
+            if (!silent)
+                Console.WriteLine(id + ": Handling trade");
             return offer;
         }
     }
