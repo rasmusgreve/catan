@@ -28,7 +28,7 @@ namespace AIsOfCatan
         private int robberLocation;
 
         private Board(Tile[][] terrain, Dictionary<Tuple<int, int>, int> roads, 
-            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber)
+            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber) : this()
         {
             this.terrain = terrain;
             this.roads = roads;

@@ -20,6 +20,7 @@ namespace AIsOfCatan
             this.players = players;
             this.curPlayer = curPlayer;
             this.log = log;
+            if (players == null) players = new Player[0];
             AllPlayerIds = players.Select(p => p.Id).ToArray();
         }
 

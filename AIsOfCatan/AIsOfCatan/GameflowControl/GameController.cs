@@ -154,12 +154,11 @@ namespace AIsOfCatan
             if (roll == 7)
             {
                 //Discard if over 7 cards
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
                 foreach (var p in players)
                 {
                     if (p.Resources.Count > 7)
                     {
-                        var cards = p.Agent.DiscardCards(state, p.Resources.Count / 2);
+                        var cards = p.Agent.DiscardCards(new GameState(board, developmentCardStack, resourceBank, players, p.Id, log), p.Resources.Count / 2);
                         if (cards.Length != p.Resources.Count / 2)
                         {
                             //Clone, shuffle, take, convert
