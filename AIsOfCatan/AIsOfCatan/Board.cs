@@ -28,12 +28,13 @@ namespace AIsOfCatan
         private int robberLocation;
 
         private Board(Tile[][] terrain, Dictionary<Tuple<int, int>, int> roads, 
-            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber) : this()
+            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber, Harbor[] harbors) : this()
         {
             this.terrain = terrain;
             this.roads = roads;
             this.settlements = settlements;
             this.robberLocation = robber;
+            this.harbors = harbors;
         }
 
         private Board()
@@ -312,7 +313,7 @@ namespace AIsOfCatan
         {
             return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), 
                 new Dictionary<Tuple<int, int, int>, 
-                    Piece>(settlements), index);
+                    Piece>(settlements), index, harbors);
         }
 
         /// <summary>
@@ -328,7 +329,7 @@ namespace AIsOfCatan
         {
             var newSettlements = new Dictionary<Tuple<int, int, int>, Piece>(settlements);
             newSettlements.Add(Get3Tuple(index1, index2, index3), p);
-            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation);
+            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation, harbors);
         }
         
         /// <summary>
@@ -343,7 +344,7 @@ namespace AIsOfCatan
         {
             var newRoads = new Dictionary<Tuple<int, int>, int>(roads);
             newRoads.Add(Get2Tuple(index1, index2), playerID);
-            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation);
+            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation, harbors);
         }
 
         /// <summary>
@@ -479,6 +480,7 @@ namespace AIsOfCatan
             }
             terrainPool.Add(Terrain.Desert);
             List<int> numberPool = new List<int>(valueOrder);
+
             List<HarborType> harborPool = new List<HarborType>(9);
             harborPool.Add(HarborType.Brick);
             harborPool.Add(HarborType.Grain);
@@ -511,7 +513,7 @@ namespace AIsOfCatan
             }
 
             // place harbors random at positions
-            for (int i = 0; i < 9; i++) harbors[i] = new Harbor(harborPool[i], harborEdges[i]);
+            for (int i = 0; i < 9; i++) this.harbors[i] = new Harbor(harborPool[i], harborEdges[i]);
         }
 
         private Tuple<int, int> GetTerrainCoords(int index)
