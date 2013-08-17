@@ -168,6 +168,7 @@ namespace AIsOfCatan
                         {
                             PayResource(p, c);
                         }
+                        log.Add(new DiscardCardsLogEvent(p.Id,cards.ToList()));
                     }
                 }
                 MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
@@ -199,6 +200,7 @@ namespace AIsOfCatan
             }
             board = board.MoveRobber(robberPosition);
 
+            log.Add(new MoveRobberLogEvent(player.Id, robberPosition));
             //Draw a card from an opponent
             var opponents = new List<int>();
             foreach (var piece in board.GetPieces(robberPosition))
@@ -209,6 +211,9 @@ namespace AIsOfCatan
             }
             if (opponents.Count == 0) return; //No opponents to draw from
             int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
+
+            log.Add(new StealCardLogEvent(player.Id, choice));
+
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
                 Console.WriteLine("IAgent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
@@ -217,6 +222,7 @@ namespace AIsOfCatan
 
             if (players[choice].Resources.Count == 0) return; //Nothing to take
             
+
             //Move a card from one player to another
             var position = shuffleRandom.Next(players[choice].Resources.Count);
             var toMove = players[choice].Resources[position];
