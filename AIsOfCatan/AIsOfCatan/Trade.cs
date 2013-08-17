@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    public enum TradeStatus {Declined, Accepted, Countered};
+    public enum TradeStatus {Declined, Countered};
 
     public class Trade : ITrade
     {
@@ -20,19 +20,16 @@ namespace AIsOfCatan
             Status = TradeStatus.Declined;
         }
 
+        public static Trade Decline()
+        {
+            Trade t = new Trade(null,null);
+            t.Status = TradeStatus.Declined;
+            return t;
+        }
+
         public Trade Reverse()
         {
             return new Trade(DeepClone(Take),DeepClone(Give)) {Status = Status};
-        }
-
-        public void Accept()
-        {
-            Status = TradeStatus.Accepted;
-        }
-
-        public void CounterOffer()
-        {
-            Status = TradeStatus.Countered;
         }
 
         private static List<List<Resource>> DeepClone(List<List<Resource>> list)
