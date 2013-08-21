@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AIsOfCatan
 {
-    public enum TradeStatus {Declined, Countered};
+    public enum TradeStatus {Declined, Countered, Untouched};
 
     public class Trade : ITrade
     {
@@ -17,14 +17,21 @@ namespace AIsOfCatan
         public Trade(List<List<Resource>> give, List<List<Resource>> take){
             this.Give = give;
             this.Take = take;
-            Status = TradeStatus.Declined;
+            Status = TradeStatus.Untouched;
         }
 
-        public static Trade Decline()
+        public ITrade Respond(List<Resource> give, List<Resource> take)
         {
-            Trade t = new Trade(null,null);
-            t.Status = TradeStatus.Declined;
-            return t;
+            return new Trade(new List<List<Resource>> {give}, new List<List<Resource>> {take})
+                {
+                    Status = TradeStatus.Countered
+                };
+        }
+
+        public ITrade Decline()
+        {
+            Status = TradeStatus.Declined;
+            return this;
         }
 
         public Trade Reverse()

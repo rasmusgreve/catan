@@ -243,7 +243,7 @@ namespace AIsOfCatan
                             for (int i = 0; i < tpTakeAmount; i++)
                                 take[0].Add(tpTakeType);
 
-                            var feedback = actions.ProposeTrade(new Trade(give, take));
+                            var feedback = actions.ProposeTrade(give, take);
                             Console.WriteLine("The other players responded:");
                             foreach (var f in feedback)
                             {

@@ -57,8 +57,20 @@ namespace AIsOfCatan
         /// <returns>The new state of the game after the resources have changed hands</returns>
         GameState PlayMonopoly(Resource resource);
 
-        Dictionary<int, Trade> ProposeTrade(Trade trade);
+        /// <summary>
+        /// Propose a trade with the other players
+        /// </summary>
+        /// <param name="give">A list of possible combinations of resources you want to trade away</param>
+        /// <param name="take">A list of possible combinations of resources you want to get in return</param>
+        /// <returns>A dictionary of PlayerID => ITrade telling what the other players responded. 
+        /// If you wish to complete a trade call Trade(otherPlayer) with the id of the player you wish to trade with</returns>
+        Dictionary<int, ITrade> ProposeTrade(List<List<Resource>> give, List<List<Resource>> take);
 
+        /// <summary>
+        /// Complete a proposed trade with a given player
+        /// </summary>
+        /// <param name="otherPlayer">The id of the player you wish to trade with</param>
+        /// <returns>The updated game state after trading</returns>
         GameState Trade(int otherPlayer);
 
         /// <summary>

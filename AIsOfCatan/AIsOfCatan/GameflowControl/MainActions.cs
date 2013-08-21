@@ -91,11 +91,11 @@ namespace AIsOfCatan
 
         //Trading
 
-        public Dictionary<int, Trade> ProposeTrade(Trade trade)
+        public Dictionary<int, ITrade> ProposeTrade(List<List<Resource>> give, List<List<Resource>> take)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to propose trade before the die roll");
-            return controller.ProposeTrade(player, trade);
+            return controller.ProposeTrade(player, give, take);
         }
 
         public GameState Trade(int otherPlayer)

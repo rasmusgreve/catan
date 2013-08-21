@@ -121,13 +121,13 @@ namespace AIsOfCatan
         /// During a players turn it is possible to propose a trade with the other players
         /// In this method you must handle this case by choosing what to do when a trade is proposed
         /// The input trade is the one that the current player has proposed to all players
-        /// You may choose to either accept the offer, decline the offer or make a counter offer with other resources
+        /// You may choose to either decline the offer or accept/counter the offer with other resources
         /// Note that even though you have acceptet the trade, it is up to the proposing player 
         /// to choose which player he want to trade with, and if he wants to trade at all
         /// </summary>
         /// <param name="offer">The proposing players trade offer</param>
         /// <param name="proposingPlayerId">The id of the player who proposed the trade</param>
-        /// <returns>Either the same offer accepted or declined, or a counteroffer</returns>
+        /// <returns>Either offer.Decline() or offer.Respond(give, take) (see ITrade)</returns>
         ITrade HandleTrade(ITrade offer, int proposingPlayerId);
     }
 }

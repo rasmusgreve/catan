@@ -503,9 +503,12 @@ namespace AIsOfCatan
 
         private readonly Dictionary<int, Dictionary<int, Trade>> proposedTrades = new Dictionary<int, Dictionary<int, Trade>>(); //TODO: Move this
 
-        public Dictionary<int, Trade> ProposeTrade(Player player, Trade trade)
+        public Dictionary<int, ITrade> ProposeTrade(Player player, List<List<Resource>> give, List<List<Resource>> take)
         {
-            var dict = new Dictionary<int, Trade>();
+            var trade = new Trade(give, take);
+
+            var dict = new Dictionary<int, Trade>(); //Reversed trades
+            var replyDict = new Dictionary<int, ITrade>();
 
             log.Add(new ProposeTradeLogEvent(player.Id, trade.Give, trade.Take));
 
@@ -513,17 +516,25 @@ namespace AIsOfCatan
             {
                 if (other.Id == player.Id) continue; //No need to propose a trade with yourself
                 dict[other.Id] = (Trade)other.Agent.HandleTrade(trade.Reverse(), player.Id);
-                if (dict[other.Id].Status == TradeStatus.Countered)
+                replyDict[other.Id] = dict[other.Id].Reverse();
+                switch (dict[other.Id].Status)
                 {
-                    //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
-                    var give = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
-                    var take = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
-                    log.Add(new CounterTradeLogEvent(other.Id, give, take));
+                    case TradeStatus.Untouched:
+                        Console.WriteLine("An agent responded falsely to a trade (didn't choose). Assumed declined");
+                        break;
+                    case TradeStatus.Countered:
+                        {
+                            //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
+                            var giveLog = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                            var takeLog = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                            log.Add(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
+                        }
+                        break;
                 }
             }
             proposedTrades[player.Id] = dict;
 
-            return dict;
+            return replyDict;
         }
 
         public GameState CompleteTrade(Player player, int playerid)
