@@ -20,7 +20,7 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
-        Board board;
+        IBoard board;
 
         GameState state;
 

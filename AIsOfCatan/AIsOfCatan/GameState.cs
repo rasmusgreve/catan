@@ -12,7 +12,7 @@ namespace AIsOfCatan
         private int curPlayer;
         private List<LogEvent> log;
 
-        public GameState(Board board, List<DevelopmentCard> deck, int[] resourceBank, Player[] players, int curPlayer, List<LogEvent> log)
+        public GameState(IBoard board, List<DevelopmentCard> deck, int[] resourceBank, Player[] players, int curPlayer, List<LogEvent> log)
         {
             Board = board;
             DevelopmentCards = deck == null ? 0 : deck.Count;
@@ -24,7 +24,7 @@ namespace AIsOfCatan
             AllPlayerIds = players.Select(p => p.Id).ToArray();
         }
 
-        public Board Board { get; private set; }
+        public IBoard Board { get; private set; }
         public int DevelopmentCards { get; private set; }
         public int[] ResourceBank { get; private set; }
         public int[] AllPlayerIds { get; private set; }

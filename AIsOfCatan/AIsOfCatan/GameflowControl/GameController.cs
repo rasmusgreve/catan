@@ -14,7 +14,7 @@ namespace AIsOfCatan
 
         private List<LogEvent> log = new List<LogEvent>(); // Here you go Rasmus
 
-        private Board board;
+        private IBoard board;
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
         private int[] resourceBank;
         private int turn;
@@ -395,7 +395,7 @@ namespace AIsOfCatan
         /// <param name="secondTile">The index of the second tile on the edge</param>
         /// <param name="playerId">The id of the player to test</param>
         /// <returns>True if the edge is connected to a road</returns>
-        private bool RoadConnected(Board board, int firstTile, int secondTile, int playerId)
+        private bool RoadConnected(IBoard board, int firstTile, int secondTile, int playerId)
         {
             return board.GetAdjacentIntersections(firstTile, secondTile)
                      .SelectMany(inter => board.GetAdjacentEdges(inter.Item1, inter.Item2, inter.Item3))

@@ -24,7 +24,7 @@ namespace AIsOfCatan
         /// <summary>
         /// 
         /// </summary>
-        Board Board { get; }
+        IBoard Board { get; }
 
         /// <summary>
         /// 
