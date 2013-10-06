@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AIsOfCatan.Log;
+using System.Threading;
 
 namespace AIsOfCatan
 {
@@ -57,10 +58,21 @@ namespace AIsOfCatan
             //Start the game!
             turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
 
-            gui = new GUIControl(CurrentGamestate());
+            //StartGUI();
+            Thread guiThread = new Thread(StartGUI);
+            guiThread.Start();
+            Thread.Sleep(5000);
+            
 
             PlaceStarts();
             return GameLoop();
+        }
+
+        private void StartGUI()
+        {
+            gui = new GUIControl(new GameState(board, developmentCardStack, resourceBank, players, turn, log));
+            gui.Run();
+            
         }
 
         private void Log(LogEvent evt)
@@ -434,7 +446,10 @@ namespace AIsOfCatan
         private GameState CurrentGamestate()
         {
             GameState gs = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
-            if (gui != null) gui.NewGameState(gs);
+            if (gui != null)
+            {
+                gui.NewGameState(gs);
+            }
             return gs;
         }
 

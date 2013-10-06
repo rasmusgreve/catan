@@ -75,8 +75,6 @@ namespace AIsOfCatan
             UpdateGameState(initial);
         }
 
-        private int counter = 0;
-
         private void InsertLogEvent(string logText)
         {
             GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0,-25)) {Text = logText};
@@ -85,6 +83,8 @@ namespace AIsOfCatan
 
         public void UpdateGameState(GameState state)
         {
+            Console.WriteLine("UpdateGameState called");
+
             latestGameState = state;
 
             #region Roads
@@ -122,6 +122,8 @@ namespace AIsOfCatan
                 }
 
                 GUIRoad newRoad = new GUIRoad(placeVector,rotation,road.Value, tile1, tile2);
+
+
 
                 AddDrawableComponent(newRoad);
 

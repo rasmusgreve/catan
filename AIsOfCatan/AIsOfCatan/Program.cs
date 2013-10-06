@@ -24,7 +24,7 @@ namespace AIsOfCatan
             Console.WriteLine("Seed: " + seed);
             */
 
-            if (false) //Set to false if you wanna see the GUI
+            if (true) //Set to false if you wanna see the GUI
             {
                 var agent1 = new StarterAgent();
                 var agent2 = new HumanAgent();

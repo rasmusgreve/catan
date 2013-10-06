@@ -29,8 +29,6 @@ namespace AIsOfCatan
         public GUIControl(GameState st)
         {
             state = st;
-            //graphics = new GraphicsDeviceManager(this);
-            //Content.RootDirectory = "Content";
         }
 
         /// <summary>
