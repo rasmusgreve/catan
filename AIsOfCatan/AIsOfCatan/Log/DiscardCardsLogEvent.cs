@@ -19,7 +19,7 @@ namespace AIsOfCatan.Log
 
         public override string ToString()
         {
-            return "Player " + Player + " discards " + CounterTradeLogEvent.ListToString(cards);
+            return "Player " + Player + " discards " + ProposeTradeLogEvent.ListToString(cards);
         }
     }
 }

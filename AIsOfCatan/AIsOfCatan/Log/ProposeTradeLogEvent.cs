@@ -27,22 +27,24 @@ namespace AIsOfCatan.Log
             return result;
         }
 
-        private static string ListToString(List<List<Resource>> list)
+        public static string ListToString<T>(T variable)
         {
-            StringBuilder builder = new StringBuilder("[");
-            foreach (List<Resource> outer in list)
-            {
-                builder.Append("[");
-                foreach (Resource res in outer)
-                {
-                    builder.Append(res + "/"); 
-                }
-                builder.Remove(builder.Length - 2, 1); // remove last slash
-                builder.Append("]");
-            }
-            builder.Append("]");
 
-            return builder.ToString();
+            var enumerable = variable as System.Collections.IEnumerable; 
+
+            if (enumerable != null){
+                StringBuilder builder = new StringBuilder("[");
+                foreach(var item in enumerable)
+                {
+                    builder.Append(ListToString(item) + "/"); 
+                }
+                builder.Remove(builder.Length - 1, 1); // remove last slash
+                builder.Append("]");
+                return builder.ToString();
+            }
+            else{
+                return variable.ToString();
+            }
         }
 
         public override string ToString()

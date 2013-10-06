@@ -20,22 +20,9 @@ namespace AIsOfCatan.Log
             this.take = take;
         }
 
-        public static string ListToString(List<Resource> list)
-        {
-            StringBuilder builder = new StringBuilder("[");
-            foreach (Resource res in list)
-            {
-                builder.Append(res + "/");
-            }
-            builder.Remove(builder.Length - 2, 1); // remove last slash
-            builder.Append("]");
-
-            return builder.ToString();
-        }
-
         public override string ToString()
         {
-            return "Player " + Player + " suggests the trade to be " + ListToString(give) + " for " + ListToString(take);
+            return "Player " + Player + " suggests the trade to be " + ProposeTradeLogEvent.ListToString(give) + " for " + ProposeTradeLogEvent.ListToString(take);
         }
     }
 }
