@@ -21,15 +21,14 @@ namespace AIsOfCatan
     {
         //GraphicsDeviceManager graphics;
         //SpriteBatch spriteBatch;
-        IBoard board;
-
         GameState state;
 
         private TXAScreen startScreen;
         private List<LogEvent> logList;
 
-        public GUIControl()
+        public GUIControl(GameState st)
         {
+            state = st;
             //graphics = new GraphicsDeviceManager(this);
             //Content.RootDirectory = "Content";
         }
@@ -42,6 +41,7 @@ namespace AIsOfCatan
         /// </summary>
         protected override void Initialize()
         {
+            /*
             board = new Board(0);
             board = board.PlaceRoad(16, 22, 1);
             board = board.PlaceRoad(23, 24, 2);
@@ -53,7 +53,7 @@ namespace AIsOfCatan
             logList.Add(new BuyDevLogEvent(2));
             logList.Add(new RollLogEvent(1, 2));
             state = new GameState(board, null, null, null, 0, logList);
-
+            */
             SCALE = 0.5f;
 
             base.Initialize();
@@ -104,7 +104,7 @@ namespace AIsOfCatan
             // TODO: Unload any non ContentManager content here
         }
 
-        private long counter = 2000;
+        //private long counter = 2000;
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -118,7 +118,7 @@ namespace AIsOfCatan
             //    this.Exit();
 
             // TODO: Add your update logic here
-
+            /*
             counter -= gameTime.ElapsedGameTime.Milliseconds;
             
             if (counter < 0)
@@ -128,7 +128,7 @@ namespace AIsOfCatan
                 state = new GameState(board, null, null, null, 0, logList);
                 NewGameState(state);
                 counter += 2000;
-            }
+            }*/
 
             base.Update(gameTime);
         }

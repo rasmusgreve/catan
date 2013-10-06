@@ -60,7 +60,7 @@ namespace AIsOfCatan
 
             gamelog = new GUILogList<GUIBufferTextBlock>(new Vector2((screenWidth-logWidth)/TXAGame.SCALE, 1/TXAGame.SCALE),screenHeight-2, logWidth-1);
 
-            AddButton(new TXAButton(new Vector2(750 / TXAGame.SCALE, 50 / TXAGame.SCALE), "Debug Log"), InsertText);
+            //AddButton(new TXAButton(new Vector2(750 / TXAGame.SCALE, 50 / TXAGame.SCALE), "Debug Log"), InsertText);
 
             AddDrawableComponent(gamelog);
 
@@ -80,12 +80,6 @@ namespace AIsOfCatan
         private void InsertLogEvent(string logText)
         {
             GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0,-25)) {Text = logText};
-            gamelog.AddToList(textB);
-        }
-
-        private void InsertText()
-        {
-            GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0, -25)) { Text = counter++.ToString(CultureInfo.InvariantCulture)};
             gamelog.AddToList(textB);
         }
 
