@@ -608,7 +608,7 @@ namespace AIsOfCatan
             
             if (trade.Give.Count > 1 || trade.Take.Count > 1)
             {
-                throw new IllegalActionException("Tried to complete an invalid trade");
+                throw new IllegalActionException("Player " + player.Id + "(" +  player.Agent.GetName() + ") tried to complete an invalid trade with Player " + opponent.Id + "(" +  opponent.Agent.GetName() + ")");
             }
             //Validate that players have enough resources (maybe do this earlier?)
 
