@@ -95,6 +95,7 @@ namespace AIsOfCatan
                 if (resources.Count(r => r == Resource.Grain) >= 2 && resources.Count(r => r == Resource.Ore) >= 3)
                 {
                     var pos = state.Board.GetPossibleCities(id);
+                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
@@ -105,6 +106,7 @@ namespace AIsOfCatan
                 if (resources.Contains(Resource.Grain) && resources.Contains(Resource.Wool) && resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
                 {
                     var pos = state.Board.GetPossibleSettlements(id);
+                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
@@ -115,6 +117,7 @@ namespace AIsOfCatan
                 if (resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
                 {
                     var pos = state.Board.GetPossibleRoads(id);
+                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
