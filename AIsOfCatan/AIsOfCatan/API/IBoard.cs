@@ -17,19 +17,16 @@ namespace AIsOfCatan
         /// <summary>
         /// Tells if a specific intersection is free for building.
         /// </summary>
-        /// <param name="index1">The first index of the tiles to look between.</param>
-        /// <param name="index2">The second index of the tiles to look between.</param>
-        /// <param name="index3">The third index of the tiles to look between.</param>
+        /// <param name="intersection">The intersection to look at.</param>
         /// <returns>True if the intersections if free, else false.</returns>
-        bool CanBuildPiece(int index1, int index2, int index3);
+        bool CanBuildPiece(Intersection intersection);
 
         /// <summary>
         /// Tells if a specific edge contains no road.
         /// </summary>
-        /// <param name="index1">The first index of the tiles to look between.</param>
-        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="index1">The edge to look at.</param>
         /// <returns>True if there is no road on the given edge, else false.</returns>
-        bool CanBuildRoad(int index1, int index2);
+        bool CanBuildRoad(Edge edge);
 
         /// <summary>
         /// Get the longest road on this board
@@ -48,19 +45,17 @@ namespace AIsOfCatan
         /// Checks if the given intersection has no pieces build at the
         /// directly connected intersections (Distance Rule).
         /// </summary>
-        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
-        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
-        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
+        /// <param name="index1">The intersection to check for.</param>
         /// <returns>Returns true if the given intersection has no direct neighboring intersections
         /// containing settlements or cities, else false.</returns>
-        bool HasNoNeighbors(int index1, int index2, int index3);
+        bool HasNoNeighbors(Intersection intersection);
 
         /// <summary>
         /// Finds all possible edges where the given player can legally build roads.
         /// </summary>
         /// <param name="playerID">The player to find edges for.</param>
         /// <returns>An array of edges where the given player can legally build a road.</returns>
-        Tuple<int, int>[] GetPossibleRoads(int playerID);
+        Edge[] GetPossibleRoads(int playerID);
 
         /// <summary>
         /// Finds all possible intersections where the given player can legally build
@@ -69,7 +64,7 @@ namespace AIsOfCatan
         /// <param name="playerID">The player to find intersections for.</param>
         /// <returns>An array of intersections where the given player can legally
         /// build a settlement.</returns>
-        Tuple<int, int, int>[] GetPossibleSettlements(int playerID);
+        Intersection[] GetPossibleSettlements(int playerID);
 
         /// <summary>
         /// Finds all possible intersections where the given player has a settlement.
@@ -77,7 +72,7 @@ namespace AIsOfCatan
         /// <param name="playerID">The player to find intersections for.</param>
         /// <returns>An array of intersections where the given player can legally
         /// upgrade a settlement to a city.</returns>
-        Tuple<int, int, int>[] GetPossibleCities(int playerID);
+        Intersection[] GetPossibleCities(int playerID);
 
         #endregion
 
@@ -104,25 +99,23 @@ namespace AIsOfCatan
         /// proves too slow it should be modified to only calculate the intersections
         /// once.
         /// </summary>
-        /// <returns>A list containing all intersections entirely or partly on land.</returns>
-        Tuple<int, int, int>[] GetAllIntersections();
+        /// <returns>An array containing all intersections entirely or partly on land.</returns>
+        Intersection[] GetAllIntersections();
 
         /// <summary>
         /// Gives a list of all legal edges on the board.
         /// </summary>
-        /// <returns>A list containing all edges around land tiles.</returns>
-        Tuple<int,int>[] GetAllEdges();
+        /// <returns>An array containing all edges around land tiles.</returns>
+        Edge[] GetAllEdges();
 
         /// <summary>
-        /// Gives the game piece at the vertex between three different tiles.
+        /// Gives the game piece at the intersection between three different tiles.
         /// </summary>
-        /// <param name="firstTile">The first index of the tiles to look between.</param>
-        /// <param name="secondTile">The second index of the tiles to look between.</param>
-        /// <param name="thirdTile">The third index of the tiles to look between.</param>
+        /// <param name="intersection">The intersection on the board to look.</param>
         /// <returns>The Piece object at the location, containing the type of token 
         /// (Settlement or City) and the owning player id. If the location is empty
         /// it will return null.</returns>
-        Piece GetPiece(int firstTile, int secondTile, int thirdTile);
+        Piece GetPiece(Intersection intersection);
 
         /// <summary>
         /// Get all pieces built adjacent to the given tile index.
@@ -136,21 +129,20 @@ namespace AIsOfCatan
         /// currently build on the board.
         /// </summary>
         /// <returns>A dictionary with all settlements and cities on the board.</returns>
-        Dictionary<Tuple<int, int, int>, Piece> GetAllPieces();
+        Dictionary<Intersection, Piece> GetAllPieces();
 
         /// <summary>
         /// Gives the id of the player who has build a road at the requested edge.
         /// </summary>
-        /// <param name="firstTile">The first index of the tiles to look between.</param>
-        /// <param name="secondTile">The second index of the tiles to look between.</param>
+        /// <param name="edge">The edge where the road should be.</param>
         /// <returns>The player id of the player who has build a road here. If empty it returns -1.</returns>
-        int GetRoad(int firstTile, int secondTile);
+        int GetRoad(Edge edge);
 
         /// <summary>
         /// Gives a (copy) of the dictionary holding all roads currently build on the board.
         /// </summary>
         /// <returns>A dictionary with all roads on the board.</returns>
-        Dictionary<Tuple<int, int>, int> GetAllRoads();
+        Dictionary<Edge, int> GetAllRoads();
 
         /// <summary>
         /// Gives an array (size 9) of Harbors containing positions (edges) and
@@ -181,20 +173,17 @@ namespace AIsOfCatan
         /// Gives all edges (places to build roads) adjacent to the given intersection. Edges
         /// between two water tiles are excluded.
         /// </summary>
-        /// <param name="index1">The first index of the tiles enclosing the intersection.</param>
-        /// <param name="index2">The second index of the tiles enclosing the intersection.</param>
-        /// <param name="index3">The third index of the tiles enclosing the intersection.</param>
-        /// <returns>An array of 2-int-tuples with the (up to three) edges next to the intersection.</returns>
-        Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3);
+        /// <param name="intersection">The intersection.</param>
+        /// <returns>An array of edges with the (up to three) edges next to the intersection.</returns>
+        Edge[] GetAdjacentEdges(Intersection intersection);
 
         /// <summary>
         /// Gives all intersections (places to build settlements and cities)
         /// adjacent to the give edge.
         /// </summary>
-        /// <param name="index1">The first index of the tiles to look between.</param>
-        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="edge">The edge to look at.</param>
         /// <returns>An array of 3-int-tuples with the (up to two) intersections at the ends of the edge.</returns>
-        Tuple<int, int, int>[] GetAdjacentIntersections(int index1, int index2);
+        Intersection[] GetAdjacentIntersections(Edge edge);
 
         /// <summary>
         /// Gets all tiles that are adjacent to the given tile.
@@ -220,22 +209,19 @@ namespace AIsOfCatan
         /// Places the given Piece on the specified position on the Board and
         /// returns the resulting Board.
         /// </summary>
-        /// <param name="index1">The first index of the tiles to look between.</param>
-        /// <param name="index2">The second index of the tiles to look between.</param>
-        /// <param name="index3">The third index of the tiles to look between.</param>
+        /// <param name="intersection">The intersection to place at.</param>
         /// <param name="p">The Piece to place on the Board.</param>
         /// <returns>The resulting Board from placing the Piece.</returns>
-        IBoard PlacePiece(int index1, int index2, int index3, Piece p);
+        IBoard PlacePiece(Intersection intersection, Piece p);
 
         /// <summary>
         /// Places a road on the specified position on the Board and
         /// returns the resulting Board.
         /// </summary>
-        /// <param name="index1">The first index of the tiles to look between.</param>
-        /// <param name="index2">The second index of the tiles to look between.</param>
+        /// <param name="edge">The edge to place at.</param>
         /// <param name="playerID">The player who owns the road.</param>
         /// <returns>The resulting Board from placing the road.</returns>
-        IBoard PlaceRoad(int index1, int index2, int playerID);
+        IBoard PlaceRoad(Edge edge, int playerID);
 
         #endregion
     }

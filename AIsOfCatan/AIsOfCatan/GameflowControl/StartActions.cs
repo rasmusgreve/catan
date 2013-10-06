@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -8,8 +9,8 @@ namespace AIsOfCatan
         private readonly GameController controller;
         private bool settlementBuilt = false;
         private bool roadBuilt = false;
-        private int[] settlementPosition;
-        private int[] roadPosition;
+        private Intersection settlementPosition;
+        private Edge roadPosition;
         public StartActions(Player player, GameController controller)
         {
             this.player = player;
@@ -27,17 +28,17 @@ namespace AIsOfCatan
         /// <summary>
         /// Internal method used for handing out resources
         /// </summary>
-        public int[] GetSettlementPosition()
+        public Intersection GetSettlementPosition()
         {
-            return settlementPosition.ToArray();
+            return settlementPosition;
         }
 
         /// <summary>
         /// Internal method used for handing out resources
         /// </summary>
-        public int[] GetRoadPosition()
+        public Edge GetRoadPosition()
         {
-            return roadPosition.ToArray();
+            return roadPosition;
         }
 
 
@@ -46,14 +47,12 @@ namespace AIsOfCatan
         /// If you try to build too close to another building a IllegalBuildPosition is thrown
         /// Must be called before BuildRoad, otherwise an IllegalActionException is thrown
         /// </summary>
-        /// <param name="firstTile">The index of the first tile in the intersection</param>
-        /// <param name="secondTile">The index of the second tile in the intersection</param>
-        /// <param name="thirdTile">The index of the third tile in the intersection</param>
-        public void BuildSettlement(int firstTile, int secondTile, int thirdTile)
+        /// <param name="firstTile">The intersection</param>
+        public void BuildSettlement(Intersection intersection)
         {
             if (settlementBuilt) throw new IllegalActionException("Only one settlement may be built in a turn during the startup");
-            settlementPosition = new int[] { firstTile, secondTile, thirdTile};
-            controller.BuildFirstSettlement(player, firstTile, secondTile, thirdTile);
+            settlementPosition = intersection;
+            controller.BuildFirstSettlement(player, intersection);
             settlementBuilt = true;
         }
 
@@ -64,14 +63,15 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="firstTile">The first tile that the road will be along</param>
         /// <param name="secondTile">The second tile that the road will be along</param>
-        public void BuildRoad(int firstTile, int secondTile)
+        public void BuildRoad(Edge edge)
         {
             if (roadBuilt) throw new IllegalActionException("Only one road may be built in a turn during the startup");
             if (!settlementBuilt) throw new IllegalActionException("The settlement must be placed before the road");
-            if (!(settlementPosition.Contains(firstTile) && settlementPosition.Contains(secondTile)))
+            int[] array = new int[] { settlementPosition.FirstTile, settlementPosition.SecondTile, settlementPosition.ThirdTile };
+            if (!(array.Contains(edge.FirstTile) && array.Contains(edge.SecondTile)))
                 throw new IllegalBuildPositionException("The road must be placed next to the settlement");
-            roadPosition = new int[] { firstTile, secondTile };
-            controller.BuildFirstRoad(player, firstTile,secondTile);
+            roadPosition = edge;
+            controller.BuildFirstRoad(player, edge);
             roadBuilt = true;
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -12,11 +13,11 @@ namespace AIsOfCatan
         private bool hasDevcardToPlay = false;
         private DevelopmentCard nextToPlay;
         private int id;
-        private int[] start1 = new[] { 21, 27, 28 };
+        private Intersection start1 = new Intersection( 21, 27, 28 );
         private bool firstStartPlaced = false;
-        private int[] start2 = new[] { 9, 15, 16 };
-        private int[] tooClose = new[] { 21, 22, 28 };
-        private int[] farRoad = new[] { 34, 35 };
+        private Intersection start2 = new Intersection( 9, 15, 16 );
+        private Intersection tooClose = new Intersection ( 21, 22, 28 );
+        private Edge farRoad = new Edge( 34, 35 );
         public void Reset(int assignedId)
         {
             id = assignedId;
@@ -41,10 +42,10 @@ namespace AIsOfCatan
             if (!firstStartPlaced)
             {
                 firstStartPlaced = true;
-                actions.BuildSettlement(start1[0], start1[1], start1[2]);
+                actions.BuildSettlement(start1);
                 if (!silent)
                     Console.WriteLine(id + ": First settlement built succesfully");
-                actions.BuildRoad(start1[0], start1[1]);
+                actions.BuildRoad(new Edge(start1.FirstTile, start1.SecondTile));
                 if (!silent)
                     Console.WriteLine(id + ": First road built succesfully");
             }
@@ -52,7 +53,7 @@ namespace AIsOfCatan
             {
                 try
                 {
-                    actions.BuildSettlement(start1[0], start1[1], start1[2]);
+                    actions.BuildSettlement(start1);
                     if (!silent)
                         Console.WriteLine(id + ": Controller allowed a building on top of another");
                 }
@@ -63,7 +64,7 @@ namespace AIsOfCatan
                 }
                 try
                 {
-                    actions.BuildSettlement(tooClose[0], tooClose[1], tooClose[2]);
+                    actions.BuildSettlement(tooClose);
                     if (!silent)
                         Console.WriteLine(id + ": Controller allowed a building too close");
                 }
@@ -72,11 +73,11 @@ namespace AIsOfCatan
                     if (!silent)
                         Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
                 }
-                actions.BuildSettlement(start2[0], start2[1], start2[2]);
+                actions.BuildSettlement(start2);
                 Console.WriteLine(id + ": Second settlement built succesfully");
                 try
                 {
-                    actions.BuildRoad(farRoad[0], farRoad[1]);
+                    actions.BuildRoad(farRoad);
                     if (!silent)
                         Console.WriteLine(id + ": Controller allowed a building disconnected road");
                 }
@@ -85,7 +86,7 @@ namespace AIsOfCatan
                     if (!silent)
                         Console.WriteLine(id + ": Controller threw exception as expected: " + e.Message);
                 }
-                actions.BuildRoad(start2[0], start2[1]);
+                actions.BuildRoad(new Edge(start2.FirstTile,start2.SecondTile));
                 if (!silent)
                     Console.WriteLine(id + ": Second road built succesfully");
             }
@@ -158,7 +159,7 @@ namespace AIsOfCatan
                     case DevelopmentCard.RoadBuilding:
                         if (!silent)
                             Console.WriteLine("Play road building");
-                        state = ((MainActions)actions).PlayRoadBuilding(27,28, 28, 34);
+                        state = ((MainActions)actions).PlayRoadBuilding(new Edge(27,28), new Edge(28, 34));
                         break;
 
                     case DevelopmentCard.YearOfPlenty:

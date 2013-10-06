@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -9,22 +10,22 @@ namespace AIsOfCatan
         private int assignedId;
         private bool hasPlayedDevCard = false;
 
-        private Tuple<int, int, int> getCityPosition()
+        private Intersection getCityPosition()
         {
             Console.WriteLine("Enter 3 id's (each followed by enter) for tiles describing which settlement to upgrade to a city");
-            return new Tuple<int, int, int>(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
+            return new Intersection(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
         }
 
-        private Tuple<int, int, int> getSettlementPosition()
+        private Intersection getSettlementPosition()
         {
             Console.WriteLine("Enter 3 id's (each followed by enter) for tiles describing where to place the settlement");
-            return new Tuple<int, int, int>(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
+            return new Intersection(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
         }
 
-        private Tuple<int, int> getRoadPosition()
+        private Edge getRoadPosition()
         {
             Console.WriteLine("Enter 2 id's (each followed by enter) for tiles describing where to place the road");
-            return new Tuple<int, int>(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
+            return new Edge(int.Parse(Console.ReadLine()), int.Parse(Console.ReadLine()));
         }
 
         private Resource selectResource(Resource[] resources = null)
@@ -69,10 +70,10 @@ namespace AIsOfCatan
         {
             Console.WriteLine("It is your turn to place a starting settlement (#" + assignedId + ")");
             var settlement = getSettlementPosition();
-            actions.BuildSettlement(settlement.Item1,settlement.Item2,settlement.Item3);
+            actions.BuildSettlement(settlement);
             Console.WriteLine("Place a road connected to the settlement you just placed");
             var road = getRoadPosition();
-            actions.BuildRoad(road.Item1,road.Item2);
+            actions.BuildRoad(road);
         }
 
         private IGameState PlayDevelopmentCard(IGameState state, IGameActions actions)
@@ -102,7 +103,7 @@ namespace AIsOfCatan
                     Console.WriteLine("Decide where to build the two roads");
                     var road1 = getRoadPosition();
                     var road2 = getRoadPosition();
-                    return actions.PlayRoadBuilding(road1.Item1, road1.Item2, road2.Item1, road2.Item2);
+                    return actions.PlayRoadBuilding(road1, road2);
                 case DevelopmentCard.YearOfPlenty:
                     Console.WriteLine("Choose which two resources you want to draw");
                     return actions.PlayYearOfPlenty(selectResource(), selectResource());
@@ -221,16 +222,15 @@ namespace AIsOfCatan
                     {
                         case 1: //road
                             var roadPos = getRoadPosition();
-                            state = actions.BuildRoad(roadPos.Item1, roadPos.Item2);
+                            state = actions.BuildRoad(roadPos);
                             break;
                         case 2: //settlement
                             var settlementPos = getSettlementPosition();
-                            state = actions.BuildSettlement(settlementPos.Item1, settlementPos.Item2,
-                                                            settlementPos.Item3);
+                            state = actions.BuildSettlement(settlementPos);
                             break;
                         case 3: //city
                             var cityPos = getCityPosition();
-                            state = actions.BuildCity(cityPos.Item1, cityPos.Item2, cityPos.Item3);
+                            state = actions.BuildCity(cityPos);
                             break;
                         case 4: //buy dev
                             state = actions.DrawDevelopmentCard();

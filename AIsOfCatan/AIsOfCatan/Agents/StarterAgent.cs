@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -40,19 +41,19 @@ namespace AIsOfCatan
                 Console.WriteLine(id + ": Place starts");
 
             var spos = state.Board.GetAllIntersections()
-                .Where(i => state.Board.GetPiece(i.Item1,i.Item2,i.Item3) == null &&
-                    state.Board.HasNoNeighbors(i.Item1,i.Item2,i.Item3))
-                .OrderBy(i => Chances(state.Board.GetTile(i.Item1).Value) +
-                    Chances(state.Board.GetTile(i.Item2).Value) +
-                    Chances(state.Board.GetTile(i.Item3).Value)).Last();
+                .Where(i => state.Board.GetPiece(i) == null &&
+                    state.Board.HasNoNeighbors(i))
+                .OrderBy(i => Chances(state.Board.GetTile(i.FirstTile).Value) +
+                    Chances(state.Board.GetTile(i.SecondTile).Value) +
+                    Chances(state.Board.GetTile(i.ThirdTile).Value)).Last();
             
-            actions.BuildSettlement(spos.Item1, spos.Item2, spos.Item3);
-            if (state.Board.CanBuildRoad(spos.Item1,spos.Item2))
-                actions.BuildRoad(spos.Item1, spos.Item2);
-            else if (state.Board.CanBuildRoad(spos.Item1, spos.Item3))
-                actions.BuildRoad(spos.Item1, spos.Item3);
+            actions.BuildSettlement(spos);
+            if (state.Board.CanBuildRoad(new Edge(spos.FirstTile,spos.SecondTile)))
+                actions.BuildRoad(new Edge(spos.FirstTile,spos.SecondTile));
+            else if (state.Board.CanBuildRoad(new Edge(spos.FirstTile,spos.ThirdTile)))
+                actions.BuildRoad(new Edge(spos.FirstTile,spos.ThirdTile));
             else
-                actions.BuildRoad(spos.Item2, spos.Item3);
+                actions.BuildRoad(new Edge(spos.SecondTile,spos.ThirdTile));
         }
 
         public void BeforeDiceRoll(IGameState state, IGameActions actions)
@@ -97,7 +98,7 @@ namespace AIsOfCatan
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildCity(pos[0].Item1, pos[0].Item2, pos[0].Item3);
+                        state = actions.BuildCity(pos[0]);
                     }
                 }
                 //Build settlement
@@ -107,7 +108,7 @@ namespace AIsOfCatan
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildSettlement(pos[0].Item1, pos[0].Item2, pos[0].Item3);
+                        state = actions.BuildSettlement(pos[0]);
                     }
                 }
                 //Build road
@@ -117,7 +118,7 @@ namespace AIsOfCatan
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildRoad(pos[0].Item1, pos[0].Item2);
+                        state = actions.BuildRoad(pos[0]);
                     }
                 }
                 //Trade bank
