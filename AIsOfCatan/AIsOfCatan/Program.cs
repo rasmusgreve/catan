@@ -12,13 +12,27 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
-            if (true) //Set to false if you wanna see the GUI
+            /*int seed = 0;
+            Terrain terrain = Terrain.Water;
+            Board b2;
+            while (terrain != Terrain.Desert)
             {
-                /*var agent1 = new DebugAgent();
+                b2 = new Board(seed);
+                if (b2.GetTile(22).Terrain == Terrain.Desert) break;
+                seed++;
+            }
+            Console.WriteLine("Seed: " + seed);
+            */
+
+            if (false) //Set to false if you wanna see the GUI
+            {
+                var agent1 = new StarterAgent();
                 var agent2 = new HumanAgent();
                 var controller = new GameController();
-                controller.StartGame(new IAgent[] { agent1, agent2 }, 0, 0);*/
-
+                var agents = new IAgent[] { agent1, agent2 };
+                var winner = controller.StartGame(agents, 10, 0);
+                Console.WriteLine("Winner: " + winner);
+                /*
                 IBoard b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(21, 27, 0).PlaceRoad(21, 28, 0).PlaceRoad(21, 22, 0).PlaceRoad(15, 21, 0).PlaceRoad(14, 21, 0).PlaceRoad(14, 15, 0).PlaceRoad(15, 16, 1).PlacePiece(20, 21, 27, new Board.Piece(Token.City, 1));
                 for (int i = 0; i < 20; i++)
                 {
@@ -33,11 +47,7 @@ namespace AIsOfCatan
                 Console.WriteLine("Player 0's harbors: " + b.GetPlayersHarbors(0).Length);
 
                 Console.ReadLine();
-            }
-
-            using (GUIControl game = new GUIControl())
-            {
-                game.Run();
+                 * */
             }
         }
     }

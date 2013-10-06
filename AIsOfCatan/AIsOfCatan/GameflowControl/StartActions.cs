@@ -9,6 +9,7 @@ namespace AIsOfCatan
         private bool settlementBuilt = false;
         private bool roadBuilt = false;
         private int[] settlementPosition;
+        private int[] roadPosition;
         public StartActions(Player player, GameController controller)
         {
             this.player = player;
@@ -29,6 +30,14 @@ namespace AIsOfCatan
         public int[] GetSettlementPosition()
         {
             return settlementPosition.ToArray();
+        }
+
+        /// <summary>
+        /// Internal method used for handing out resources
+        /// </summary>
+        public int[] GetRoadPosition()
+        {
+            return roadPosition.ToArray();
         }
 
 
@@ -61,6 +70,7 @@ namespace AIsOfCatan
             if (!settlementBuilt) throw new IllegalActionException("The settlement must be placed before the road");
             if (!(settlementPosition.Contains(firstTile) && settlementPosition.Contains(secondTile)))
                 throw new IllegalBuildPositionException("The road must be placed next to the settlement");
+            roadPosition = new int[] { firstTile, secondTile };
             controller.BuildFirstRoad(player, firstTile,secondTile);
             roadBuilt = true;
         }

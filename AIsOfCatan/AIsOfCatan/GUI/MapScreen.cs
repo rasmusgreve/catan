@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.Log;
 using MS.Internal.Xml.XPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,8 @@ namespace AIsOfCatan
     class MapScreen : TXAScreen
     {
         private GameState latestGameState;
+
+        private DateTime lastLogPoll;
 
         private readonly GUITile[][] board = new GUITile[7][];
 
@@ -57,7 +60,7 @@ namespace AIsOfCatan
 
             gamelog = new GUILogList<GUIBufferTextBlock>(new Vector2((screenWidth-logWidth)/TXAGame.SCALE, 1/TXAGame.SCALE),screenHeight-2, logWidth-1);
 
-            AddButton(new TXAButton(new Vector2(750 / TXAGame.SCALE, 50 / TXAGame.SCALE), "Debug Log"), InsertText);
+            //AddButton(new TXAButton(new Vector2(750 / TXAGame.SCALE, 50 / TXAGame.SCALE), "Debug Log"), InsertText);
 
             AddDrawableComponent(gamelog);
 
@@ -65,15 +68,18 @@ namespace AIsOfCatan
 
             AddDrawableComponent(robber);
 
+            initial.GetEventsSince(DateTime.MinValue).ForEach(a => InsertLogEvent(a.ToString()));
+            lastLogPoll = DateTime.Now;
+
             //Test Roads and pieces
             UpdateGameState(initial);
         }
 
         private int counter = 0;
 
-        private void InsertText()
+        private void InsertLogEvent(string logText)
         {
-            GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0, -25)) { Text = counter++.ToString(CultureInfo.InvariantCulture)};
+            GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0,-25)) {Text = logText};
             gamelog.AddToList(textB);
         }
 
@@ -161,6 +167,14 @@ namespace AIsOfCatan
             #region Robber
             robber.UpdateRobberPosition(GetRobberPos());
             #endregion
+
+            #region GameLog
+
+            List<LogEvent> events = state.GetEventsSince(lastLogPoll);
+            Console.WriteLine(events.Count);
+            events.ForEach(a => InsertLogEvent(a.ToString()));
+            lastLogPoll = DateTime.Now;
+            #endregion
         }
 
         private Vector2 GetRobberPos()
@@ -218,5 +232,6 @@ namespace AIsOfCatan
                     return Color.Black;
             }
         }
+
     }
 }

@@ -9,7 +9,7 @@ namespace AIsOfCatan
     {
         private static readonly int[] WaterTiles = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 18, 19, 25, 26, 31, 32, 33, 37, 38, 39, 40, 41, 42, 43, 44 };
         private static readonly int[] placementOrder = new int[] { 8, 14, 20, 27, 34, 35, 36, 30, 24, 17, 10, 9, 15, 21, 28, 29, 23, 16, 22 };
-        private static readonly int[] valueOrder = new int[] { 5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11 };
+        private static readonly int[] valueOrder = new int[] { 11, 2, 9, 4, 3, 6, 4, 11, 10, 3, 9, 6, 5, 8, 5, 10, 8, 12 };
         private static readonly Tuple<int, int>[] harborEdges = new Tuple<int, int>[] { new Tuple<int, int>(1, 8), new Tuple<int, int>(3, 9),
                                                                                         new Tuple<int, int>(11, 17), new Tuple<int, int>(24, 25),
                                                                                         new Tuple<int, int>(30, 37), new Tuple<int, int>(35, 42),
@@ -213,10 +213,10 @@ namespace AIsOfCatan
                         if (r + 1 < 7 && c < 6)
                             southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
                     }
-
-                    if (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water)
+                    
+                    if (south != null && (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water))
                         result.Add(south);
-                    if (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water)
+                    if (southeast != null && (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water))
                         result.Add(southeast);
                 }
             }
@@ -248,7 +248,7 @@ namespace AIsOfCatan
         public IBoard PlacePiece(int index1, int index2, int index3, Piece p)
         {
             var newSettlements = new Dictionary<Tuple<int, int, int>, Piece>(settlements);
-            newSettlements.Add(Get3Tuple(index1, index2, index3), p);
+            newSettlements[Get3Tuple(index1, index2, index3)] = p;
             return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation, harbors);
         }
         
