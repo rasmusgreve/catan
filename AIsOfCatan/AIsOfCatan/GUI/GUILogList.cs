@@ -16,6 +16,8 @@ namespace AIsOfCatan
         private int Width { get; set; }
         private int Height { get; set; }
 
+        public int Count { get { return fullList.Count; } }
+
         private readonly List<T> fullList = new List<T>();
         private int numOfElements;
 

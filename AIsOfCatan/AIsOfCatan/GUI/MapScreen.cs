@@ -17,7 +17,7 @@ namespace AIsOfCatan
     {
         private GameState latestGameState;
 
-        private DateTime lastLogPoll;
+        //private DateTime lastLogPoll;
 
         private readonly GUITile[][] board = new GUITile[7][];
 
@@ -69,8 +69,8 @@ namespace AIsOfCatan
 
             AddDrawableComponent(robber);
 
-            initial.GetEventsSince(DateTime.MinValue).ForEach(a => InsertLogEvent(a.ToString()));
-            lastLogPoll = DateTime.Now;
+            latestGameState.GetLatestEvents(int.MaxValue).Skip(gamelog.Count).ForEach(a => InsertLogEvent(a.ToString()));
+            //lastLogPoll = DateTime.Now;
 
             //Test Roads and pieces
             UpdateGameState(initial);
@@ -123,6 +123,7 @@ namespace AIsOfCatan
                 }
 
                 GUIRoad newRoad = new GUIRoad(placeVector,rotation,road.Value, tile1, tile2);
+                newRoad.Visible = true;
 
 
 
@@ -160,6 +161,7 @@ namespace AIsOfCatan
                 Vector2 placePos = board[t1C.Item1][t1C.Item2].Position/TXAGame.SCALE + diffVector;
 
                 GUIPiece newPiece = new GUIPiece(placePos, piece.Value.Player, piece.Value.Token, t1, t2, t3);
+                newPiece.Visible = true;
 
                 pieces.Add(newPiece);
 
@@ -173,10 +175,10 @@ namespace AIsOfCatan
 
             #region GameLog
 
-            List<LogEvent> events = state.GetEventsSince(lastLogPoll);
-            Console.WriteLine(events.Count);
-            events.ForEach(a => InsertLogEvent(a.ToString()));
-            lastLogPoll = DateTime.Now;
+            latestGameState.GetLatestEvents(int.MaxValue).Skip(gamelog.Count).ForEach(a => InsertLogEvent(a.ToString()));
+            //Console.WriteLine(events.Count);
+            //events.ForEach(a => InsertLogEvent(a.ToString()));
+            //lastLogPoll = DateTime.Now;
             #endregion
         }
 
@@ -223,14 +225,14 @@ namespace AIsOfCatan
         {
             switch (i)
             {
+                case 0:
+                    return Color.White;
                 case 1:
                     return Color.RoyalBlue;
                 case 2:
                     return Color.Red;
                 case 3:
                     return Color.Orange;
-                case 4:
-                    return Color.White;
                 default:
                     return Color.Black;
             }
