@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TroyXnaAPI;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -29,9 +30,9 @@ namespace AIsOfCatan
         private Vector2 textPos;
         private readonly Color valueColour;
 
-        private Board.Tile Tile { get; set; }
+        private Tile Tile { get; set; }
 
-        public GUITile(int x, int y, Board.Tile tile, bool omit) : 
+        public GUITile(int x, int y, Tile tile, bool omit) : 
             base(
                 new Vector2((float) ((x+0.5+(y % 2 == 0 ? 0.5 : 0))*TileWidth()), (float) ((0.66+y)*TileShift())),
                 GetTexture(tile.Terrain)
@@ -88,7 +89,7 @@ namespace AIsOfCatan
             }
         }
 
-        private static bool IsTileNumbered(Board.Tile tile)
+        private static bool IsTileNumbered(Tile tile)
         {
             switch (tile.Terrain)
             {

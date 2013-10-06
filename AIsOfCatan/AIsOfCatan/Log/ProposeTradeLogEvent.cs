@@ -27,24 +27,6 @@ namespace AIsOfCatan.Log
             return result;
         }
 
-        private static string ListToString(List<List<Resource>> list)
-        {
-            StringBuilder builder = new StringBuilder("[");
-            foreach (List<Resource> outer in list)
-            {
-                builder.Append("[");
-                foreach (Resource res in outer)
-                {
-                    builder.Append(res + "/"); 
-                }
-                builder.Remove(builder.Length - 2, 1); // remove last slash
-                builder.Append("]");
-            }
-            builder.Append("]");
-
-            return builder.ToString();
-        }
-
         public override string ToString()
         {
             return "Player " + Player + " proposes to trade " + ListToString(give) + " for " + ListToString(take);

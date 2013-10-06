@@ -117,11 +117,16 @@
     <Compile Include="Agents\StarterAgent.cs" />
     <Compile Include="Agents\DebugAgent.cs" />
     <Compile Include="Agents\HumanAgent.cs" />
+    <Compile Include="API\Edge.cs" />
+    <Compile Include="API\Harbor.cs" />
     <Compile Include="API\IAgent.cs" />
     <Compile Include="API\IGameActions.cs" />
     <Compile Include="API\IGameState.cs" />
+    <Compile Include="API\Intersection.cs" />
     <Compile Include="API\IStartActions.cs" />
     <Compile Include="API\ITrade.cs" />
+    <Compile Include="API\Piece.cs" />
+    <Compile Include="API\Tile.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="ActionLog.cs" />
     <Compile Include="Exceptions\AgentActionException.cs" />
@@ -142,7 +147,7 @@
     <Compile Include="GUI\GUIPiece.cs" />
     <Compile Include="GUI\MapScreen.cs" />
     <Compile Include="Exceptions\NoMoreCardsException.cs" />
-    <Compile Include="IBoard.cs" />
+    <Compile Include="API\IBoard.cs" />
     <Compile Include="Log\AcceptTradeLogEvent.cs" />
     <Compile Include="Log\BuildPieceLogEvent.cs" />
     <Compile Include="Log\BuildRoadLogEvent.cs" />
@@ -156,6 +161,7 @@
     <Compile Include="Log\PlayRoadBuildingLogEvent.cs" />
     <Compile Include="Log\PlayYearOfPlentyLogEvent.cs" />
     <Compile Include="Log\ProposeTradeLogEvent.cs" />
+    <Compile Include="Log\ReceiveResourcesLogEvent.cs" />
     <Compile Include="Log\RollLogEvent.cs" />
     <Compile Include="Log\StealCardLogEvent.cs" />
     <Compile Include="Log\TradeBankLogEvent.cs" />

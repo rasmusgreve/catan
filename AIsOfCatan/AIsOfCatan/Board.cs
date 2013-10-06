@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -21,6 +22,9 @@ namespace AIsOfCatan
             return row % 2 == 0 ? 6 : 7;
         }
 
+        private Tuple<int, int, int>[] allIntersections = null; // to minimize computation
+        private Tuple<int, int>[] allEdges = null;
+
         private Tile[][] terrain;
         private Harbor[] harbors;
         private Dictionary<Tuple<int, int>, int> roads;
@@ -28,8 +32,12 @@ namespace AIsOfCatan
         private int robberLocation;
 
         private Board(Tile[][] terrain, Dictionary<Tuple<int, int>, int> roads, 
-            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber, Harbor[] harbors) : this()
+            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber, 
+            Harbor[] harbors, Tuple<int, int, int>[] inter, Tuple<int, int>[] edges) : this()
         {
+            this.allEdges = edges;
+            this.allIntersections = inter;
+
             this.terrain = terrain;
             this.roads = roads;
             this.settlements = settlements;
@@ -64,11 +72,15 @@ namespace AIsOfCatan
         public Board(int terrainSeed, int numberSeed) : this()
         {
             InitTerrain(terrainSeed, numberSeed, true);
+            GetAllEdges();
+            GetAllIntersections();
         }
 
         public Board(int terrainSeed) : this()
         {
             InitTerrain(terrainSeed, 0, false);
+            GetAllEdges();
+            GetAllIntersections();
         }
 
         public Dictionary<int, int> GetLongestRoad()
@@ -191,46 +203,54 @@ namespace AIsOfCatan
 
         public Tuple<int, int, int>[] GetAllIntersections()
         {
-            List<Tuple<int, int, int>> result = new List<Tuple<int, int, int>>(22);
-            for (int r = 0; r < 7; r++)
-            {
-                for (int c = 0; c < Board.GetRowLength(r); c++)
+            if(allIntersections == null){
+                List<Tuple<int, int, int>> result = new List<Tuple<int, int, int>>(22);
+                for (int r = 0; r < 7; r++)
                 {
-                    Tuple<int, int, int> south = null;
-                    Tuple<int,int,int> southeast = null;
+                    for (int c = 0; c < Board.GetRowLength(r); c++)
+                    {
+                        Tuple<int, int, int> south = null;
+                        Tuple<int,int,int> southeast = null;
 
-                    if (r % 2 == 0)
-                    {
-                        if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1)) 
-                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
-                        if (r + 1 < 7 && c + 1 < Board.GetRowLength(r)) 
-                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
-                    }
-                    else
-                    {
-                        if (r + 1 < 7 && c - 1 >= 0 && c < 6)
-                            south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
-                        if (r + 1 < 7 && c < 6)
-                            southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
-                    }
+                        if (r % 2 == 0)
+                        {
+                            if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1)) 
+                                south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
+                            if (r + 1 < 7 && c + 1 < Board.GetRowLength(r)) 
+                                southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
+                        }
+                        else
+                        {
+                            if (r + 1 < 7 && c - 1 >= 0 && c < 6)
+                                south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
+                            if (r + 1 < 7 && c < 6)
+                                southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
+                        }
                     
-                    if (south != null && (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water))
-                        result.Add(south);
-                    if (southeast != null && (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water))
-                        result.Add(southeast);
+                        if (south != null && (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water))
+                            result.Add(south);
+                        if (southeast != null && (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water))
+                            result.Add(southeast);
+                    }
                 }
+                allIntersections = result.ToArray();
+
             }
-            return result.ToArray();
+            return allIntersections.ToArray();
         }
 
         public Tuple<int, int>[] GetAllEdges()
         {
-            HashSet<Tuple<int,int>> result = new HashSet<Tuple<int,int>>();
-            for (int i = 0; i < 45; i++)
-            {
-                this.GetAdjacentTiles(i).Where(j => this.IsLegalEdge(i, j)).ForEach(j => result.Add(this.Get2Tuple(i, j)));
+            if(allEdges == null){
+                HashSet<Tuple<int,int>> result = new HashSet<Tuple<int,int>>();
+                for (int i = 0; i < 45; i++)
+                {
+                    this.GetAdjacentTiles(i).Where(j => this.IsLegalEdge(i, j)).ForEach(j => result.Add(this.Get2Tuple(i, j)));
+                }
+                allEdges = result.ToArray();
             }
-            return result.ToArray();
+            
+            return allEdges.ToArray();
         }
 
         public int GetRobberLocation()
@@ -242,21 +262,21 @@ namespace AIsOfCatan
         {
             return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), 
                 new Dictionary<Tuple<int, int, int>, 
-                    Piece>(settlements), index, harbors);
+                    Piece>(settlements), index, harbors, allIntersections, allEdges);
         }
 
         public IBoard PlacePiece(int index1, int index2, int index3, Piece p)
         {
             var newSettlements = new Dictionary<Tuple<int, int, int>, Piece>(settlements);
             newSettlements[Get3Tuple(index1, index2, index3)] = p;
-            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation, harbors);
+            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation, harbors, allIntersections, allEdges);
         }
         
         public IBoard PlaceRoad(int index1, int index2, int playerID)
         {
             var newRoads = new Dictionary<Tuple<int, int>, int>(roads);
             newRoads.Add(Get2Tuple(index1, index2), playerID);
-            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation, harbors);
+            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation, harbors, allIntersections, allEdges);
         }
 
         public Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3)
@@ -515,46 +535,6 @@ namespace AIsOfCatan
         private Boolean IsLegalEdge(int index1, int index2)
         {
             return GetTile(index1).Terrain != Terrain.Water || GetTile(index2).Terrain != Terrain.Water;
-        }
-
-        public class Tile
-        {
-            public Terrain Terrain { get; private set; }
-            public int Value { get; internal set; }
-
-            public Tile(Terrain terrain, int value)
-            {
-                this.Terrain = terrain;
-                this.Value = value;
-            }
-
-            public override string ToString()
-            {
-                return "[" + Terrain.ToString() + " : " + Value + "]";
-            }
-        }
-
-        public class Piece
-        {
-            public Token Token { get; private set; }
-            public int Player { get; private set; }
-
-            public Piece(Token token, int player)
-            {
-                this.Token = token;
-                this.Player = player;
-            }
-        }
-
-        public class Harbor
-        {
-            public HarborType Type { get; private set; }
-            public Tuple<int,int> Position { get; private set; }
-
-            public Harbor(HarborType type, Tuple<int,int> position){
-                this.Type = type;
-                this.Position = position;
-            }
         }
     }
 }
