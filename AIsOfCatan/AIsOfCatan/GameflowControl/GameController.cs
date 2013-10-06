@@ -12,7 +12,8 @@ namespace AIsOfCatan
         private Random shuffleRandom;
         private Player[] players;
 
-        private List<LogEvent> log = new List<LogEvent>(); // Here you go Rasmus
+        private List<LogEvent> log = new List<LogEvent>();
+        private const bool debug = true;
 
         private IBoard board;
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
@@ -55,6 +56,12 @@ namespace AIsOfCatan
             turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
             PlaceStarts();
             return GameLoop();
+        }
+
+        private void Log(LogEvent evt)
+        {
+            log.Add(evt);
+            if (debug) Console.WriteLine("LOG!: " + evt);
         }
 
         /// <summary>
@@ -171,7 +178,7 @@ namespace AIsOfCatan
             
             int roll = RollDice();
             actions.DieRoll();
-            log.Add(new RollLogEvent(player.Id,roll));
+            Log(new RollLogEvent(player.Id,roll));
             
             if (roll == 7)
             {
@@ -190,7 +197,7 @@ namespace AIsOfCatan
                         {
                             PayResource(p, c);
                         }
-                        log.Add(new DiscardCardsLogEvent(p.Id,cards.ToList()));
+                        Log(new DiscardCardsLogEvent(p.Id,cards.ToList()));
                     }
                 }
                 MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
@@ -222,7 +229,7 @@ namespace AIsOfCatan
             }
             board = board.MoveRobber(robberPosition);
 
-            log.Add(new MoveRobberLogEvent(player.Id, robberPosition));
+            Log(new MoveRobberLogEvent(player.Id, robberPosition));
             //Draw a card from an opponent
             var opponents = new List<int>();
             foreach (var piece in board.GetPieces(robberPosition))
@@ -234,7 +241,7 @@ namespace AIsOfCatan
             if (opponents.Count == 0) return; //No opponents to draw from
             int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
 
-            log.Add(new StealCardLogEvent(player.Id, choice));
+            Log(new StealCardLogEvent(player.Id, choice));
 
             if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
             {
@@ -324,6 +331,11 @@ namespace AIsOfCatan
                 {
                     throw new AgentActionException("Agent " + p.Agent.GetType().Name + " did not place the correct amount of start pieces (1/2)", true);
                 }
+                var spos = new Tuple<int, int, int>(actions.GetSettlementPosition()[0], actions.GetSettlementPosition()[1], actions.GetSettlementPosition()[2]);
+                Log(new BuildPieceLogEvent(p.Id,Token.Settlement,spos));
+                var rpos = new Tuple<int, int>(actions.GetRoadPosition()[0], actions.GetRoadPosition()[1]);
+                Log(new BuildRoadLogEvent(p.Id, rpos));
+
                 NextTurn();
             }
             foreach (Player p in players)
@@ -336,6 +348,10 @@ namespace AIsOfCatan
                 {
                     throw new AgentActionException("Agent " + p.Agent.GetType().Name + " did not place the correct amount of start piece (2/2)", true);
                 }
+                var spos = new Tuple<int, int, int>(actions.GetSettlementPosition()[0], actions.GetSettlementPosition()[1], actions.GetSettlementPosition()[2]);
+                Log(new BuildPieceLogEvent(p.Id, Token.Settlement, spos));
+                var rpos = new Tuple<int, int>(actions.GetRoadPosition()[0], actions.GetRoadPosition()[1]);
+                Log(new BuildRoadLogEvent(p.Id, rpos));
 
                 //Hand out resources
                 foreach (var pos in actions.GetSettlementPosition())
@@ -521,7 +537,7 @@ namespace AIsOfCatan
             var last = developmentCardStack.Last();
             developmentCardStack.RemoveAt(developmentCardStack.Count-1);
 
-            log.Add(new BuyDevLogEvent(player.Id));
+            Log(new BuyDevLogEvent(player.Id));
 
             player.DevelopmentCards.Add(last);
             player.NewDevelopmentCards.Add(last);
@@ -537,7 +553,7 @@ namespace AIsOfCatan
             var dict = new Dictionary<int, Trade>(); //Reversed trades
             var replyDict = new Dictionary<int, ITrade>();
 
-            log.Add(new ProposeTradeLogEvent(player.Id, trade.Give, trade.Take));
+            Log(new ProposeTradeLogEvent(player.Id, trade.Give, trade.Take));
 
             foreach (var other in players)
             {
@@ -554,7 +570,7 @@ namespace AIsOfCatan
                             //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
                             var giveLog = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
                             var takeLog = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
-                            log.Add(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
+                            Log(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
                         }
                         break;
                 }
@@ -598,7 +614,7 @@ namespace AIsOfCatan
                 give.Add(res[0]);
             }
 
-            log.Add(new AcceptTradeLogEvent(player.Id, playerid, give, take));
+            Log(new AcceptTradeLogEvent(player.Id, playerid, give, take));
 
             return CurrentGamestate();
         }
@@ -626,7 +642,7 @@ namespace AIsOfCatan
 
             MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
 
-            log.Add(new PlayKnightLogEvent(player.Id));
+            Log(new PlayKnightLogEvent(player.Id));
 
             return CurrentGamestate();
         }
@@ -662,7 +678,7 @@ namespace AIsOfCatan
 
                 player.RoadsLeft--;
                 board = board.PlaceRoad(road1Tile1, road1Tile2, player.Id);
-                log.Add(new PlayRoadBuildingLogEvent(player.Id, new Tuple<int, int>(road1Tile1, road1Tile2)));
+                Log(new PlayRoadBuildingLogEvent(player.Id, new Tuple<int, int>(road1Tile1, road1Tile2)));
             }
             else
             {
@@ -699,7 +715,7 @@ namespace AIsOfCatan
                 {
                     throw new IllegalBuildPositionException("The chosen positions are not connected to any of your buildings or roads");
                 }
-                log.Add(new PlayRoadBuildingLogEvent(player.Id, new Tuple<int, int>(road1Tile1,road1Tile2), new Tuple<int, int>(road2Tile1,road2Tile2)));
+                Log(new PlayRoadBuildingLogEvent(player.Id, new Tuple<int, int>(road1Tile1,road1Tile2), new Tuple<int, int>(road2Tile1,road2Tile2)));
             }
 
             player.DevelopmentCards.Remove(DevelopmentCard.RoadBuilding);
@@ -726,7 +742,7 @@ namespace AIsOfCatan
             GetResource(player, resource1);
             GetResource(player, resource2);
             
-            log.Add(new PlayYearOfPlentyLogEvent(player.Id, resource1, resource2));
+            Log(new PlayYearOfPlentyLogEvent(player.Id, resource1, resource2));
 
             return CurrentGamestate();
         }
@@ -752,7 +768,7 @@ namespace AIsOfCatan
                 player.Resources.Add(resource);
             }
 
-            log.Add(new PlayMonopolyLogEvent(player.Id, resource, count));
+            Log(new PlayMonopolyLogEvent(player.Id, resource, count));
 
             return CurrentGamestate();
         }
@@ -791,7 +807,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
-            log.Add(new BuildPieceLogEvent(player.Id, Token.Settlement, new Tuple<int, int, int>(firstTile,secondTile,thirdTile)));
+            Log(new BuildPieceLogEvent(player.Id, Token.Settlement, new Tuple<int, int, int>(firstTile,secondTile,thirdTile)));
 
             player.SettlementsLeft--;
             board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
@@ -827,7 +843,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Ore, 3);
             PayResource(player, Resource.Grain, 2);
 
-            log.Add(new BuildPieceLogEvent(player.Id, Token.City, new Tuple<int, int, int>(firstTile, secondTile, thirdTile)));
+            Log(new BuildPieceLogEvent(player.Id, Token.City, new Tuple<int, int, int>(firstTile, secondTile, thirdTile)));
 
             player.CitiesLeft--;
             player.SettlementsLeft++;
@@ -863,7 +879,7 @@ namespace AIsOfCatan
             PayResource(player, Resource.Brick);
             PayResource(player, Resource.Lumber);
 
-            log.Add(new BuildRoadLogEvent(player.Id, new Tuple<int, int>(firstTile,secondTile)));
+            Log(new BuildRoadLogEvent(player.Id, new Tuple<int, int>(firstTile,secondTile)));
 
             player.RoadsLeft--;
             board = board.PlaceRoad(firstTile, secondTile, player.Id);
@@ -940,7 +956,7 @@ namespace AIsOfCatan
             PayResource(player,giving,amountToGive);
             GetResource(player,receiving);
 
-            log.Add(new TradeBankLogEvent(player.Id,giving,amountToGive,receiving));
+            Log(new TradeBankLogEvent(player.Id,giving,amountToGive,receiving));
 
             return CurrentGamestate();
         }

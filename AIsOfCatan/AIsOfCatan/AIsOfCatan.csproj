@@ -114,6 +114,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agents\StarterAgent.cs" />
     <Compile Include="Agents\DebugAgent.cs" />
     <Compile Include="Agents\HumanAgent.cs" />
     <Compile Include="API\IAgent.cs" />

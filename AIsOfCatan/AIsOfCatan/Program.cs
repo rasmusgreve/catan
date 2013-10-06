@@ -26,7 +26,7 @@ namespace AIsOfCatan
 
             if (true) //Set to false if you wanna see the GUI
             {
-                var agent1 = new DebugAgent();
+                var agent1 = new StarterAgent();
                 var agent2 = new HumanAgent();
                 var controller = new GameController();
                 controller.StartGame(new IAgent[] { agent1, agent2 }, 10, 0);

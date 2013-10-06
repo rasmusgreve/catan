@@ -213,10 +213,10 @@ namespace AIsOfCatan
                         if (r + 1 < 7 && c < 6)
                             southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
                     }
-
-                    if (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water)
+                    
+                    if (south != null && (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water))
                         result.Add(south);
-                    if (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water)
+                    if (southeast != null && (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water))
                         result.Add(southeast);
                 }
             }
