@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.Log;
 using MS.Internal.Xml.XPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,8 @@ namespace AIsOfCatan
     class MapScreen : TXAScreen
     {
         private GameState latestGameState;
+
+        private DateTime lastLogPoll;
 
         private readonly GUITile[][] board = new GUITile[7][];
 
@@ -65,11 +68,20 @@ namespace AIsOfCatan
 
             AddDrawableComponent(robber);
 
+            initial.GetEventsSince(DateTime.MinValue).ForEach(a => InsertLogEvent(a.ToString()));
+            lastLogPoll = DateTime.Now;
+
             //Test Roads and pieces
             UpdateGameState(initial);
         }
 
         private int counter = 0;
+
+        private void InsertLogEvent(string logText)
+        {
+            GUIBufferTextBlock textB = new GUIBufferTextBlock(new Vector2(0,-25)) {Text = logText};
+            gamelog.AddToList(textB);
+        }
 
         private void InsertText()
         {
@@ -161,6 +173,14 @@ namespace AIsOfCatan
             #region Robber
             robber.UpdateRobberPosition(GetRobberPos());
             #endregion
+
+            #region GameLog
+
+            List<LogEvent> events = state.GetEventsSince(lastLogPoll);
+            Console.WriteLine(events.Count);
+            events.ForEach(a => InsertLogEvent(a.ToString()));
+            lastLogPoll = DateTime.Now;
+            #endregion
         }
 
         private Vector2 GetRobberPos()
@@ -218,5 +238,6 @@ namespace AIsOfCatan
                     return Color.Black;
             }
         }
+
     }
 }

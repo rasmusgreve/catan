@@ -27,6 +27,8 @@ namespace AIsOfCatan
         private const int LargestArmyMinimum = 3;
         private const int LongestRoadMinimum = 5;
 
+        private GUIControl gui;
+
         /// <summary>
         /// Start the game. This method will run for the length of the game and returns the id of the winner
         /// </summary>
@@ -54,6 +56,9 @@ namespace AIsOfCatan
 
             //Start the game!
             turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
+
+            gui = new GUIControl();//CurrentGamestate());
+
             PlaceStarts();
             return GameLoop();
         }
@@ -428,7 +433,9 @@ namespace AIsOfCatan
 
         private GameState CurrentGamestate()
         {
-            return new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+            GameState gs = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+            if (gui != null) gui.NewGameState(gs);
+            return gs;
         }
 
         /// <summary>
