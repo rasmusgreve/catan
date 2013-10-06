@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -62,13 +63,13 @@ namespace AIsOfCatan
             return controller.PlayKnight(player);
         }
 
-        public GameState PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2)
+        public GameState PlayRoadBuilding(Edge firstEdge, Edge secondEdge)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (hasPlayedDevCard)
                 throw new IllegalActionException("Max one development card can be played each turn");
             hasPlayedDevCard = true;
-            return controller.PlayRoadBuilding(player, firstTile1, secondTile1, firstTile2, secondTile2);
+            return controller.PlayRoadBuilding(player, firstEdge, secondEdge);
         }
 
         public GameState PlayYearOfPlenty(Resource resource1, Resource resource2)
@@ -107,25 +108,25 @@ namespace AIsOfCatan
 
         //Building
 
-        public GameState BuildSettlement(int firstTile, int secondTile, int thirdTile)
+        public GameState BuildSettlement(Intersection intersection)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
-            return controller.BuildSettlement(player, firstTile, secondTile, thirdTile);
+            return controller.BuildSettlement(player, intersection);
         }
 
-        public GameState BuildCity(int firstTile, int secondTile, int thirdTile)
+        public GameState BuildCity(Intersection intersection)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
-            return controller.BuildCity(player, firstTile, secondTile, thirdTile);
+            return controller.BuildCity(player, intersection);
         }
 
-        public GameState BuildRoad(int firstTile, int secondTile)
+        public GameState BuildRoad(Edge edge)
         {
             if (!valid) throw new IllegalActionException("Tried to perform an action on an invalid GameAction");
             if (!isAfterDieRoll) throw new IllegalActionException("Tried to build before the die roll");
-            return controller.BuildRoad(player, firstTile, secondTile);
+            return controller.BuildRoad(player, edge);
         }
     }
 }

@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan.Log
 {
-    class BuildRoadLogEvent : LogEvent
+    public class BuildRoadLogEvent : LogEvent
     {
         public int Player { get; private set; }
-        private Tuple<int, int> position;
-        public Tuple<int, int> Position { get{ return new Tuple<int,int>(position.Item1, position.Item2); } }
+        public Edge Position { get; private set; }
 
-        public BuildRoadLogEvent(int player, Tuple<int, int> position)
+        public BuildRoadLogEvent(int player, Edge position)
         {
             Player = player;
-            this.position = position;
+            this.Position = position;
         }
 
         public override string ToString()
         {
-            return "Player " + Player + " build a Road at [" + position.Item1 + ", " + position.Item2 + "]"; 
+            return "Player " + Player + " build a Road at " + Position;
         }
     }
 }

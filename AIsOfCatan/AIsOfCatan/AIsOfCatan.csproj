@@ -136,6 +136,7 @@
     <Compile Include="GameflowControl\Player.cs" />
     <Compile Include="GameflowControl\StartActions.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="GUI\GUIPlayerBox.cs" />
     <Compile Include="GUI\GUIBufferTextBlock.cs" />
     <Compile Include="GUI\GUILogList.cs" />
     <Compile Include="GUI\GUIRoad.cs" />

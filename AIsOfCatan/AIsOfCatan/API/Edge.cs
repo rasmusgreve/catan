@@ -12,8 +12,31 @@ namespace AIsOfCatan.API
 
         public Edge(int first, int second)
         {
-            FirstTile = first;
-            SecondTile = second;
+            FirstTile = first < second ? first : second;
+            SecondTile = first < second ? second : first;
+        }
+
+        public int[] ToArray()
+        {
+            return new int[] { FirstTile, SecondTile};
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (!(obj is Edge)) return false;
+            Edge that = (Edge)obj;
+            return this.FirstTile == that.FirstTile && this.SecondTile == that.SecondTile;
+        }
+
+        public override int GetHashCode()
+        {
+            return FirstTile << 16 | SecondTile;
+        }
+
+        public override string ToString()
+        {
+            return "[" + FirstTile + "," + SecondTile + "]";
         }
     }
 }

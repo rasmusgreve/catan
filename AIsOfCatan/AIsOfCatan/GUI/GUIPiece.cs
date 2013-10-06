@@ -49,8 +49,6 @@ namespace AIsOfCatan
                     return TXAGame.TEXTURES["TO_Settle"];
 
             }
-                
-            
         }
 
         protected override void Draw(SpriteBatch batch)

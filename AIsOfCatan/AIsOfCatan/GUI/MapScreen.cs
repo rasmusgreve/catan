@@ -17,7 +17,7 @@ namespace AIsOfCatan
     {
         private GameState latestGameState;
 
-        private DateTime lastLogPoll;
+        //private DateTime lastLogPoll;
 
         private readonly GUITile[][] board = new GUITile[7][];
 
@@ -69,14 +69,12 @@ namespace AIsOfCatan
 
             AddDrawableComponent(robber);
 
-            initial.GetEventsSince(DateTime.MinValue).ForEach(a => InsertLogEvent(a.ToString()));
-            lastLogPoll = DateTime.Now;
+            latestGameState.GetLatestEvents(int.MaxValue).Skip(gamelog.Count).ForEach(a => InsertLogEvent(a.ToString()));
+            //lastLogPoll = DateTime.Now;
 
             //Test Roads and pieces
             UpdateGameState(initial);
         }
-
-        private int counter = 0;
 
         private void InsertLogEvent(string logText)
         {
@@ -86,28 +84,30 @@ namespace AIsOfCatan
 
         public void UpdateGameState(GameState state)
         {
+            Console.WriteLine("UpdateGameState called");
+
             latestGameState = state;
 
             #region Roads
-            Dictionary<Tuple<int, int>, int> allRoads = latestGameState.Board.GetAllRoads();
+            Dictionary<Edge, int> allRoads = latestGameState.Board.GetAllRoads();
 
-            foreach (KeyValuePair<Tuple<int, int>, int> road in allRoads)
+            foreach (KeyValuePair<Edge, int> road in allRoads)
             {
-                int tile1 = road.Key.Item1;
-                int tile2 = road.Key.Item2;
+                int tile1 = road.Key.FirstTile;
+                int tile2 = road.Key.SecondTile;
 
                 if (roads.Exists(r => r.Tile1 == tile1 && r.Tile2 == tile2))
                 {
                     continue;
                 }
 
-                Tuple<int, int> t1Coord = GetTerrainCoords(tile1);
-                Tuple<int, int> t2Coord = GetTerrainCoords(tile2);
+                Edge t1Coord = GetTerrainCoords(tile1);
+                Edge t2Coord = GetTerrainCoords(tile2);
 
-                Vector2 diffVector = board[t2Coord.Item1][t2Coord.Item2].Position / TXAGame.SCALE -
-                                     board[t1Coord.Item1][t1Coord.Item2].Position / TXAGame.SCALE;
+                Vector2 diffVector = board[t2Coord.FirstTile][t2Coord.SecondTile].Position / TXAGame.SCALE -
+                                     board[t1Coord.FirstTile][t1Coord.SecondTile].Position / TXAGame.SCALE;
 
-                Vector2 placeVector = (board[t1Coord.Item1][t1Coord.Item2].Position/TXAGame.SCALE)+(diffVector/2);
+                Vector2 placeVector = (board[t1Coord.FirstTile][t1Coord.SecondTile].Position/TXAGame.SCALE)+(diffVector/2);
 
                 float rotation = 0;
 
@@ -123,6 +123,9 @@ namespace AIsOfCatan
                 }
 
                 GUIRoad newRoad = new GUIRoad(placeVector,rotation,road.Value, tile1, tile2);
+                newRoad.Visible = true;
+
+
 
                 AddDrawableComponent(newRoad);
 
@@ -130,13 +133,13 @@ namespace AIsOfCatan
             #endregion
 
             #region Pieces
-            Dictionary<Tuple<int, int, int>, Piece> piecelist = state.Board.GetAllPieces();
+            Dictionary<Intersection, Piece> piecelist = state.Board.GetAllPieces();
 
-            foreach (KeyValuePair<Tuple<int, int, int>, Piece> piece in piecelist)
+            foreach (KeyValuePair<Intersection, Piece> piece in piecelist)
             {
-                int t1 = piece.Key.Item1;
-                int t2 = piece.Key.Item2;
-                int t3 = piece.Key.Item3;
+                int t1 = piece.Key.FirstTile;
+                int t2 = piece.Key.SecondTile;
+                int t3 = piece.Key.ThirdTile;
 
                 GUIPiece alreadyPiece = pieces.FirstOrDefault(e => e.Tile1 == t1 && e.Tile2 == t2 && e.Tile3 == t3);
 
@@ -153,11 +156,12 @@ namespace AIsOfCatan
                                          ? new Vector2(GUITile.TileWidth()/2, GUITile.TileHeight()/4)
                                          : new Vector2(0, GUITile.TileHeight()/2);
 
-                Tuple<int, int> t1C = GetTerrainCoords(t1);
+                Edge t1C = GetTerrainCoords(t1);
 
-                Vector2 placePos = board[t1C.Item1][t1C.Item2].Position/TXAGame.SCALE + diffVector;
+                Vector2 placePos = board[t1C.FirstTile][t1C.SecondTile].Position/TXAGame.SCALE + diffVector;
 
                 GUIPiece newPiece = new GUIPiece(placePos, piece.Value.Player, piece.Value.Token, t1, t2, t3);
+                newPiece.Visible = true;
 
                 pieces.Add(newPiece);
 
@@ -171,22 +175,22 @@ namespace AIsOfCatan
 
             #region GameLog
 
-            List<LogEvent> events = state.GetEventsSince(lastLogPoll);
-            Console.WriteLine(events.Count);
-            events.ForEach(a => InsertLogEvent(a.ToString()));
-            lastLogPoll = DateTime.Now;
+            latestGameState.GetLatestEvents(int.MaxValue).Skip(gamelog.Count).ForEach(a => InsertLogEvent(a.ToString()));
+            //Console.WriteLine(events.Count);
+            //events.ForEach(a => InsertLogEvent(a.ToString()));
+            //lastLogPoll = DateTime.Now;
             #endregion
         }
 
         private Vector2 GetRobberPos()
         {
             int robberTile = latestGameState.Board.GetRobberLocation();
-            Tuple<int, int> robberCoord = GetTerrainCoords(robberTile);
+            Edge robberCoord = GetTerrainCoords(robberTile);
 
-            return board[robberCoord.Item1][robberCoord.Item2].Position/TXAGame.SCALE;
+            return board[robberCoord.FirstTile][robberCoord.SecondTile].Position/TXAGame.SCALE;
         }
 
-        private Tuple<int, int> GetTerrainCoords(int index)
+        private Edge GetTerrainCoords(int index)
         {
             int row = 0;
             bool longrow = false;
@@ -196,7 +200,7 @@ namespace AIsOfCatan
                 index -= longrow ? 7 : 6;
                 longrow = !longrow;
             }
-            return new Tuple<int, int>(row, index);
+            return new Edge(row, index);
         }
 
         internal static int GetTerrainIndex(int row, int col)
@@ -221,14 +225,14 @@ namespace AIsOfCatan
         {
             switch (i)
             {
+                case 0:
+                    return Color.White;
                 case 1:
                     return Color.RoyalBlue;
                 case 2:
                     return Color.Red;
                 case 3:
                     return Color.Orange;
-                case 4:
-                    return Color.White;
                 default:
                     return Color.Black;
             }
