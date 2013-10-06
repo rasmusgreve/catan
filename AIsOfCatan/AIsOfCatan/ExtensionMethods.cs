@@ -26,5 +26,25 @@ namespace AIsOfCatan
                 list[n] = value;
             }
         }
+
+        public static string ToDeepString<T>(this IEnumerable<T> enumerable)
+        {
+            StringBuilder builder = new StringBuilder("[");
+            foreach (var item in enumerable)
+            {
+                IEnumerable<T> sublist = item as IEnumerable<T>;
+                if (sublist != null)
+                {
+                    builder.Append(sublist.ToDeepString() + "/");
+                }
+                else
+                {
+                    builder.Append(item.ToString() + "/");
+                }
+            }
+            builder.Remove(builder.Length - 1, 1); // remove last slash
+            builder.Append("]");
+            return builder.ToString();
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace AIsOfCatan.Log
 
         public override string ToString()
         {
-            return "Player " + Player + " proposes to trade " + ListToString(give) + " for " + ListToString(take);
+            return "Player " + Player + " proposes to trade " + give.ToDeepString() + " for " + take.ToDeepString();
         }
     }
 }

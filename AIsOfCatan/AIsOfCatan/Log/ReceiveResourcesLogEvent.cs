@@ -18,7 +18,7 @@ namespace AIsOfCatan.Log
 
         public override string ToString()
         {
-            return "Player " + Player + " received " + ListToString(Resources);
+            return "Player " + Player + " received " + Resources.ToDeepString();
         }
     }
 }
