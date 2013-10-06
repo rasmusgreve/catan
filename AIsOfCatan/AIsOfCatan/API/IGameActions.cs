@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -27,12 +28,10 @@ namespace AIsOfCatan
         /// If you only have one road piece left, the position to place it must be passed as firstTile1, secondTile1 (the others are ignored)
         /// Notice! You may only play one development card in each turn. This includes both the BeforeDiceRoll and PerformTurn methods
         /// </summary>
-        /// <param name="firstTile1">The first tile that the first road must be along</param>
-        /// <param name="secondTile1">The second tile that the first road must be along</param>
-        /// <param name="firstTile2">The first tile that the second road must be along</param>
-        /// <param name="secondTile2">The second tile that the second road must be along</param>
+        /// <param name="firstEdge">The first edge to build a road along.</param>
+        /// <param name="firstEdge">The second edge to build a road along.</param>
         /// <returns>The new state of the game after the roads are built</returns>
-        GameState PlayRoadBuilding(int firstTile1, int secondTile1, int firstTile2, int secondTile2);
+        GameState PlayRoadBuilding(Edge firstEdge, Edge secondEdge);
 
         /// <summary>
         /// Play a year of plenty development card
@@ -101,11 +100,9 @@ namespace AIsOfCatan
         /// The required resources are taken from your hand and placed back at the resource bank
         /// If the settlement is placed at a harbor, the harbor can be used immediately (rules p. 7 - footnote 12)
         /// </summary>
-        /// <param name="firstTile">The index of the first tile in the intersection</param>
-        /// <param name="secondTile">The index of the second tile in the intersection</param>
-        /// <param name="thirdTile">The index of the third tile in the intersection</param>
+        /// <param name="intersection">The intersection to build at</param>
         /// <returns>The state of the game after the settlement has been placed</returns>
-        GameState BuildSettlement(int firstTile, int secondTile, int thirdTile);
+        GameState BuildSettlement(Intersection intersection);
 
         /// <summary>
         /// Upgrade an existing settlement to a city at the cost of (2 x Grain, 3 x Ore)
@@ -115,11 +112,9 @@ namespace AIsOfCatan
         /// The required resources are taken from your hand and placed back at the resource bank
         /// The settlement previously on the location is given back to you and can be placed again later
         /// </summary>
-        /// <param name="firstTile">The index of the first tile in the intersection</param>
-        /// <param name="secondTile">The index of the second tile in the intersection</param>
-        /// <param name="thirdTile">The index of the third tile in the intersection</param>
+        /// <param name="intersection">The intersection to upgrade at</param>
         /// <returns>The state of the game after the settlement has been upgraded to a city</returns>
-        GameState BuildCity(int firstTile, int secondTile, int thirdTile);
+        GameState BuildCity(Intersection intersection);
 
         /// <summary>
         /// Build a road on the board at the cost of (1 x Lumber, 1 x Brick)
@@ -127,9 +122,8 @@ namespace AIsOfCatan
         /// If you try to build at a position not connected to another or your roads, settlements or cities an IllegalBuildPositionException is thrown
         /// If you don't have any more road pieces left to place an IllegalActionException is thrown
         /// </summary>
-        /// <param name="firstTile">The first tile that the road will be along</param>
-        /// <param name="secondTile">The second tile that the road will be along</param>
+        /// <param name="edge">The edge to build a road at</param>
         /// <returns>The state of the game after the road has been built</returns>
-        GameState BuildRoad(int firstTile, int secondTile);
+        GameState BuildRoad(Edge edge);
     }
 }

@@ -11,29 +11,30 @@ namespace AIsOfCatan
         private static readonly int[] WaterTiles = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 18, 19, 25, 26, 31, 32, 33, 37, 38, 39, 40, 41, 42, 43, 44 };
         private static readonly int[] placementOrder = new int[] { 8, 14, 20, 27, 34, 35, 36, 30, 24, 17, 10, 9, 15, 21, 28, 29, 23, 16, 22 };
         private static readonly int[] valueOrder = new int[] { 11, 2, 9, 4, 3, 6, 4, 11, 10, 3, 9, 6, 5, 8, 5, 10, 8, 12 };
-        private static readonly Tuple<int, int>[] harborEdges = new Tuple<int, int>[] { new Tuple<int, int>(1, 8), new Tuple<int, int>(3, 9),
-                                                                                        new Tuple<int, int>(11, 17), new Tuple<int, int>(24, 25),
-                                                                                        new Tuple<int, int>(30, 37), new Tuple<int, int>(35, 42),
-                                                                                        new Tuple<int, int>(34, 40), new Tuple<int, int>(26, 27),
-                                                                                        new Tuple<int, int>(13, 14)};
+        private static readonly Edge[] harborEdges = new Edge[] { new Edge(1, 8), new Edge(3, 9),
+                                                                                        new Edge(11, 17), new Edge(24, 25),
+                                                                                        new Edge(30, 37), new Edge(35, 42),
+                                                                                        new Edge(34, 40), new Edge(26, 27),
+                                                                                        new Edge(13, 14)};
 
         public static int GetRowLength(int row)
         {
             return row % 2 == 0 ? 6 : 7;
         }
 
-        private Tuple<int, int, int>[] allIntersections = null; // to minimize computation
-        private Tuple<int, int>[] allEdges = null;
+        private Intersection[] allIntersections = null; // to minimize computation
+        private Edge[] allEdges = null;
 
         private Tile[][] terrain;
         private Harbor[] harbors;
-        private Dictionary<Tuple<int, int>, int> roads;
-        private Dictionary<Tuple<int, int, int>, Piece> settlements;
+        private Dictionary<Edge, int> roads;
+        private Dictionary<Intersection, Piece> settlements;
         private int robberLocation;
 
-        private Board(Tile[][] terrain, Dictionary<Tuple<int, int>, int> roads, 
-            Dictionary<Tuple<int, int, int>, Piece> settlements, int robber, 
-            Harbor[] harbors, Tuple<int, int, int>[] inter, Tuple<int, int>[] edges) : this()
+        private Board(Tile[][] terrain, Dictionary<Edge, int> roads,
+            Dictionary<Intersection, Piece> settlements, int robber,
+            Harbor[] harbors, Intersection[] inter, Edge[] edges)
+            : this()
         {
             this.allEdges = edges;
             this.allIntersections = inter;
@@ -48,8 +49,8 @@ namespace AIsOfCatan
         private Board()
         {
             // initialize fields
-            roads = new Dictionary<Tuple<int, int>, int>(22);
-            settlements = new Dictionary<Tuple<int, int, int>, Piece>(22);
+            roads = new Dictionary<Edge, int>(22);
+            settlements = new Dictionary<Intersection, Piece>(22);
             harbors = new Harbor[9];
 
             // create board
@@ -90,15 +91,15 @@ namespace AIsOfCatan
             var playersLongest = new Dictionary<int, int>(4);
 
             // floodfill from each road segment to see if it constitutes the longest road.
-            var visited = new HashSet<Tuple<int, int>>();
+            var visited = new HashSet<Edge>();
             foreach (var road in roads)
             {
                 if (visited.Contains(road.Key)) continue; // already explored
                 visited.Add(road.Key);
 
                 // get ends 
-                var ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
-                var tempVisited = new HashSet<Tuple<int, int>>();
+                var ends = this.GetAdjacentIntersections(road.Key);
+                var tempVisited = new HashSet<Edge>();
                 tempVisited.Add(road.Key);
                 int first  = CountRoadLengthFromIntersection(road.Value, ends[0], tempVisited, visited);
                 int second = CountRoadLengthFromIntersection(road.Value, ends[1], tempVisited, visited);
@@ -117,15 +118,15 @@ namespace AIsOfCatan
         {
             int highest = 0;
             // floodfill from each road segment to see if it constitutes the longest road.
-            HashSet<Tuple<int, int>> visited = new HashSet<Tuple<int, int>>();
-            foreach (var road in roads.Where(r => GetRoad(r.Key.Item1,r.Key.Item2) == playerID))
+            HashSet<Edge> visited = new HashSet<Edge>();
+            foreach (var road in roads.Where(r => GetRoad(r.Key) == playerID))
             {
                 if (visited.Contains(road.Key)) continue; // already explored
                 visited.Add(road.Key);
 
                 // get ends 
-                Tuple<int, int, int>[] ends = this.GetAdjacentIntersections(road.Key.Item1, road.Key.Item2);
-                HashSet<Tuple<int, int>> tempVisited = new HashSet<Tuple<int, int>>();
+                Intersection[] ends = this.GetAdjacentIntersections(road.Key);
+                HashSet<Edge> tempVisited = new HashSet<Edge>();
                 tempVisited.Add(road.Key);
                 int first = CountRoadLengthFromIntersection(road.Value, ends[0], tempVisited, visited);
                 int second = CountRoadLengthFromIntersection(road.Value, ends[1], tempVisited, visited);
@@ -150,86 +151,82 @@ namespace AIsOfCatan
             return terrain[row][column];
         }
 
-        public bool CanBuildPiece(int index1, int index2, int index3)
+        public bool CanBuildPiece(Intersection intersection)
         {
-            Tuple<int, int, int> tuple = Get3Tuple(index1, index2, index3);
-            if (GetTile(index1).Terrain == Terrain.Water && GetTile(index2).Terrain == Terrain.Water && GetTile(index3).Terrain == Terrain.Water)
+            if (GetTile(intersection.FirstTile).Terrain == Terrain.Water && GetTile(intersection.SecondTile).Terrain == Terrain.Water && GetTile(intersection.ThirdTile).Terrain == Terrain.Water)
                 return false;
 
-            return !settlements.ContainsKey(tuple);
+            return !settlements.ContainsKey(intersection);
         }
 
-        public int GetRoad(int firstTile, int secondTile)
+        public int GetRoad(Edge edge)
         {
-            var key = Get2Tuple(firstTile, secondTile);
-            return roads.ContainsKey(key) ? roads[key] : -1;
+            return roads.ContainsKey(edge) ? roads[edge] : -1;
         }
 
-        public Dictionary<Tuple<int,int>,int> GetAllRoads()
+        public Dictionary<Edge,int> GetAllRoads()
         {
-            return new Dictionary<Tuple<int, int>, int>(roads);
+            return new Dictionary<Edge, int>(roads);
         }
 
-        public bool CanBuildRoad(int index1, int index2)
+        public bool CanBuildRoad(Edge edge)
         {
-            Tuple<int, int> tuple = Get2Tuple(index1, index2);
-            if (!IsLegalEdge(index1, index2)) return false;
+            if (!IsLegalEdge(edge)) return false;
 
-            return !roads.ContainsKey(tuple);
+            return !roads.ContainsKey(edge);
         }
 
-        public Piece GetPiece(int firstTile, int secondTile, int thirdTile)
+        public Piece GetPiece(Intersection intersection)
         {
-            var key = Get3Tuple(firstTile, secondTile, thirdTile);
-            return settlements.ContainsKey(key) ? settlements[key] : null;
+            return settlements.ContainsKey(intersection) ? settlements[intersection] : null;
         }
 
-        public Dictionary<Tuple<int,int,int>,Piece> GetAllPieces()
+        public Dictionary<Intersection,Piece> GetAllPieces()
         {
-            return new Dictionary<Tuple<int, int, int>, Piece>(settlements);
+            return new Dictionary<Intersection, Piece>(settlements);
         } 
 
         public Piece[] GetPieces(int index)
         {
             List<Piece> result = new List<Piece>();
-            AddPiece(result, index, index - 7, index - 1);
-            AddPiece(result, index, index - 7, index - 6);
-            AddPiece(result, index, index - 6, index + 1);
-            AddPiece(result, index, index + 1, index + 7);
-            AddPiece(result, index, index + 6, index + 7);
-            AddPiece(result, index, index + 6, index - 1);
+            AddPiece(result, new Intersection(index, index - 7, index - 1));
+            AddPiece(result, new Intersection(index, index - 7, index - 6));
+            AddPiece(result, new Intersection(index, index - 6, index + 1));
+            AddPiece(result, new Intersection(index, index + 1, index + 7));
+            AddPiece(result, new Intersection(index, index + 6, index + 7));
+            AddPiece(result, new Intersection(index, index + 6, index - 1));
             return result.ToArray();
         }
 
-        public Tuple<int, int, int>[] GetAllIntersections()
+        public Intersection[] GetAllIntersections()
         {
             if(allIntersections == null){
-                List<Tuple<int, int, int>> result = new List<Tuple<int, int, int>>(22);
+                List<Intersection> result = new List<Intersection>(22);
                 for (int r = 0; r < 7; r++)
                 {
                     for (int c = 0; c < Board.GetRowLength(r); c++)
                     {
-                        Tuple<int, int, int> south = null;
-                        Tuple<int,int,int> southeast = null;
+                        Intersection south = null;
+                        Intersection southeast = null;
 
                         if (r % 2 == 0)
                         {
-                            if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1)) 
-                                south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
-                            if (r + 1 < 7 && c + 1 < Board.GetRowLength(r)) 
-                                southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
+                            if(r + 1 < 7 && c + 1 < Board.GetRowLength(r + 1))
+                                south = new Intersection(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c), GetTerrainIndex(r + 1, c + 1));
+                            if (r + 1 < 7 && c + 1 < Board.GetRowLength(r))
+                                southeast = new Intersection(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c + 1));
                         }
                         else
                         {
                             if (r + 1 < 7 && c - 1 >= 0 && c < 6)
-                                south = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
+                                south = new Intersection(GetTerrainIndex(r, c), GetTerrainIndex(r + 1, c - 1), GetTerrainIndex(r + 1, c));
                             if (r + 1 < 7 && c < 6)
-                                southeast = new Tuple<int, int, int>(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
+                                southeast = new Intersection(GetTerrainIndex(r, c), GetTerrainIndex(r, c + 1), GetTerrainIndex(r + 1, c));
                         }
                     
-                        if (south != null && (GetTile(south.Item1).Terrain != Terrain.Water || GetTile(south.Item2).Terrain != Terrain.Water || GetTile(south.Item1).Terrain != Terrain.Water))
+                        if (south != null && (GetTile(south.FirstTile).Terrain != Terrain.Water || GetTile(south.SecondTile).Terrain != Terrain.Water))
                             result.Add(south);
-                        if (southeast != null && (GetTile(southeast.Item1).Terrain != Terrain.Water || GetTile(southeast.Item2).Terrain != Terrain.Water || GetTile(southeast.Item1).Terrain != Terrain.Water))
+                        if (southeast != null && (GetTile(southeast.FirstTile).Terrain != Terrain.Water || GetTile(southeast.SecondTile).Terrain != Terrain.Water))
                             result.Add(southeast);
                     }
                 }
@@ -239,13 +236,13 @@ namespace AIsOfCatan
             return allIntersections.ToArray();
         }
 
-        public Tuple<int, int>[] GetAllEdges()
+        public Edge[] GetAllEdges()
         {
             if(allEdges == null){
-                HashSet<Tuple<int,int>> result = new HashSet<Tuple<int,int>>();
+                HashSet<Edge> result = new HashSet<Edge>();
                 for (int i = 0; i < 45; i++)
                 {
-                    this.GetAdjacentTiles(i).Where(j => this.IsLegalEdge(i, j)).ForEach(j => result.Add(this.Get2Tuple(i, j)));
+                    this.GetAdjacentTiles(i).Where(j => this.IsLegalEdge(new Edge(i, j))).ForEach(j => result.Add(new Edge(i, j)));
                 }
                 allEdges = result.ToArray();
             }
@@ -260,42 +257,41 @@ namespace AIsOfCatan
 
         public IBoard MoveRobber(int index)
         {
-            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), 
-                new Dictionary<Tuple<int, int, int>, 
-                    Piece>(settlements), index, harbors, allIntersections, allEdges);
+            return new Board(terrain, new Dictionary<Edge, int>(roads), 
+                new Dictionary<Intersection, Piece>(settlements), 
+                index, harbors, allIntersections, allEdges);
         }
 
-        public IBoard PlacePiece(int index1, int index2, int index3, Piece p)
+        public IBoard PlacePiece(Intersection intersection, Piece p)
         {
-            var newSettlements = new Dictionary<Tuple<int, int, int>, Piece>(settlements);
-            newSettlements[Get3Tuple(index1, index2, index3)] = p;
-            return new Board(terrain, new Dictionary<Tuple<int, int>, int>(roads), newSettlements, robberLocation, harbors, allIntersections, allEdges);
+            var newSettlements = new Dictionary<Intersection, Piece>(settlements);
+            newSettlements[intersection] = p;
+            return new Board(terrain, new Dictionary<Edge, int>(roads), newSettlements, robberLocation, harbors, allIntersections, allEdges);
         }
         
-        public IBoard PlaceRoad(int index1, int index2, int playerID)
+        public IBoard PlaceRoad(Edge edge, int playerID)
         {
-            var newRoads = new Dictionary<Tuple<int, int>, int>(roads);
-            newRoads.Add(Get2Tuple(index1, index2), playerID);
-            return new Board(terrain, newRoads, new Dictionary<Tuple<int, int, int>, Piece>(settlements), robberLocation, harbors, allIntersections, allEdges);
+            var newRoads = new Dictionary<Edge, int>(roads);
+            newRoads[edge] = playerID;
+            return new Board(terrain, newRoads, new Dictionary<Intersection, Piece>(settlements), robberLocation, harbors, allIntersections, allEdges);
         }
 
-        public Tuple<int, int>[] GetAdjacentEdges(int index1, int index2, int index3)
+        public Edge[] GetAdjacentEdges(Intersection intersection)
         {
-            var o = Get3Tuple(index1,index2,index3);
-            List<Tuple<int, int>> result = new List<Tuple<int, int>>(3);
-            if (IsLegalEdge(index1, index2)) result.Add(new Tuple<int,int>(o.Item1,o.Item2));
-            if (IsLegalEdge(index2, index3)) result.Add(new Tuple<int, int>(o.Item2, o.Item3));
-            if (IsLegalEdge(index1, index3)) result.Add(new Tuple<int, int>(o.Item1, o.Item3));
+            List<Edge> result = new List<Edge>(3);
+            if (IsLegalEdge(new Edge(intersection.FirstTile, intersection.SecondTile))) result.Add(new Edge(intersection.FirstTile,intersection.SecondTile));
+            if (IsLegalEdge(new Edge(intersection.SecondTile, intersection.ThirdTile))) result.Add(new Edge(intersection.SecondTile, intersection.ThirdTile));
+            if (IsLegalEdge(new Edge(intersection.FirstTile, intersection.ThirdTile))) result.Add(new Edge(intersection.FirstTile, intersection.ThirdTile));
             return result.ToArray();
         }
 
-        public Tuple<int,int,int>[] GetAdjacentIntersections(int index1, int index2)
+        public Intersection[] GetAdjacentIntersections(Edge edge)
         {
-            var n1 = GetAdjacentTiles(index1);
-            return GetAdjacentTiles(index2)
+            var n1 = GetAdjacentTiles(edge.FirstTile);
+            return GetAdjacentTiles(edge.SecondTile)
                 .Where(t => n1.Contains(t))
-                .Where(t => GetTile(index1).Terrain != Terrain.Water || GetTile(index2).Terrain != Terrain.Water || GetTile(t).Terrain != Terrain.Water)
-                .Select(t => Get3Tuple(index1,index2,t))
+                .Where(t => IsLegalEdge(edge) || GetTile(t).Terrain != Terrain.Water)
+                .Select(t => new Intersection(edge.FirstTile, edge.SecondTile, t))
                 .ToArray();
         }
 
@@ -311,12 +307,11 @@ namespace AIsOfCatan
             return result;
         }
 
-        public bool HasNoNeighbors(int index1, int index2, int index3)
+        public bool HasNoNeighbors(Intersection intersection)
         {
-            Tuple<int,int,int> tuple = Get3Tuple(index1,index2,index3);
-            return GetAdjacentEdges(tuple.Item1, tuple.Item2, tuple.Item3).
-                SelectMany(edge => GetAdjacentIntersections(edge.Item1, edge.Item2)).
-                All(inter => inter.Equals(tuple) || GetPiece(inter.Item1, inter.Item2, inter.Item3) == null);
+            return GetAdjacentEdges(intersection).
+                SelectMany(edge => GetAdjacentIntersections(edge)).
+                All(inter => inter.Equals(intersection) || GetPiece(inter) == null);
         }
 
         public Harbor[] GetHarbors()
@@ -329,32 +324,32 @@ namespace AIsOfCatan
             HashSet<HarborType> result = new HashSet<HarborType>();
             foreach (var h in harbors)
             {
-                var corners = GetAdjacentIntersections(h.Position.Item1, h.Position.Item2);
-                foreach (Tuple<int, int, int> pos in corners)
+                var corners = GetAdjacentIntersections(h.Position);
+                foreach (Intersection pos in corners)
                 {
-                    Piece curPiece = GetPiece(pos.Item1,pos.Item2,pos.Item3);
+                    Piece curPiece = GetPiece(pos);
                     if (curPiece != null && curPiece.Player == playerID) result.Add(h.Type);
                 }
             }
             return result.ToArray();
         }
 
-        public Tuple<int, int>[] GetPossibleRoads(int playerID)
+        public Edge[] GetPossibleRoads(int playerID)
         {
-            List<Tuple<int, int>> result = new List<Tuple<int, int>>(15);
-            foreach(Tuple<int,int> edge in this.GetAllEdges()){
+            List<Edge> result = new List<Edge>(15);
+            foreach(Edge edge in this.GetAllEdges()){
                 // must be empty
                 if (roads.ContainsKey(edge)) continue;
-                
-                
-                foreach (Tuple<int, int, int> inter in this.GetAdjacentIntersections(edge.Item1, edge.Item2))
+
+
+                foreach (Intersection inter in this.GetAdjacentIntersections(edge))
                 {
                     // must not be other players piece at intersection
-                    Piece atInter = this.GetPiece(inter.Item1,inter.Item2,inter.Item3);
+                    Piece atInter = this.GetPiece(inter);
                     if (atInter != null && atInter.Player != playerID) continue;
 
                     // must have one of the players roads connected to one of the end edges
-                    if(this.GetAdjacentEdges(inter.Item1,inter.Item2,inter.Item3).Any(e => this.GetRoad(e.Item1,e.Item2) == playerID))
+                    if(this.GetAdjacentEdges(inter).Any(e => this.GetRoad(e) == playerID))
                     {
                         result.Add(edge);
                         break;
@@ -364,15 +359,15 @@ namespace AIsOfCatan
             return result.ToArray();
         }
 
-        public Tuple<int, int, int>[] GetPossibleSettlements(int playerID)
+        public Intersection[] GetPossibleSettlements(int playerID)
         {
-            return new HashSet<Tuple<int,int,int>>(this.roads.Keys.Where(k => roads[k] == playerID)
-                .SelectMany(e => this.GetAdjacentIntersections(e.Item1,e.Item2)))
-                .Where(i => HasNoNeighbors(i.Item1,i.Item2,i.Item3) 
+            return new HashSet<Intersection>(this.roads.Keys.Where(k => roads[k] == playerID)
+                .SelectMany(e => this.GetAdjacentIntersections(e)))
+                .Where(i => HasNoNeighbors(i) 
                     && !this.settlements.ContainsKey(i)).ToArray();
         }
 
-        public Tuple<int, int, int>[] GetPossibleCities(int playerID)
+        public Intersection[] GetPossibleCities(int playerID)
         {
             return this.settlements.Keys.Where(i => settlements[i].Player == playerID && settlements[i].Token == Token.Settlement).ToArray();
         }
@@ -420,9 +415,9 @@ namespace AIsOfCatan
             for(int i = 0; i < 4; i++) harborPool.Add(HarborType.ThreeForOne);
 
             // shuffles
-            Shuffle(terrainPool, terrainSeed);
-            Shuffle(harborPool, terrainSeed);
-            if (randomNumbers) Shuffle(numberPool, numberSeed);
+            terrainPool.Shuffle(terrainSeed);
+            harborPool.Shuffle(terrainSeed);
+            if (randomNumbers) numberPool.Shuffle(numberSeed);
 
             // place randomized tiles
             bool desertFound = false;
@@ -472,47 +467,20 @@ namespace AIsOfCatan
             return index + col;
         }
 
-        private void Shuffle<T>(IList<T> list, int seed)
+        private void AddPiece(List<Piece> list, Intersection intersection)
         {
-            Random rng = new Random(seed);
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-
-        private void AddPiece(List<Piece> list, int index1, int index2, int index3)
-        {
-            Piece hit = this.GetPiece(index1, index2, index3);
+            Piece hit = this.GetPiece(intersection);
             if(hit != null) list.Add(hit);
         }
 
-        private Tuple<int,int> Get2Tuple(int first, int second)
-        {
-            return new Tuple<int, int>(first < second ? first : second, first < second ? second : first);
-        } 
-
-        private Tuple<int,int,int> Get3Tuple(int first, int second, int third)
-        {
-            List<int> tiles = new List<int>(3) { first, second, third };
-            tiles.Sort();
-
-            return new Tuple<int, int, int>(tiles[0], tiles[1], tiles[2]);
-        }
-
-        private int CountRoadLengthFromIntersection(int playerID, Tuple<int, int,int> curInt, HashSet<Tuple<int, int>> visited, HashSet<Tuple<int,int>> globalVisited)
+        private int CountRoadLengthFromIntersection(int playerID, Intersection curInt, HashSet<Edge> visited, HashSet<Edge> globalVisited)
         {
             // check for break
-            Piece curPiece = GetPiece(curInt.Item1,curInt.Item2,curInt.Item3);
+            Piece curPiece = GetPiece(curInt);
             if(curPiece != null && curPiece.Player != playerID) return 0; // no more edges this direction
 
             // find connections
-            var edgesOut = GetAdjacentEdges(curInt.Item1, curInt.Item2, curInt.Item3).Where(e => !visited.Contains(e) && GetRoad(e.Item1,e.Item2) == playerID).ToArray(); // temp array
+            var edgesOut = GetAdjacentEdges(curInt).Where(e => !visited.Contains(e) && GetRoad(e) == playerID).ToArray(); // temp array
 
             int highest = 0;
             foreach (var edge in edgesOut)
@@ -521,7 +489,7 @@ namespace AIsOfCatan
                 visited.Add(edge);
                 globalVisited.Add(edge);
 
-                Tuple<int,int,int> otherEnd = GetAdjacentIntersections(edge.Item1, edge.Item2).First(i => !i.Equals(curInt));
+                Intersection otherEnd = GetAdjacentIntersections(edge).First(i => !i.Equals(curInt));
                 int depthSearch = CountRoadLengthFromIntersection(playerID, otherEnd, visited, globalVisited);
 
                 if (1 + depthSearch > highest) highest = 1 + depthSearch;
@@ -532,9 +500,9 @@ namespace AIsOfCatan
             return highest;
         }
 
-        private Boolean IsLegalEdge(int index1, int index2)
+        private Boolean IsLegalEdge(Edge edge)
         {
-            return GetTile(index1).Terrain != Terrain.Water || GetTile(index2).Terrain != Terrain.Water;
+            return GetTile(edge.FirstTile).Terrain != Terrain.Water || GetTile(edge.SecondTile).Terrain != Terrain.Water;
         }
     }
 }
