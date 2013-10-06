@@ -57,7 +57,7 @@ namespace AIsOfCatan
             //Start the game!
             turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
 
-            gui = new GUIControl();//CurrentGamestate());
+            gui = new GUIControl(CurrentGamestate());
 
             PlaceStarts();
             return GameLoop();

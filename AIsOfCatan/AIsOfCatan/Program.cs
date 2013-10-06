@@ -49,10 +49,6 @@ namespace AIsOfCatan
                 Console.ReadLine();
                  * */
             }
-            using (GUIControl game = new GUIControl())
-            {
-                game.Run();
-            }
         }
     }
 #endif
