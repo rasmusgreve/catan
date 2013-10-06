@@ -55,7 +55,7 @@ namespace AIsOfCatan
             resourceBank = new int[] { 19, 19, 19, 19, 19 };
 
             //Start the game!
-            turn = 0; //TODO: Shuffle agents array? !IMPORTANT! DO IT BEFORE THE IDs ARE ASSIGNED!
+            turn = 0;
 
             gui = new GUIControl(CurrentGamestate());
 
