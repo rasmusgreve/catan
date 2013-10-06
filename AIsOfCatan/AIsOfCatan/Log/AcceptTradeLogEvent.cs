@@ -24,7 +24,7 @@ namespace AIsOfCatan.Log
 
         public override string ToString()
         {
-            return "Player " + Player + " accepts to trade " + ProposeTradeLogEvent.ListToString(give) + " for " + ProposeTradeLogEvent.ListToString(take) + " with " + OtherPlayer;
+            return "Player " + Player + " accepts to trade " + ListToString(give) + " for " + ListToString(take) + " with " + OtherPlayer;
         }
     }
 }

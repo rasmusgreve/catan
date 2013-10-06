@@ -21,7 +21,7 @@ namespace AIsOfCatan
 
         public string GetName()
         {
-            return "Simple Agent";
+            return "Starter Agent";
         }
 
         public string GetDescription()
@@ -90,7 +90,6 @@ namespace AIsOfCatan
                 changed = false;
                 var resources = ((GameState)state).GetOwnResources();
 
-
                 //Build city
                 if (resources.Count(r => r == Resource.Grain) >= 2 && resources.Count(r => r == Resource.Ore) >= 3)
                 {
@@ -121,6 +120,25 @@ namespace AIsOfCatan
                         state = actions.BuildRoad(pos[0].Item1, pos[0].Item2);
                     }
                 }
+                //Trade bank
+                foreach (Resource give in Enum.GetValues(typeof(Resource)))
+                {
+                    if (changed) break;
+                    if (resources.Count(r => r == give) > 4)
+                    {
+                        foreach (Resource take in Enum.GetValues(typeof(Resource)))
+                        {
+                            if (changed) break;
+                            if (resources.Count(r => r == take) == 0)
+                            {
+                                state = actions.TradeBank(give, take);
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+                //TODO: other stuff
+
             }
         }
 

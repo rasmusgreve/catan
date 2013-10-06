@@ -27,26 +27,6 @@ namespace AIsOfCatan.Log
             return result;
         }
 
-        public static string ListToString<T>(T variable)
-        {
-
-            var enumerable = variable as System.Collections.IEnumerable; 
-
-            if (enumerable != null){
-                StringBuilder builder = new StringBuilder("[");
-                foreach(var item in enumerable)
-                {
-                    builder.Append(ListToString(item) + "/"); 
-                }
-                builder.Remove(builder.Length - 1, 1); // remove last slash
-                builder.Append("]");
-                return builder.ToString();
-            }
-            else{
-                return variable.ToString();
-            }
-        }
-
         public override string ToString()
         {
             return "Player " + Player + " proposes to trade " + ListToString(give) + " for " + ListToString(take);

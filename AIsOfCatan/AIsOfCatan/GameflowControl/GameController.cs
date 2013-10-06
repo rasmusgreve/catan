@@ -314,10 +314,14 @@ namespace AIsOfCatan
             //Hand out resources
             foreach (var player in players)
             {
+                List<Resource> logResources = new List<Resource>();
                 foreach (var resource in handouts[player.Id].Keys)
                 {
                     GetResource(player, resource, handouts[player.Id][resource]);
+                    for (var i = 0; i < handouts[player.Id][resource]; i++)
+                        logResources.Add(resource);
                 }
+                Log(new ReceiveResourcesLogEvent(logResources.ToArray(), player.Id));
             }
         }
 
