@@ -94,6 +94,7 @@ namespace AIsOfCatan
                 try
                 {
                     TakeTurn(players[turn]);
+                    ShowScores();
                 }
                 catch (AgentActionException e)
                 {
@@ -111,8 +112,29 @@ namespace AIsOfCatan
             }
         }
 
+        private void ShowScores()
+        {
+            Console.Write("\tScoreboard: [");
+            foreach (Player p in players)
+            {
+                Console.Write("#" + p.Id + " " + p.Agent.GetName() + " : " + GetPoints(p) + " , ");
+            }
+            Console.WriteLine("]");
+        }
+
         /// <summary>
         /// Find out if a given player has won (if his number of victory points is over or equal to 10)
+        /// </summary>
+        /// <param name="player">The player to test</param>
+        /// <returns>True if the player has 10 or more victory points</returns>
+        private Boolean HasWon(Player player)
+        {
+            return (GetPoints(player) >= 10);
+        }
+
+
+        /// <summary>
+        /// Find out how many victory points a given player has
         /// Points are counted as:
         ///     Settlements give 1 point each
         ///     Cities give 2 points each
@@ -120,19 +142,19 @@ namespace AIsOfCatan
         ///     Having the largest army or the longest road give 2 points each.
         /// </summary>
         /// <param name="player">The player to test</param>
-        /// <returns>True if the player has 10 or more victory points</returns>
-        private Boolean HasWon(Player player)
+        /// <returns>How many victory points the player has</returns>
+        private int GetPoints(Player player)
         {
             int points = 0;
             points += (5 - player.SettlementsLeft) * 1;
             points += (4 - player.CitiesLeft) * 2;
-            
+
             points += player.DevelopmentCards.Count(c => c == DevelopmentCard.VictoryPoint) * 1;
-            
+
             if (player.Id == largestArmyId) points += 2;
             if (player.Id == longestRoadId) points += 2;
-            
-            return (points >= 10);
+
+            return points;
         }
 
         /// <summary>
@@ -256,6 +278,7 @@ namespace AIsOfCatan
             {
                 var tile = board.GetTile(i);
                 if (tile.Value != roll || board.GetRobberLocation() == i) continue;
+                if (tile.Terrain == Terrain.Desert || tile.Terrain == Terrain.Water) continue;
                 foreach (var piece in board.GetPieces(i))
                 {
                     int incr = (piece.Token == Token.Settlement) ? 1 : 2;
@@ -317,6 +340,9 @@ namespace AIsOfCatan
                 //Hand out resources
                 foreach (var pos in actions.GetSettlementPosition())
                 {
+                    Terrain terrain = board.GetTile(pos).Terrain;
+                    if (terrain == Terrain.Desert || terrain == Terrain.Water)
+                        continue; //can't get desert or water
                     GetResource(players[turn], (Resource)board.GetTile(pos).Terrain);
                 }
             }
@@ -361,6 +387,7 @@ namespace AIsOfCatan
         {
             for (int i = 0; i < quantity; i++)
             {
+                if (!player.Resources.Contains(resource)) throw new InsufficientResourcesException("Player out of " + resource);
                 player.Resources.Remove(resource);
                 resourceBank[(int)resource]++;
             }
@@ -624,7 +651,7 @@ namespace AIsOfCatan
 
             //Must always check road1
             if (!board.CanBuildRoad(road1Tile1, road1Tile2))
-                throw new IllegalBuildPositionException("The chosen position does not exist");
+                throw new IllegalBuildPositionException("The chosen position is illegal or occupied");
             if (board.GetRoad(road1Tile1, road1Tile2) != -1)
                 throw new IllegalBuildPositionException("There is already a road on the selected position");
 
@@ -641,7 +668,7 @@ namespace AIsOfCatan
             {
                 //Check road 2
                 if (!board.CanBuildRoad(road2Tile1, road2Tile2))
-                    throw new IllegalBuildPositionException("The chosen position does not exist");
+                    throw new IllegalBuildPositionException("The chosen position is illegal or occupied");
                 if (board.GetRoad(road2Tile1, road2Tile2) != -1)
                     throw new IllegalBuildPositionException("There is already a road on the selected position");
 
@@ -907,7 +934,7 @@ namespace AIsOfCatan
 
             var amountToGive = (hasSpecific) ? 2 : ((hasGeneral) ? 3 : 4);
 
-            if (player.Resources.Count(r => r == receiving) < amountToGive)
+            if (player.Resources.Count(r => r == giving) < amountToGive)
                 throw new InsufficientResourcesException("Player hasn't got enough resources to trade");
             
             PayResource(player,giving,amountToGive);
