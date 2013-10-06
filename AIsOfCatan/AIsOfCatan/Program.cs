@@ -27,15 +27,16 @@ namespace AIsOfCatan
 
             if (true) //Set to false if you wanna see the GUI
             {
-                /*var agent1 = new StarterAgent();
+                var agent1 = new StarterAgent();
                 var agent2 = new HumanAgent();
                 var controller = new GameController();
                 var agents = new IAgent[] { agent1, agent2 };
-                var winner = controller.StartGame(agents, 10, 0);
-                Console.WriteLine("Winner: " + winner);*/
-                
-                IBoard b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(21, 27, 0).PlaceRoad(21, 28, 0).PlaceRoad(21, 22, 0).PlaceRoad(15, 21, 0).PlaceRoad(14, 21, 0).PlaceRoad(14, 15, 0).PlaceRoad(15, 16, 1).PlacePiece(20, 21, 27, new Piece(Token.City, 1));
-                for (int i = 0; i < 2; i++)
+                //TODO: Shuffle agents array!
+                var winner = agents[controller.StartGame(agents, 10, 0)];
+                Console.WriteLine("Winner: " + winner.GetName());
+                /*
+                IBoard b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(21, 27, 0).PlaceRoad(21, 28, 0).PlaceRoad(21, 22, 0).PlaceRoad(15, 21, 0).PlaceRoad(14, 21, 0).PlaceRoad(14, 15, 0).PlaceRoad(15, 16, 1).PlacePiece(20, 21, 27, new Board.Piece(Token.City, 1));
+                for (int i = 0; i < 20; i++)
                 {
                     DateTime start = DateTime.Now;
                     Console.WriteLine("# All Edges = " + b.GetAllEdges().Length);
@@ -48,7 +49,7 @@ namespace AIsOfCatan
                 Console.WriteLine("Player 0's harbors: " + b.GetPlayersHarbors(0).Length);
 
                 Console.ReadLine();
-                 
+                 */
             }
         }
     }
