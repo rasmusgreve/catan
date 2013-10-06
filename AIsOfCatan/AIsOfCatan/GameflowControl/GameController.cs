@@ -192,7 +192,7 @@ namespace AIsOfCatan
         private void TakeTurn(Player player)
         {
             var actions = new MainActions(player, this);
-            player.Agent.BeforeDiceRoll(new GameState(board, developmentCardStack, resourceBank, players, turn, log), actions);
+            player.Agent.BeforeDiceRoll(CurrentGamestate(), actions);
             
             int roll = RollDice();
             actions.DieRoll();
@@ -205,7 +205,7 @@ namespace AIsOfCatan
                 {
                     if (p.Resources.Count > 7)
                     {
-                        var cards = p.Agent.DiscardCards(new GameState(board, developmentCardStack, resourceBank, players, p.Id, log), p.Resources.Count / 2);
+                        var cards = p.Agent.DiscardCards(CurrentGamestate(), p.Resources.Count / 2);
                         if (cards.Length != p.Resources.Count / 2)
                         {
                             //Clone, shuffle, take, convert
@@ -218,13 +218,13 @@ namespace AIsOfCatan
                         Log(new DiscardCardsLogEvent(p.Id,cards.ToList()));
                     }
                 }
-                MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
+                MoveRobber(player, CurrentGamestate());
             }
             else
             {
                 HandOutResources(roll);
             }
-            var afterResourcesState = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+            var afterResourcesState = CurrentGamestate();
             player.Agent.PerformTurn(afterResourcesState, actions);
 
             player.NewDevelopmentCards.Clear(); //Reset new development cards
@@ -346,7 +346,7 @@ namespace AIsOfCatan
         {
             foreach (Player p in players)
             {
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+                var state = CurrentGamestate();
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
@@ -363,7 +363,7 @@ namespace AIsOfCatan
             foreach (Player p in players)
             {
                 PrevTurn();
-                var state = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+                var state = CurrentGamestate();
                 var actions = new StartActions(players[turn], this);
                 players[turn].Agent.PlaceStart(state, actions);
                 if (!actions.IsComplete())
@@ -674,7 +674,7 @@ namespace AIsOfCatan
                 largestArmyId = player.Id;
             }
 
-            MoveRobber(player, new GameState(board, developmentCardStack, resourceBank, players, turn, log));
+            MoveRobber(player, CurrentGamestate());
 
             Log(new PlayKnightLogEvent(player.Id));
 
