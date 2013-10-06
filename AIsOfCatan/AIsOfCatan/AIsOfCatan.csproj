@@ -142,7 +142,7 @@
     <Compile Include="GUI\GUIPiece.cs" />
     <Compile Include="GUI\MapScreen.cs" />
     <Compile Include="Exceptions\NoMoreCardsException.cs" />
-    <Compile Include="IBoard.cs" />
+    <Compile Include="API\IBoard.cs" />
     <Compile Include="Log\AcceptTradeLogEvent.cs" />
     <Compile Include="Log\BuildPieceLogEvent.cs" />
     <Compile Include="Log\BuildRoadLogEvent.cs" />
