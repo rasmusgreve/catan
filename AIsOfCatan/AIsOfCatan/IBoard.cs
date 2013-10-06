@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace AIsOfCatan
 {
     /// <summary>
@@ -33,7 +34,7 @@ namespace AIsOfCatan
         /// Get the longest road on this board
         /// </summary>
         /// <returns>Dictionary of playerID -> longest road length of that player</returns>
-        System.Collections.Generic.Dictionary<int, int> GetLongestRoad();
+        Dictionary<int, int> GetLongestRoad();
 
         /// <summary>
         /// Gets the length of the given player's longest road.
@@ -52,6 +53,30 @@ namespace AIsOfCatan
         /// <returns>Returns true if the given intersection has no direct neighboring intersections
         /// containing settlements or cities, else false.</returns>
         bool HasNoNeighbors(int index1, int index2, int index3);
+
+        /// <summary>
+        /// Finds all possible edges where the given player can legally build roads.
+        /// </summary>
+        /// <param name="playerID">The player to find edges for.</param>
+        /// <returns>An array of edges where the given player can legally build a road.</returns>
+        Tuple<int, int>[] GetPossibleRoads(int playerID);
+
+        /// <summary>
+        /// Finds all possible intersections where the given player can legally build
+        /// a settlement (i.e it is currently unoccupied).
+        /// </summary>
+        /// <param name="playerID">The player to find intersections for.</param>
+        /// <returns>An array of intersections where the given player can legally
+        /// build a settlement.</returns>
+        Tuple<int, int, int>[] GetPossibleSettlements(int playerID);
+
+        /// <summary>
+        /// Finds all possible intersections where the given player has a settlement.
+        /// </summary>
+        /// <param name="playerID">The player to find intersections for.</param>
+        /// <returns>An array of intersections where the given player can legally
+        /// upgrade a settlement to a city.</returns>
+        Tuple<int, int, int>[] GetPossibleCities(int playerID);
 
         #endregion
 
@@ -79,7 +104,13 @@ namespace AIsOfCatan
         /// once.
         /// </summary>
         /// <returns>A list containing all intersections entirely or partly on land.</returns>
-        System.Collections.Generic.List<Tuple<int, int, int>> GetAllIntersections();
+        Tuple<int, int, int>[] GetAllIntersections();
+
+        /// <summary>
+        /// Gives a list of all legal edges on the board.
+        /// </summary>
+        /// <returns>A list containing all edges around land tiles.</returns>
+        Tuple<int,int>[] GetAllEdges();
 
         /// <summary>
         /// Gives the game piece at the vertex between three different tiles.
@@ -97,14 +128,14 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="index">The location of the tile.</param>
         /// <returns>A list of all the valid Pieces.</returns>
-        System.Collections.Generic.List<Board.Piece> GetPieces(int index);
+        Board.Piece[] GetPieces(int index);
 
         /// <summary>
         /// Gives a (copy) of the dictionary holding all settlements and cities 
         /// currently build on the board.
         /// </summary>
         /// <returns>A dictionary with all settlements and cities on the board.</returns>
-        System.Collections.Generic.Dictionary<Tuple<int, int, int>, Board.Piece> GetAllPieces();
+        Dictionary<Tuple<int, int, int>, Board.Piece> GetAllPieces();
 
         /// <summary>
         /// Gives the id of the player who has build a road at the requested edge.
@@ -118,7 +149,7 @@ namespace AIsOfCatan
         /// Gives a (copy) of the dictionary holding all roads currently build on the board.
         /// </summary>
         /// <returns>A dictionary with all roads on the board.</returns>
-        System.Collections.Generic.Dictionary<Tuple<int, int>, int> GetAllRoads();
+        Dictionary<Tuple<int, int>, int> GetAllRoads();
 
         /// <summary>
         /// Gives an array (size 9) of Harbors containing positions (edges) and
@@ -169,7 +200,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="index">The tile to look around.</param>
         /// <returns>A list of all the (legal) adjacent tiles.</returns>
-        System.Collections.Generic.List<int> GetAdjacentTiles(int index);
+        List<int> GetAdjacentTiles(int index);
 
         #endregion
 
@@ -206,6 +237,5 @@ namespace AIsOfCatan
         IBoard PlaceRoad(int index1, int index2, int playerID);
 
         #endregion
-
     }
 }
