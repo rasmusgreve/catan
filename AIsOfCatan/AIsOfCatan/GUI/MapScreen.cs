@@ -9,6 +9,7 @@ using MS.Internal.Xml.XPath;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TroyXnaAPI;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -129,9 +130,9 @@ namespace AIsOfCatan
             #endregion
 
             #region Pieces
-            Dictionary<Tuple<int, int, int>, Board.Piece> piecelist = state.Board.GetAllPieces();
+            Dictionary<Tuple<int, int, int>, Piece> piecelist = state.Board.GetAllPieces();
 
-            foreach (KeyValuePair<Tuple<int, int, int>, Board.Piece> piece in piecelist)
+            foreach (KeyValuePair<Tuple<int, int, int>, Piece> piece in piecelist)
             {
                 int t1 = piece.Key.Item1;
                 int t2 = piece.Key.Item2;

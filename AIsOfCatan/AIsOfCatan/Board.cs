@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -534,46 +535,6 @@ namespace AIsOfCatan
         private Boolean IsLegalEdge(int index1, int index2)
         {
             return GetTile(index1).Terrain != Terrain.Water || GetTile(index2).Terrain != Terrain.Water;
-        }
-
-        public class Tile
-        {
-            public Terrain Terrain { get; private set; }
-            public int Value { get; internal set; }
-
-            public Tile(Terrain terrain, int value)
-            {
-                this.Terrain = terrain;
-                this.Value = value;
-            }
-
-            public override string ToString()
-            {
-                return "[" + Terrain.ToString() + " : " + Value + "]";
-            }
-        }
-
-        public class Piece
-        {
-            public Token Token { get; private set; }
-            public int Player { get; private set; }
-
-            public Piece(Token token, int player)
-            {
-                this.Token = token;
-                this.Player = player;
-            }
-        }
-
-        public class Harbor
-        {
-            public HarborType Type { get; private set; }
-            public Tuple<int,int> Position { get; private set; }
-
-            public Harbor(HarborType type, Tuple<int,int> position){
-                this.Type = type;
-                this.Position = position;
-            }
         }
     }
 }

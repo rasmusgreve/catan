@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AIsOfCatan.API;
 namespace AIsOfCatan
 {
     /// <summary>
@@ -87,7 +88,7 @@ namespace AIsOfCatan
         /// </summary>
         /// <param name="index">The index to check terrain for.</param>
         /// <returns>A Tile object containing the terrain type and dice value.</returns>
-        Board.Tile GetTile(int index);
+        Tile GetTile(int index);
 
         /// <summary>
         /// Give the type of terrain and dice value for the given coordinates of the board.
@@ -96,7 +97,7 @@ namespace AIsOfCatan
         /// <param name="column">The column of the tile. Even row numbers have a length
         /// of 6 and uneven has a length of 7.</param>
         /// <returns>A Tile object containing the terrain type and dice value.</returns>
-        Board.Tile GetTile(int row, int column);
+        Tile GetTile(int row, int column);
 
         /// <summary>
         /// Gives a list of all legal intersections on the board. If this method
@@ -121,21 +122,21 @@ namespace AIsOfCatan
         /// <returns>The Piece object at the location, containing the type of token 
         /// (Settlement or City) and the owning player id. If the location is empty
         /// it will return null.</returns>
-        Board.Piece GetPiece(int firstTile, int secondTile, int thirdTile);
+        Piece GetPiece(int firstTile, int secondTile, int thirdTile);
 
         /// <summary>
         /// Get all pieces built adjacent to the given tile index.
         /// </summary>
         /// <param name="index">The location of the tile.</param>
         /// <returns>A list of all the valid Pieces.</returns>
-        Board.Piece[] GetPieces(int index);
+        Piece[] GetPieces(int index);
 
         /// <summary>
         /// Gives a (copy) of the dictionary holding all settlements and cities 
         /// currently build on the board.
         /// </summary>
         /// <returns>A dictionary with all settlements and cities on the board.</returns>
-        Dictionary<Tuple<int, int, int>, Board.Piece> GetAllPieces();
+        Dictionary<Tuple<int, int, int>, Piece> GetAllPieces();
 
         /// <summary>
         /// Gives the id of the player who has build a road at the requested edge.
@@ -156,7 +157,7 @@ namespace AIsOfCatan
         /// HarborType's for those positions.
         /// </summary>
         /// <returns>The array of Harbors on the board.</returns>
-        Board.Harbor[] GetHarbors();
+        Harbor[] GetHarbors();
 
         /// <summary>
         /// Gives an array of Harbors that the given player has a settlement or
@@ -224,7 +225,7 @@ namespace AIsOfCatan
         /// <param name="index3">The third index of the tiles to look between.</param>
         /// <param name="p">The Piece to place on the Board.</param>
         /// <returns>The resulting Board from placing the Piece.</returns>
-        IBoard PlacePiece(int index1, int index2, int index3, Board.Piece p);
+        IBoard PlacePiece(int index1, int index2, int index3, Piece p);
 
         /// <summary>
         /// Places a road on the specified position on the Board and

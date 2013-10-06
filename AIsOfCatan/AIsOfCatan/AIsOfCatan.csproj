@@ -117,11 +117,16 @@
     <Compile Include="Agents\StarterAgent.cs" />
     <Compile Include="Agents\DebugAgent.cs" />
     <Compile Include="Agents\HumanAgent.cs" />
+    <Compile Include="API\Edge.cs" />
+    <Compile Include="API\Harbor.cs" />
     <Compile Include="API\IAgent.cs" />
     <Compile Include="API\IGameActions.cs" />
     <Compile Include="API\IGameState.cs" />
+    <Compile Include="API\Intersection.cs" />
     <Compile Include="API\IStartActions.cs" />
     <Compile Include="API\ITrade.cs" />
+    <Compile Include="API\Piece.cs" />
+    <Compile Include="API\Tile.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="ActionLog.cs" />
     <Compile Include="Exceptions\AgentActionException.cs" />

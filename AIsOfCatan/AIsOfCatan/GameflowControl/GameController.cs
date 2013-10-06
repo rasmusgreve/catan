@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AIsOfCatan.Log;
+using AIsOfCatan.API;
 
 namespace AIsOfCatan
 {
@@ -821,7 +822,7 @@ namespace AIsOfCatan
             Log(new BuildPieceLogEvent(player.Id, Token.Settlement, new Tuple<int, int, int>(firstTile,secondTile,thirdTile)));
 
             player.SettlementsLeft--;
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Piece(Token.Settlement, player.Id));
             UpdateLongestRoad();
             return CurrentGamestate();
         }
@@ -847,7 +848,7 @@ namespace AIsOfCatan
             if (player.CitiesLeft == 0)
                 throw new IllegalActionException("No more city pieces left of your color");
 
-            Board.Piece piece = board.GetPiece(firstTile, secondTile, thirdTile);
+            Piece piece = board.GetPiece(firstTile, secondTile, thirdTile);
             if (piece == null || piece.Player != player.Id || piece.Token != Token.Settlement)
                 throw new IllegalBuildPositionException("The chosen position does not contain one of your settlements");
 
@@ -859,7 +860,7 @@ namespace AIsOfCatan
             player.CitiesLeft--;
             player.SettlementsLeft++;
 
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.City, player.Id));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Piece(Token.City, player.Id));
             return CurrentGamestate();
         }
 
@@ -916,7 +917,7 @@ namespace AIsOfCatan
                 throw new IllegalBuildPositionException("The chosen position is not valid");
 
             player.SettlementsLeft--;
-            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Board.Piece(Token.Settlement, player.Id));
+            board = board.PlacePiece(firstTile, secondTile, thirdTile, new Piece(Token.Settlement, player.Id));
             return CurrentGamestate();
         }
 
