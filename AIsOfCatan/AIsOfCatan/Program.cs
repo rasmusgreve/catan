@@ -22,12 +22,12 @@ namespace AIsOfCatan
                 IBoard b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(21, 27, 0).PlaceRoad(21, 28, 0).PlaceRoad(21, 22, 0).PlaceRoad(15, 21, 0).PlaceRoad(14, 21, 0).PlaceRoad(14, 15, 0).PlaceRoad(15, 16, 1).PlacePiece(20, 21, 27, new Board.Piece(Token.City, 1));
                 for (int i = 0; i < 20; i++)
                 {
-                    DateTime start = DateTime.Now;
-                    Dictionary<int, int> results = b.GetLongestRoad();
-                    int player = results.OrderByDescending(r => r.Value).First().Key;
-                    int length = results[player];
-                    Console.WriteLine("Time: " + (DateTime.Now - start).TotalMilliseconds);
-                    Console.WriteLine("Longest Road; Player " + player + " with " + length);
+                    long start = DateTime.Now.Ticks;
+                    Console.WriteLine("# Possible roads; Player 0 = " + b.GetPossibleRoads(0).Length);
+                    Console.WriteLine("# Possible settlements; Player 0 = " + b.GetPossibleSettlements(0).Length);
+                    Console.WriteLine("# Possible cities; Player 0 = " + b.GetPossibleCities(0).Length);
+                    Console.WriteLine("Time: " + (DateTime.Now.Ticks - start));
+                    
                 }
                 Console.WriteLine("Player 0's harbors: " + b.GetPlayersHarbors(0).Length);
 
