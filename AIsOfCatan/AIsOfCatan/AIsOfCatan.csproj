@@ -156,6 +156,7 @@
     <Compile Include="Log\PlayRoadBuildingLogEvent.cs" />
     <Compile Include="Log\PlayYearOfPlentyLogEvent.cs" />
     <Compile Include="Log\ProposeTradeLogEvent.cs" />
+    <Compile Include="Log\ReceiveResourcesLogEvent.cs" />
     <Compile Include="Log\RollLogEvent.cs" />
     <Compile Include="Log\StealCardLogEvent.cs" />
     <Compile Include="Log\TradeBankLogEvent.cs" />
