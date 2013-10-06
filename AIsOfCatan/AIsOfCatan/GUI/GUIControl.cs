@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using AIsOfCatan.Log;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -25,6 +26,7 @@ namespace AIsOfCatan
         GameState state;
 
         private TXAScreen startScreen;
+        private List<LogEvent> logList;
 
         public GUIControl()
         {
@@ -47,7 +49,10 @@ namespace AIsOfCatan
             board = board.PlacePiece(8, 14, 15, new Board.Piece(Token.Settlement, 2));
             board = board.PlacePiece(28, 29, 35, new Board.Piece(Token.City, 3));
             board = board.MoveRobber(23);
-            state = new GameState(board, null, null, null, 0, null);
+            logList = new List<LogEvent>();
+            logList.Add(new BuyDevLogEvent(2));
+            logList.Add(new RollLogEvent(1, 2));
+            state = new GameState(board, null, null, null, 0, logList);
 
             SCALE = 0.5f;
 
@@ -87,7 +92,7 @@ namespace AIsOfCatan
 
             startScreen = new MapScreen(state);
 
-            screenManager.AddScreen("start", startScreen);
+            screenManager.AddScreen("map", startScreen);
         }
 
         /// <summary>
@@ -98,6 +103,8 @@ namespace AIsOfCatan
         {
             // TODO: Unload any non ContentManager content here
         }
+
+        private long counter = 2000;
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -112,6 +119,17 @@ namespace AIsOfCatan
 
             // TODO: Add your update logic here
 
+            counter -= gameTime.ElapsedGameTime.Milliseconds;
+            
+            if (counter < 0)
+            {
+                Console.WriteLine("New Log event added");
+                logList.Add(new RollLogEvent(1, 9));
+                state = new GameState(board, null, null, null, 0, logList);
+                NewGameState(state);
+                counter += 2000;
+            }
+
             base.Update(gameTime);
         }
 
@@ -124,6 +142,13 @@ namespace AIsOfCatan
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        public void NewGameState(GameState state)
+        {
+            //assert CurrentScreen is always MapScreen
+            MapScreen ms = screenManager.CurrentScreen as MapScreen;
+            ms.UpdateGameState(state);
         }
     }
 }
