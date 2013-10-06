@@ -23,6 +23,7 @@ namespace AIsOfCatan
                 for (int i = 0; i < 20; i++)
                 {
                     long start = DateTime.Now.Ticks;
+                    Console.WriteLine("# All Edges = " + b.GetAllEdges().Length);
                     Console.WriteLine("# Possible roads; Player 0 = " + b.GetPossibleRoads(0).Length);
                     Console.WriteLine("# Possible settlements; Player 0 = " + b.GetPossibleSettlements(0).Length);
                     Console.WriteLine("# Possible cities; Player 0 = " + b.GetPossibleCities(0).Length);
