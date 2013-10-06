@@ -582,8 +582,8 @@ namespace AIsOfCatan
                             var giveLog = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
                             var takeLog = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
                             Log(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
+                            break;
                         }
-                        break;
                 }
             }
             proposedTrades[player.Id] = dict;
@@ -604,28 +604,36 @@ namespace AIsOfCatan
                 throw new IllegalActionException("Tried to complete a declined trade");
 
             //Validate trade
-            if (trade.Give.Any(res => res.Count > 1) || trade.Take.Any(res => res.Count > 1))
+            
+            if (trade.Give.Count > 1 || trade.Take.Count > 1)
             {
-                throw new IllegalActionException("Tried to complete a trade containing wildcards");
+                throw new IllegalActionException("Tried to complete an invalid trade");
+            }
+            //Validate that players have enough resources (maybe do this earlier?)
+
+            foreach (Resource resource in Enum.GetValues(typeof(Resource)))
+            {
+                //Give - other must have
+                if (trade.Give[0].Count(r => r == resource) > opponent.Resources.Count(r => r == resource))
+                    throw new InsufficientResourcesException("Player " + opponent.Id + "(" +  opponent.Agent.GetName() + ") does not have enough resource to complete trade");
+                //Take - this must have
+                if (trade.Take[0].Count(r => r == resource) > player.Resources.Count(r => r == resource))
+                    throw new InsufficientResourcesException("Player " + player.Id + "(" + player.Agent.GetName() + ") does not have enough resource to complete trade");
             }
 
             //Complete trade
-            var give = new List<Resource>(); //for logging
-            var take = new List<Resource>();
-            foreach (var res in trade.Give.Where(res => res.Count != 0))
+            foreach (var res in trade.Give[0])
             {
-                opponent.Resources.Remove(res[0]);
-                player.Resources.Add(res[0]);
-                take.Add(res[0]);
+                opponent.Resources.Remove(res);
+                player.Resources.Add(res);
             }
-            foreach (var res in trade.Take.Where(res => res.Count != 0))
+            foreach (var res in trade.Take[0])
             {
-                player.Resources.Remove(res[0]);
-                opponent.Resources.Add(res[0]);
-                give.Add(res[0]);
+                player.Resources.Remove(res);
+                opponent.Resources.Add(res);
             }
 
-            Log(new AcceptTradeLogEvent(player.Id, playerid, give, take));
+            Log(new AcceptTradeLogEvent(player.Id, playerid, trade.Give[0], trade.Take[0]));
 
             return CurrentGamestate();
         }
