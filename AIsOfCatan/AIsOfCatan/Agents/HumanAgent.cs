@@ -38,6 +38,17 @@ namespace AIsOfCatan
             return res[int.Parse(Console.ReadLine()) - 1];
         }
 
+        private Resource selectResourceTradeBank(IBoard board, Resource[] resources = null)
+        {
+            Console.WriteLine("Select a resource:");
+            var res = resources ?? new Resource[] { Resource.Lumber, Resource.Brick, Resource.Grain, Resource.Ore, Resource.Wool };
+            for (var i = 0; i < res.Length; i++)
+            {
+                Console.WriteLine((i + 1) + ")" + res[i] + " - " + TradePrice(board, res[i]) + ":1");
+            }
+            return res[int.Parse(Console.ReadLine()) - 1];
+        }
+
         public void Reset(int assignedId)
         {
             Console.WriteLine("You are playing as player id #" + assignedId);
@@ -56,7 +67,7 @@ namespace AIsOfCatan
 
         public void PlaceStart(IGameState state, IStartActions actions)
         {
-            Console.WriteLine("It is your turn to place a starting settlement");
+            Console.WriteLine("It is your turn to place a starting settlement (#" + assignedId + ")");
             var settlement = getSettlementPosition();
             actions.BuildSettlement(settlement.Item1,settlement.Item2,settlement.Item3);
             Console.WriteLine("Place a road connected to the settlement you just placed");
@@ -84,21 +95,17 @@ namespace AIsOfCatan
             {
                 case DevelopmentCard.Knight:
                     return actions.PlayKnight();
-                    break;
                 case DevelopmentCard.Monopoly:
                     Console.WriteLine("Choose the resource type to get monopoly on");
                     return actions.PlayMonopoly(selectResource());
-                    break;
                 case DevelopmentCard.RoadBuilding:
                     Console.WriteLine("Decide where to build the two roads");
                     var road1 = getRoadPosition();
                     var road2 = getRoadPosition();
                     return actions.PlayRoadBuilding(road1.Item1, road1.Item2, road2.Item1, road2.Item2);
-                    break;
                 case DevelopmentCard.YearOfPlenty:
                     Console.WriteLine("Choose which two resources you want to draw");
                     return actions.PlayYearOfPlenty(selectResource(), selectResource());
-                    break;
             }
             return null;
         }
@@ -144,8 +151,12 @@ namespace AIsOfCatan
                     if (hand.Count(r => r == resource) == 0) continue;
                     Console.WriteLine(((int)resource) + ") " + resource + " x " + hand.Count(r => r == resource));
                 }
-                cards[toDiscard] = (Resource) int.Parse(Console.ReadLine());
-                hand.Remove(cards[toDiscard]);
+
+                //Keep trying if answering wrong
+                do
+                {
+                    cards[toDiscard] = (Resource)int.Parse(Console.ReadLine());
+                } while (!hand.Remove(cards[toDiscard]));
             }
             return cards;
         }
@@ -157,17 +168,25 @@ namespace AIsOfCatan
 
         public void PerformTurn(IGameState state, IGameActions actions)
         {
-            Console.WriteLine("It is now your turn.");
+            Console.WriteLine("It is now your turn (#" + assignedId + ")");
             while (true)
             {
                 try
                 {
-                    Console.Write("You have the following resources: [");
+                    Console.Write("Resources: [");
                     foreach (Resource resource in Enum.GetValues(typeof (Resource)))
                     {
                         var count = state.GetOwnResources().Count(r => r == resource);
                         if (count == 0) continue;
                         Console.Write(resource + " x " + count + ", ");
+                    }
+                    Console.WriteLine("]");
+                    Console.Write("Dev. cards: [");
+                    foreach (DevelopmentCard devcard in Enum.GetValues(typeof(DevelopmentCard)))
+                    {
+                        var count = state.GetOwnDevelopmentCards().Count(r => r == devcard);
+                        if (count == 0) continue;
+                        Console.Write(devcard + " x " + count + ", ");
                     }
                     Console.WriteLine("]");
 
@@ -185,16 +204,16 @@ namespace AIsOfCatan
                     bool canTradeBank = true, canTradePlayers = true; //TODO: Implement these
 
                     Console.WriteLine("Choose an action:");
-                    Console.WriteLine("0) End turn");
-                    if (canBuildRoad) Console.WriteLine("1) Build road");
+                                            Console.WriteLine("0) End turn");
+                    if (canBuildRoad)       Console.WriteLine("1) Build road");
                     if (canBuildSettlement) Console.WriteLine("2) Build settlement");
-                    if (canBuildCity) Console.WriteLine("3) Build city");
-                    if (canBuyDevCard) Console.WriteLine("4) Buy development card");
+                    if (canBuildCity)       Console.WriteLine("3) Build city");
+                    if (canBuyDevCard)      Console.WriteLine("4) Buy development card");
                     if (!hasPlayedDevCard &&
                         state.GetOwnDevelopmentCards().Count(d => d != DevelopmentCard.VictoryPoint) > 0)
-                        Console.WriteLine("5) Play development card");
-                    if (canTradeBank) Console.WriteLine("6) Trade resources with the bank");
-                    if (canTradePlayers) Console.WriteLine("7) Trade resources with the other players");
+                                            Console.WriteLine("5) Play development card");
+                    if (canTradeBank)       Console.WriteLine("6) Trade resources with the bank");
+                    if (canTradePlayers)    Console.WriteLine("7) Trade resources with the other players");
 
                     int answer = int.Parse(Console.ReadLine() ?? "0");
 
@@ -221,7 +240,7 @@ namespace AIsOfCatan
                             break;
                         case 6: //trade bank
                             Console.WriteLine("Choose which resource to give");
-                            var tbGive = selectResource();
+                            var tbGive = selectResourceTradeBank(state.Board);
                             Console.WriteLine("Choose which resource to receive");
                             var tbTake = selectResource();
                             state = actions.TradeBank(tbGive, tbTake);
@@ -287,6 +306,15 @@ namespace AIsOfCatan
                     Console.WriteLine("Illegal input! Message: " + ex.Message);
                 }
             }
+        }
+
+        private int TradePrice(IBoard board, Resource giving)
+        {
+            var harbors = board.GetPlayersHarbors(assignedId);
+            var hasSpecific = harbors.Contains((HarborType)giving);
+            var hasGeneral = harbors.Contains(HarborType.ThreeForOne);
+
+            return (hasSpecific) ? 2 : ((hasGeneral) ? 3 : 4);
         }
 
 
