@@ -107,7 +107,6 @@ namespace AIsOfCatan
                 if (resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
                 {
                     var pos = state.Board.GetPossibleRoads(id);
-                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
