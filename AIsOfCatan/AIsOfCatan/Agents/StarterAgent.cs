@@ -40,20 +40,12 @@ namespace AIsOfCatan
             if (!silent)
                 Console.WriteLine(id + ": Place starts");
 
-            var spos = state.Board.GetAllIntersections()
+            var spos = FindBestIntersection(state.Board.GetAllIntersections()
                 .Where(i => state.Board.GetPiece(i) == null &&
-                    state.Board.HasNoNeighbors(i))
-                .OrderBy(i => Chances(state.Board.GetTile(i.FirstTile).Value) +
-                    Chances(state.Board.GetTile(i.SecondTile).Value) +
-                    Chances(state.Board.GetTile(i.ThirdTile).Value)).Last();
+                    state.Board.HasNoNeighbors(i)), state.Board);
             
             actions.BuildSettlement(spos);
-            if (state.Board.CanBuildRoad(new Edge(spos.FirstTile,spos.SecondTile)))
-                actions.BuildRoad(new Edge(spos.FirstTile,spos.SecondTile));
-            else if (state.Board.CanBuildRoad(new Edge(spos.FirstTile,spos.ThirdTile)))
-                actions.BuildRoad(new Edge(spos.FirstTile,spos.ThirdTile));
-            else
-                actions.BuildRoad(new Edge(spos.SecondTile,spos.ThirdTile));
+            actions.BuildRoad(FindBestRoad(spos, state.Board));
         }
 
         public void BeforeDiceRoll(IGameState state, IGameActions actions)
@@ -95,22 +87,20 @@ namespace AIsOfCatan
                 if (resources.Count(r => r == Resource.Grain) >= 2 && resources.Count(r => r == Resource.Ore) >= 3)
                 {
                     var pos = state.Board.GetPossibleCities(id);
-                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildCity(pos[0]);
+                        state = actions.BuildCity(FindBestIntersection(pos,state.Board));
                     }
                 }
                 //Build settlement
                 if (resources.Contains(Resource.Grain) && resources.Contains(Resource.Wool) && resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
                 {
                     var pos = state.Board.GetPossibleSettlements(id);
-                    pos.OrderBy(e => Guid.NewGuid());
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildSettlement(pos[0]);
+                        state = actions.BuildSettlement(FindBestIntersection(pos,state.Board));
                     }
                 }
                 //Build road
@@ -121,7 +111,7 @@ namespace AIsOfCatan
                     if (pos.Length > 0)
                     {
                         changed = true;
-                        state = actions.BuildRoad(pos[0]);
+                        state = actions.BuildRoad(FindBestRoad(pos, state.Board));
                     }
                 }
                 //Trade bank
@@ -141,14 +131,48 @@ namespace AIsOfCatan
                         }
                     }
                 }
-                //TODO: other stuff
-
             }
         }
 
         public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
         {
             return offer.Respond(offer.Give[0],offer.Take[0]);
+        }
+
+        private int GetScore(Intersection inter, IBoard board)
+        {
+            return Chances(board.GetTile(inter.FirstTile).Value) +
+                    Chances(board.GetTile(inter.SecondTile).Value) +
+                    Chances(board.GetTile(inter.ThirdTile).Value);
+        }
+
+        private Intersection FindBestIntersection(IEnumerable<Intersection> enumerable, IBoard board)
+        {
+            return enumerable.OrderBy(i => GetScore(i,board)).Last();
+        }
+
+        private IEnumerable<Intersection> GetEnds(Intersection inter, IBoard board)
+        {
+            return board.GetAdjacentEdges(inter).SelectMany(e => board.GetAdjacentIntersections(e)).Where(i => !i.Equals(inter));
+        }
+
+        private Edge GetEdgeBetween(Intersection first, Intersection second)
+        {
+            int[] result = first.ToArray().Where(i => second.ToArray().Contains(i)).ToArray();
+            if (result.Length < 2) return null;
+            return new Edge(result[0], result[1]);
+        }
+
+        private Edge FindBestRoad(Intersection from, IBoard board)
+        {
+            // find the best neighbor intersection and takes the edge to that
+            return GetEdgeBetween(FindBestIntersection(GetEnds(from, board),board),from);
+        }
+
+        private Edge FindBestRoad(IEnumerable<Edge> edges, IBoard board)
+        {
+            // best edge ordered by highest average of possible values on edges ends
+            return edges.OrderBy(e => board.GetAdjacentIntersections(e).Where(i => board.HasNoNeighbors(i)).Average(i => GetScore(i, board))).Last();
         }
     }
 }
