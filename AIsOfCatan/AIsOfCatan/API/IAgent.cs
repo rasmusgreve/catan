@@ -126,9 +126,10 @@ namespace AIsOfCatan
         /// Note that even though you have acceptet the trade, it is up to the proposing player 
         /// to choose which player he want to trade with, and if he wants to trade at all
         /// </summary>
+        /// <param name="state">The state of the game</param>
         /// <param name="offer">The proposing players trade offer</param>
         /// <param name="proposingPlayerId">The id of the player who proposed the trade</param>
         /// <returns>Either offer.Decline() or offer.Respond(give, take) (see ITrade)</returns>
-        ITrade HandleTrade(ITrade offer, int proposingPlayerId);
+        ITrade HandleTrade(IGameState state, ITrade offer, int proposingPlayerId);
     }
 }

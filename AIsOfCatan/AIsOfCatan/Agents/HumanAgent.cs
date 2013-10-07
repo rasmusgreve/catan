@@ -318,9 +318,11 @@ namespace AIsOfCatan
         }
 
 
-        public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
+        public ITrade HandleTrade(IGameState state, ITrade offer, int proposingPlayerId)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("You were asked if you wanted to trade.");
+            Console.WriteLine("This is not yet implemented, so you declined.");
+            return offer.Decline();
         }
     }
 }

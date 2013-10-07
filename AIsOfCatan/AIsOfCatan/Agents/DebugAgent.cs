@@ -206,7 +206,7 @@ namespace AIsOfCatan
 
         }
 
-        public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
+        public ITrade HandleTrade(IGameState state, ITrade offer, int proposingPlayerId)
         {
             if (!silent)
                 Console.WriteLine(id + ": Handling trade");

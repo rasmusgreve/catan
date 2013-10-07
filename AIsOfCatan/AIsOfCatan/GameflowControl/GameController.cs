@@ -580,10 +580,12 @@ namespace AIsOfCatan
 
             Log(new ProposeTradeLogEvent(player.Id, trade.Give, trade.Take));
 
+            var state = CurrentGamestate();
+
             foreach (var other in players)
             {
                 if (other.Id == player.Id) continue; //No need to propose a trade with yourself
-                dict[other.Id] = (Trade)other.Agent.HandleTrade(trade.Reverse(), player.Id);
+                dict[other.Id] = (Trade)other.Agent.HandleTrade(state, trade.Reverse(), player.Id);
                 replyDict[other.Id] = dict[other.Id].Reverse();
                 switch (dict[other.Id].Status)
                 {

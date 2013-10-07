@@ -131,7 +131,7 @@ namespace AIsOfCatan
             }
         }
 
-        public ITrade HandleTrade(ITrade offer, int proposingPlayerId)
+        public ITrade HandleTrade(IGameState state, ITrade offer, int proposingPlayerId)
         {
             return offer.Respond(offer.Give[0],offer.Take[0]);
         }
