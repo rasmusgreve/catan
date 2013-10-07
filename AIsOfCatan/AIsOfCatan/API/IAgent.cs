@@ -91,9 +91,10 @@ namespace AIsOfCatan
         /// The array validOptions contains IDs of players with buildings on hex where the robber was placed
         /// If an invalid player Id is returned you will receive no resources
         /// </summary>
+        /// <param name="state">The state of the game when the agent is to decide from whom to steal</param>
         /// <param name="validOpponents">IDs of players with buildings on hex where the robber was placed</param>
         /// <returns>The chosen Id from the list</returns>
-        int ChoosePlayerToDrawFrom(int[] validOpponents); //You must choose an opponent to draw a card from (called after you move the robber)
+        int ChoosePlayerToDrawFrom(IGameState state, int[] validOpponents); //You must choose an opponent to draw a card from (called after you move the robber)
 
         /// <summary>
         /// If a 7 is rolled on any turn, players with more than 7 cards must discard half of their cards rounded down

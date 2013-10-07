@@ -128,7 +128,7 @@ namespace AIsOfCatan
             return int.Parse(Console.ReadLine());
         }
 
-        public int ChoosePlayerToDrawFrom(int[] validOpponents)
+        public int ChoosePlayerToDrawFrom(IGameState state, int[] validOpponents)
         {
             Console.WriteLine("Choose which opponent to draw a card from: ");
             foreach (int o in validOpponents)

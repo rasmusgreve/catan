@@ -10,8 +10,6 @@ namespace AIsOfCatan
     {
         private const bool silent = true;
 
-        private bool hasDevcardToPlay = false;
-        private DevelopmentCard nextToPlay;
         private int id;
         public void Reset(int assignedId)
         {
@@ -59,7 +57,7 @@ namespace AIsOfCatan
             return ((GameState)state).Board.GetRobberLocation() == 8 ? 9 : 8;
         }
 
-        public int ChoosePlayerToDrawFrom(int[] validOpponents)
+        public int ChoosePlayerToDrawFrom(IGameState state, int[] validOpponents)
         {
             if (!silent)
                 Console.WriteLine(id + ": Choosing opponent to draw from");

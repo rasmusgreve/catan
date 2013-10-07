@@ -257,18 +257,17 @@ namespace AIsOfCatan
                 opponents.Add(piece.Player);
             }
             if (opponents.Count == 0) return; //No opponents to draw from
-            int choice = player.Agent.ChoosePlayerToDrawFrom(opponents.ToArray());
+            int choice = player.Agent.ChoosePlayerToDrawFrom(CurrentGamestate(), opponents.ToArray());
 
-            Log(new StealCardLogEvent(player.Id, choice));
-
-            if (!opponents.Contains(choice)) //If the agent gives a bad answer, we ask again
+            if (!opponents.Contains(choice))
             {
                 Console.WriteLine("IAgent " + player.Agent.GetType().Name + " chose an illegal player to draw from");
                 return;
             }
 
             if (players[choice].Resources.Count == 0) return; //Nothing to take
-            
+
+            Log(new StealCardLogEvent(player.Id, choice));
 
             //Move a card from one player to another
             var position = shuffleRandom.Next(players[choice].Resources.Count);

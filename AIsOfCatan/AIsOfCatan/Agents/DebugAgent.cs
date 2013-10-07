@@ -105,7 +105,7 @@ namespace AIsOfCatan
             return ((GameState)state).Board.GetRobberLocation() == 8 ? 9 : 8;
         }
 
-        public int ChoosePlayerToDrawFrom(int[] validOpponents)
+        public int ChoosePlayerToDrawFrom(IGameState state, int[] validOpponents)
         {
             if (!silent)
                 Console.WriteLine(id + ": Choosing opponent to draw from");
