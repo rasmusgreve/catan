@@ -65,6 +65,27 @@ namespace AIsOfCatan
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="playerID"></param>
+        /// <returns></returns>
+        int GetSettlementsLeft(int playerID);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerID"></param>
+        /// <returns></returns>
+        int GetCitiesLeft(int playerID);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerID"></param>
+        /// <returns></returns>
+        int GetRoadsLeft(int playerID);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         Resource[] GetOwnResources();
 

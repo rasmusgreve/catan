@@ -29,6 +29,7 @@ namespace AIsOfCatan
         private const int LargestArmyMinimum = 3;
         private const int LongestRoadMinimum = 5;
 
+        private bool visual = false;
         private GUIControl gui;
 
         /// <summary>
@@ -37,9 +38,11 @@ namespace AIsOfCatan
         /// <param name="agents">The competing agents (The order in which they are submitted is irrelevant)</param>
         /// <param name="boardSeed">The seed for the board generator, used to shuffle development cards, and for drawing a random card after moving the robber</param>
         /// <param name="diceSeed">The seed for the dice</param>
+        /// <param name="visual">True if the game should be displayed visually</param>
         /// <returns>The id of the winner of the game (-1 in case of error)</returns>
-        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed)
+        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed, bool visual)
         {
+            this.visual = visual;
             //Initialize random number generators
             diceRandom = new Random(diceSeed);
             shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
@@ -60,10 +63,12 @@ namespace AIsOfCatan
             turn = 0;
 
             //StartGUI();
-            Thread guiThread = new Thread(StartGUI);
-            guiThread.Start();
-            Thread.Sleep(5000);
-            
+            if (visual)
+            {
+                Thread guiThread = new Thread(StartGUI);
+                guiThread.Start();
+                Thread.Sleep(5000);
+            }
 
             PlaceStarts();
             return GameLoop();
@@ -450,7 +455,7 @@ namespace AIsOfCatan
         private GameState CurrentGamestate()
         {
             GameState gs = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
-            if (gui != null)
+            if (visual)
             {
                 gui.NewGameState(gs);
             }

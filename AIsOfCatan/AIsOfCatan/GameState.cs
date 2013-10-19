@@ -44,6 +44,21 @@ namespace AIsOfCatan
             return players[playerID].PlayedKnights;
         }
 
+        public int GetSettlementsLeft(int playerID)
+        {
+            return players[playerID].SettlementsLeft;
+        }
+
+        public int GetCitiesLeft(int playerID)
+        {
+            return players[playerID].CitiesLeft;
+        }
+
+        public int GetRoadsLeft(int playerID)
+        {
+            return players[playerID].RoadsLeft;
+        }
+
         public Resource[] GetOwnResources()
         {
             return players[curPlayer].Resources.ToArray();

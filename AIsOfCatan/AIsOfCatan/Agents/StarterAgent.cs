@@ -102,7 +102,7 @@ namespace AIsOfCatan
                     }
                 }
                 //Build road
-                if (resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
+                if (state.GetRoadsLeft(id) > 0 && resources.Contains(Resource.Lumber) && resources.Contains(Resource.Brick))
                 {
                     var pos = state.Board.GetPossibleRoads(id);
                     if (pos.Length > 0)
@@ -143,6 +143,16 @@ namespace AIsOfCatan
                     Chances(board.GetTile(inter.ThirdTile).Value);
         }
 
+        private double GetScore(Edge e, IBoard board)
+        {
+            Intersection[] adjacentFree = board.GetAdjacentIntersections(e).Where(i => board.HasNoNeighbors(i)).ToArray();
+            if (adjacentFree.Length > 0)
+            {
+                return adjacentFree.Average(i => GetScore(i, board));
+            }
+            return 0.0;
+        }
+
         private Intersection FindBestIntersection(IEnumerable<Intersection> enumerable, IBoard board)
         {
             return enumerable.OrderBy(i => GetScore(i,board)).Last();
@@ -169,7 +179,7 @@ namespace AIsOfCatan
         private Edge FindBestRoad(IEnumerable<Edge> edges, IBoard board)
         {
             // best edge ordered by highest average of possible values on edges ends
-            return edges.OrderBy(e => board.GetAdjacentIntersections(e).Where(i => board.HasNoNeighbors(i)).Average(i => GetScore(i, board))).Last();
+            return edges.OrderBy(e => GetScore(e,board)).Last();
         }
     }
 }
