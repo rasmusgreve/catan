@@ -41,6 +41,27 @@ namespace AIsOfCatan
         /// </summary>
         int[] AllPlayerIds { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        int LongestRoadId { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        int LargestArmyId { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        int GetPlayerScore(int playerId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         int GetRoundNumber();
 
         /// <summary>

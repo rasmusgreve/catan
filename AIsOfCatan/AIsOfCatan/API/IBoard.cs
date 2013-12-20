@@ -178,12 +178,28 @@ namespace AIsOfCatan
         Edge[] GetAdjacentEdges(Intersection intersection);
 
         /// <summary>
+        /// Gives all edges (places to build roads) adjacent to the given tile index. Edges
+        /// between two water tiles are excluded.
+        /// </summary>
+        /// <param name="tileIndex">Tile tile index.</param>
+        /// <returns>An array of edges with the (up to six) edges next to the tile.</returns>
+        Edge[] GetAdjacentEdges(int tileIndex);
+
+        /// <summary>
         /// Gives all intersections (places to build settlements and cities)
-        /// adjacent to the give edge.
+        /// adjacent to the given edge.
         /// </summary>
         /// <param name="edge">The edge to look at.</param>
-        /// <returns>An array of 3-int-tuples with the (up to two) intersections at the ends of the edge.</returns>
+        /// <returns>An array of Intersections with the (up to two) intersections at the ends of the edge.</returns>
         Intersection[] GetAdjacentIntersections(Edge edge);
+
+        /// <summary>
+        /// Gives all intersections (places to build settlements and cities)
+        /// adjacent to the give tile index.
+        /// </summary>
+        /// <param name="tileIndex">The tile index.</param>
+        /// <returns>An array of Intersections with the (up to six) intersections around the tile.</returns>
+        Intersection[] GetAdjacentIntersections(int tileIndex);
 
         /// <summary>
         /// Gets all tiles that are adjacent to the given tile.

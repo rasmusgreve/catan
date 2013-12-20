@@ -285,6 +285,11 @@ namespace AIsOfCatan
             return result.ToArray();
         }
 
+        public Edge[] GetAdjacentEdges(int tileIndex)
+        {
+            return GetAllEdges().Where(e => e.FirstTile == tileIndex || e.SecondTile == tileIndex).ToArray();
+        }
+
         public Intersection[] GetAdjacentIntersections(Edge edge)
         {
             var n1 = GetAdjacentTiles(edge.FirstTile);
@@ -293,6 +298,11 @@ namespace AIsOfCatan
                 .Where(t => IsLegalEdge(edge) || GetTile(t).Terrain != Terrain.Water)
                 .Select(t => new Intersection(edge.FirstTile, edge.SecondTile, t))
                 .ToArray();
+        }
+
+        public Intersection[] GetAdjacentIntersections(int tileIndex)
+        {
+            return GetAllIntersections().Where(i => i.FirstTile == tileIndex || i.SecondTile == tileIndex || i.ThirdTile == tileIndex).ToArray();
         }
 
         public List<int> GetAdjacentTiles(int index)

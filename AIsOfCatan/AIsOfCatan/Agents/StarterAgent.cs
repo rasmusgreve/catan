@@ -20,17 +20,12 @@ namespace AIsOfCatan
 
         public string GetName()
         {
-            return "Starter Agent";
+            return "Starter Agent #"+id;
         }
 
         public string GetDescription()
         {
             return "";
-        }
-
-        private int Chances(int roll)
-        {
-            return 6 - Math.Abs(7 - roll);
         }
 
         public void PlaceStart(IGameState state, IStartActions actions)
@@ -48,27 +43,50 @@ namespace AIsOfCatan
 
         public void BeforeDiceRoll(IGameState state, IGameActions actions)
         {
+            // We don't play knights before dice roll
         }
 
         public int MoveRobber(IGameState state)
         {
             if (!silent)
                 Console.WriteLine(id + ": Move robber");
-            return ((GameState)state).Board.GetRobberLocation() == 8 ? 9 : 8;
+
+            // get locations not connected to ours
+            List<int> options = new List<int>(45);
+            for (int i = 0; i < 45; i++) options.Add(i);
+
+            int choice = options.Where(t => state.Board.GetTile(t).Terrain != Terrain.Water
+                        && state.Board.GetTile(t).Terrain != Terrain.Desert
+                        && t != state.Board.GetRobberLocation()) // legal
+                .OrderBy(t => OwnTileValue(t, state.Board) - OpponentTileValue(t, state.Board)).First(); // own value - opponent value, lowest is best for us
+
+            return choice;
         }
 
         public int ChoosePlayerToDrawFrom(IGameState state, int[] validOpponents)
         {
             if (!silent)
                 Console.WriteLine(id + ": Choosing opponent to draw from");
-            return validOpponents[0];
+            return validOpponents.OrderBy(o => state.GetPlayerScore(o)).First(); // steal from highest points
         }
 
         public Resource[] DiscardCards(IGameState state, int toDiscard)
         {
             if (!silent)
                 Console.WriteLine(id + ": Choosing cards to discard");
-            return ((GameState)state).GetOwnResources().Take(toDiscard).ToArray();
+
+            List<Resource> chosenDiscard = new List<Resource>(toDiscard);
+            List<Resource> hand = state.GetOwnResources().ToList();
+
+            while (chosenDiscard.Count < toDiscard)
+            {
+                // pick one of the type we have most of
+                Resource pick = hand.OrderByDescending(r => hand.Count(c => c == r)).First();
+                chosenDiscard.Add(pick);
+                hand.Remove(pick);
+            }
+
+            return chosenDiscard.ToArray();
         }
 
         public void PerformTurn(IGameState state, IGameActions actions)
@@ -133,7 +151,37 @@ namespace AIsOfCatan
 
         public ITrade HandleTrade(IGameState state, ITrade offer, int proposingPlayerId)
         {
-            return offer.Respond(offer.Give[0],offer.Take[0]);
+            // accept if convert extras to needed and opponent < 7 points
+            List<Resource> extras = new List<Resource>();
+            foreach (Resource r in Enum.GetValues(typeof(Resource)))
+            {
+                int extra = state.GetOwnResources().Count(res => res == r) - 1;
+                for (int i = 0; i < extra; i++) extras.Add(r);
+            }
+
+            // good offer?
+            var valid = offer.Give.Where(o => o.All(r => o.Count(cur => cur == r) <= extras.Count(e => e == r)));
+
+            if (valid.Count() == 0) return offer.Decline();
+
+            // take the one with least cards to give, and then by most duplicates
+            List<Resource> bestGive = offer.Give.OrderBy(o => o.Count)
+                .ThenByDescending(o => state.GetOwnResources().Sum(r => state.GetOwnResources().Count(res => res == r)))
+                .First();
+
+            // find best "take" (cards we get) kind of the opposite of above
+            List<Resource> bestTake = offer.Take.OrderBy(o => o.Count)
+                .ThenBy(o => state.GetOwnResources().Sum(r => state.GetOwnResources().Count(res => res == r)))
+                .First();
+
+            return offer.Respond(bestGive, bestTake);
+        }
+
+        // PRIVATE HELPERS //
+
+        private int Chances(int roll)
+        {
+            return 6 - Math.Abs(7 - roll);
         }
 
         private int GetScore(Intersection inter, IBoard board)
@@ -180,6 +228,37 @@ namespace AIsOfCatan
         {
             // best edge ordered by highest average of possible values on edges ends
             return edges.OrderBy(e => GetScore(e,board)).Last();
+        }
+
+        private int OpponentTileValue(int tile, IBoard board)
+        {
+            int value = 0;
+
+            foreach (Intersection i in board.GetAdjacentIntersections(tile))
+            {
+                Piece curPiece = board.GetPiece(i);
+                if (curPiece != null && curPiece.Player != id)
+                {
+                    value += curPiece.Token == Token.City ? 2 : 1;
+                }
+            }
+
+            return Chances(board.GetTile(tile).Value) * value;
+        }
+
+        private int OwnTileValue(int tile, IBoard board)
+        {
+            int value = 0;
+
+            foreach(Intersection i in board.GetAdjacentIntersections(tile)){
+                Piece curPiece = board.GetPiece(i);
+                if (curPiece != null && curPiece.Player == id)
+                {
+                    value += curPiece.Token == Token.City ? 2 : 1;
+                }
+            }
+
+            return Chances(board.GetTile(tile).Value) * value;
         }
     }
 }

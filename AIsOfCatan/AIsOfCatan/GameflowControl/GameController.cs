@@ -87,7 +87,7 @@ namespace AIsOfCatan
 
         private void StartGUI()
         {
-            gui = new GUIControl(new GameState(board, developmentCardStack, resourceBank, players, turn, log));
+            gui = new GUIControl(new GameState(board, developmentCardStack, resourceBank, players, turn, log, longestRoadId, largestArmyId));
             gui.Run();
             
         }
@@ -140,8 +140,9 @@ namespace AIsOfCatan
                 }
                 catch (AgentActionException e)
                 {
-                    if(debug) Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
-                    if (debug) Console.WriteLine("       -> Message: " + e.Message);
+                    Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
+                    Console.WriteLine("       -> Message: " + e.Message);
+                    //Console.WriteLine(e.StackTrace);
                     if (e.StopGame)
                     {
                         Console.WriteLine("This is game breaking, and the game ends now.");
@@ -223,7 +224,7 @@ namespace AIsOfCatan
                 {
                     if (p.Resources.Count > 7)
                     {
-                        var cards = p.Agent.DiscardCards(CurrentGamestate(), p.Resources.Count / 2);
+                        var cards = p.Agent.DiscardCards(CurrentGamestate(p.Id), p.Resources.Count / 2);
                         if (cards.Length != p.Resources.Count / 2)
                         {
                             //Clone, shuffle, take, convert
@@ -465,14 +466,19 @@ namespace AIsOfCatan
             }
         }
 
-        private GameState CurrentGamestate()
+        private GameState CurrentGamestate(int playerId)
         {
-            GameState gs = new GameState(board, developmentCardStack, resourceBank, players, turn, log);
+            GameState gs = new GameState(board, developmentCardStack, resourceBank, players, playerId, log, longestRoadId, largestArmyId);
             if (visual)
             {
                 gui.NewGameState(gs);
             }
             return gs;
+        }
+
+        private GameState CurrentGamestate()
+        {
+            return CurrentGamestate(turn);
         }
 
         /// <summary>

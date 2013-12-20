@@ -15,10 +15,10 @@ namespace AIsOfCatan
         {
             Dictionary<int, int> wins = new Dictionary<int, int>(4);
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 var controller = new GameController();
-                var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
+                var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
                 int intWinner = controller.StartGame(agents, i, i, false, false);
                 //var winner = agents[intWinner];
 
