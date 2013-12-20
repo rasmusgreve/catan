@@ -13,9 +13,30 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
+            PerformGameBenchmarking();
+            
+            /*var controller = new GameController();
+            var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
+            int intWinner = controller.StartGame(agents, 0, 0, false, true);
+
+            if (intWinner != -1)
+            {
+                var winner = agents[intWinner];
+                Console.WriteLine("Winner is: " + winner.GetName() + " (" + intWinner + ")");
+            }
+            else
+            {
+                Console.WriteLine("It is a draw after 100 rounds");
+            }
+            
+            Console.WriteLine(controller.GetBoard());*/
+        }
+
+        static void PerformGameBenchmarking()
+        {
             Dictionary<int, int> wins = new Dictionary<int, int>(4);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 var controller = new GameController();
                 var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
@@ -30,7 +51,7 @@ namespace AIsOfCatan
                 {
                     wins.Add(intWinner, 1);
                 }
-                Console.WriteLine(i+": P "+intWinner + " wins.");
+                Console.WriteLine(i + ": P " + intWinner + " wins.");
             }
 
             Console.WriteLine();

@@ -140,8 +140,8 @@ namespace AIsOfCatan
                 }
                 catch (AgentActionException e)
                 {
-                    Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
-                    Console.WriteLine("       -> Message: " + e.Message);
+                    //Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
+                    //Console.WriteLine("       -> Message: " + e.Message);
                     //Console.WriteLine(e.StackTrace);
                     if (e.StopGame)
                     {
@@ -378,7 +378,7 @@ namespace AIsOfCatan
 
                 NextTurn();
             }
-            foreach (Player p in players)
+            foreach (Player p in players.Reverse())
             {
                 PrevTurn();
                 var state = CurrentGamestate();
