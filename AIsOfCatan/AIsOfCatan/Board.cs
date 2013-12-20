@@ -384,6 +384,20 @@ namespace AIsOfCatan
                 }
                 builder.Append("\n");
             }
+
+            // cities
+            this.settlements.Where(s => s.Value.Token.Equals(Token.City))
+                .OrderBy(s => s.Value.Player)
+                .ForEach(c => builder.Append("City: p=" + c.Value.Player + " " + c.Key + "\n"));
+
+            // settlements
+            this.settlements.Where(s => s.Value.Token.Equals(Token.Settlement))
+                .OrderBy(s => s.Value.Player)
+                .ForEach(s => builder.Append("Settlement: p=" + s.Value.Player + " " + s.Key + "\n"));
+
+            // roads
+            this.roads.OrderBy(r => r.Value).ForEach(r => builder.Append("Road: p=" + r.Value + " " + r.Key + "\n"));
+
             return builder.ToString();
         }
 

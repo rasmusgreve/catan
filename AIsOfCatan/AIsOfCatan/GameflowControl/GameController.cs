@@ -15,12 +15,14 @@ namespace AIsOfCatan
         private Player[] players;
 
         private List<LogEvent> log = new List<LogEvent>();
-        private const bool debug = true;
+        private const bool debug = false;
+        private const int maxRounds = 100;
 
         private IBoard board;
         private List<DevelopmentCard> developmentCardStack = new List<DevelopmentCard>();
         private int[] resourceBank;
         private int turn;
+        private int round = -1;
         private int largestArmySize = 2; //One less than the minimum for getting the largest army card
         private int longestRoadLength = 0;
         private int largestArmyId = -1;
@@ -128,17 +130,18 @@ namespace AIsOfCatan
         /// <returns>The Id of the winning player</returns>
         private int GameLoop()
         {
-            while (true)
+            while (round < maxRounds)
             {
+                if (turn == 0) round++;
                 try
                 {
                     TakeTurn(players[turn]);
-                    ShowScores();
+                    if(debug) ShowScores();
                 }
                 catch (AgentActionException e)
                 {
-                    Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
-                    Console.WriteLine("       -> Message: " + e.Message);
+                    if(debug) Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
+                    if (debug) Console.WriteLine("       -> Message: " + e.Message);
                     if (e.StopGame)
                     {
                         Console.WriteLine("This is game breaking, and the game ends now.");
@@ -149,6 +152,7 @@ namespace AIsOfCatan
 
                 NextTurn();
             }
+            return -1;
         }
 
         private void ShowScores()
@@ -407,7 +411,7 @@ namespace AIsOfCatan
         {
             int d1 = diceRandom.Next(1,7);
             int d2 = diceRandom.Next(1,7);
-            Console.WriteLine("Rolled " + d1 + ", " + d2 + " = " + (d1+d2));
+            if(debug) Console.WriteLine("Rolled " + d1 + ", " + d2 + " = " + (d1+d2));
             return d1+d2;
         }
 
@@ -1001,6 +1005,15 @@ namespace AIsOfCatan
             Log(new TradeBankLogEvent(player.Id,giving,amountToGive,receiving));
 
             return CurrentGamestate();
+        }
+
+        /// <summary>
+        /// Returns the current game board held by this controller.
+        /// </summary>
+        /// <returns>The game board.</returns>
+        public IBoard GetBoard()
+        {
+            return board;
         }
     }
 }

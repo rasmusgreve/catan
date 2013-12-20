@@ -13,42 +13,28 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
-            /*int seed = 0;
-            Terrain terrain = Terrain.Water;
-            Board b2;
-            while (terrain != Terrain.Desert)
-            {
-                b2 = new Board(seed);
-                if (b2.GetTile(22).Terrain == Terrain.Desert) break;
-                seed++;
-            }
-            Console.WriteLine("Seed: " + seed);
-            */
+            Dictionary<int, int> wins = new Dictionary<int, int>(4);
 
-            if (true) //Set to false if you wanna see the GUI
+            for (int i = 0; i < 10000; i++)
             {
                 var controller = new GameController();
                 var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
-                //TODO: Shuffle agents array!
-                var winner = agents[controller.StartGame(agents, 10, 0,false,true)];
-                Console.WriteLine("Winner: " + winner.GetName());
-                /*
-                IBoard b = new Board(0).PlaceRoad(14, 20, 0).PlaceRoad(20, 21, 0).PlaceRoad(21, 27, 0).PlaceRoad(21, 28, 0).PlaceRoad(21, 22, 0).PlaceRoad(15, 21, 0).PlaceRoad(14, 21, 0).PlaceRoad(14, 15, 0).PlaceRoad(15, 16, 1).PlacePiece(20, 21, 27, new Board.Piece(Token.City, 1));
-                for (int i = 0; i < 20; i++)
-                {
-                    DateTime start = DateTime.Now;
-                    Console.WriteLine("# All Edges = " + b.GetAllEdges().Length);
-                    Console.WriteLine("# Possible roads; Player 0 = " + b.GetPossibleRoads(0).Length);
-                    Console.WriteLine("# Possible settlements; Player 0 = " + b.GetPossibleSettlements(0).Length);
-                    Console.WriteLine("# Possible cities; Player 0 = " + b.GetPossibleCities(0).Length);
-                    Console.WriteLine("Time: " + (DateTime.Now - start).TotalMilliseconds);
-                    
-                }
-                Console.WriteLine("Player 0's harbors: " + b.GetPlayersHarbors(0).Length);
+                int intWinner = controller.StartGame(agents, i, i, false, false);
+                //var winner = agents[intWinner];
 
-                Console.ReadLine();
-                 */
+                if (wins.ContainsKey(intWinner))
+                {
+                    wins[intWinner] = wins[intWinner] + 1;
+                }
+                else
+                {
+                    wins.Add(intWinner, 1);
+                }
+                Console.WriteLine(i+": P "+intWinner + " wins.");
             }
+
+            Console.WriteLine();
+            wins.OrderBy(w => w.Key).ForEach(kv => Console.WriteLine("Player " + kv.Key + ": " + kv.Value + " wins."));
         }
     }
 #endif
