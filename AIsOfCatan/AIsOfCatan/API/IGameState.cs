@@ -41,6 +41,8 @@ namespace AIsOfCatan
         /// </summary>
         int[] AllPlayerIds { get; }
 
+        int GetRoundNumber();
+
         /// <summary>
         /// 
         /// </summary>

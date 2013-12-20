@@ -29,6 +29,11 @@ namespace AIsOfCatan
         public int[] ResourceBank { get; private set; }
         public int[] AllPlayerIds { get; private set; }
 
+        public int GetRoundNumber()
+        {
+            return log.OfType<RollLogEvent>().Where(r => r.Player == 0).Count();
+        }
+
         public int GetResourceCount(int playerID)
         {
             return players[playerID].Resources.Count;

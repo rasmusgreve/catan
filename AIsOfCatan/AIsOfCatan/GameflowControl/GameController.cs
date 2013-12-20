@@ -30,6 +30,7 @@ namespace AIsOfCatan
         private const int LongestRoadMinimum = 5;
 
         private bool visual = false;
+        private bool logToFile = false;
         private GUIControl gui;
 
         /// <summary>
@@ -39,10 +40,13 @@ namespace AIsOfCatan
         /// <param name="boardSeed">The seed for the board generator, used to shuffle development cards, and for drawing a random card after moving the robber</param>
         /// <param name="diceSeed">The seed for the dice</param>
         /// <param name="visual">True if the game should be displayed visually</param>
+        /// <param name="visual">True if the game should save the game log to a file</param>
         /// <returns>The id of the winner of the game (-1 in case of error)</returns>
-        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed, bool visual)
+        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed, bool visual, bool logToFile)
         {
             this.visual = visual;
+            this.logToFile = logToFile;
+
             //Initialize random number generators
             diceRandom = new Random(diceSeed);
             shuffleRandom = new Random(boardSeed); //The card deck is based on the seed of the board
@@ -71,8 +75,13 @@ namespace AIsOfCatan
             }
 
             PlaceStarts();
-            return GameLoop();
+            int result = GameLoop();
+            if (logToFile) System.IO.File.WriteAllLines(DateTime.Now.ToString("s").Replace(":","").Replace("-","")+" GameLog.txt", log.Select(l => l.ToString()));
+
+            return result;
         }
+
+        public int StartGame(IAgent[] agents, int boardSeed, int diceSeed) { return StartGame(agents, boardSeed, diceSeed, false, false); }
 
         private void StartGUI()
         {

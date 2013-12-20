@@ -29,6 +29,8 @@ namespace AIsOfCatan
 
         public static string ToDeepString<T>(this IEnumerable<T> enumerable)
         {
+            if (enumerable.Count() < 1) return "[]";
+
             StringBuilder builder = new StringBuilder("[");
             foreach (var item in enumerable)
             {
