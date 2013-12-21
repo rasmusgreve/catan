@@ -36,7 +36,7 @@ namespace AIsOfCatan
         {
             Dictionary<int, int> wins = new Dictionary<int, int>(4);
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 var controller = new GameController();
                 var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()

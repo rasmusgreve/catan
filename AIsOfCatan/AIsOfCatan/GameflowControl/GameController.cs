@@ -136,12 +136,12 @@ namespace AIsOfCatan
                 try
                 {
                     TakeTurn(players[turn]);
-                    if(debug) ShowScores();
+                    if (debug) ShowScores();
                 }
                 catch (AgentActionException e)
                 {
-                    //Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
-                    //Console.WriteLine("       -> Message: " + e.Message);
+                    Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
+                    Console.WriteLine("\t\t-> Message: " + e.Message);
                     //Console.WriteLine(e.StackTrace);
                     if (e.StopGame)
                     {
@@ -853,7 +853,7 @@ namespace AIsOfCatan
             if (!board.HasNoNeighbors(inter))
                 throw new IllegalBuildPositionException("The chosen position violates the distance rule");
             if (board.GetRoad(new Edge(inter.FirstTile,inter.SecondTile)) != player.Id 
-                && board.GetRoad(new Edge(inter.FirstTile,inter.SecondTile)) != player.Id 
+                && board.GetRoad(new Edge(inter.FirstTile,inter.ThirdTile)) != player.Id 
                 && board.GetRoad(new Edge(inter.SecondTile, inter.ThirdTile)) != player.Id)
                 throw new IllegalBuildPositionException("The chosen position has no road leading to it");
                 
