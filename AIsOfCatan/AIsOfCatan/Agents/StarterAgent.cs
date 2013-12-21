@@ -141,7 +141,7 @@ namespace AIsOfCatan
                         foreach (Resource take in Enum.GetValues(typeof(Resource)))
                         {
                             if (changed) break;
-                            if (resources.Count(r => r == take) == 0)
+                            if (resources.Count(r => r == take) == 0 && state.ResourceBank[(int)take] > 0)
                             {
                                 state = actions.TradeBank(give, take);
                                 changed = true;
@@ -206,7 +206,12 @@ namespace AIsOfCatan
 
         private Intersection FindBestIntersection(IEnumerable<Intersection> enumerable, IBoard board)
         {
-            return enumerable.OrderBy(i => GetScore(i,board)).Last();
+            return enumerable.OrderByDescending(i => DifferentTypes(i,board)).ThenByDescending(i => GetScore(i,board)).First();
+        }
+
+        private int DifferentTypes(Intersection inter, IBoard board)
+        {
+            return inter.ToArray().Select(i => board.GetTile(i).Terrain).Where(t => t != Terrain.Water && t != Terrain.Desert).Distinct().Count();
         }
 
         private IEnumerable<Intersection> GetEnds(Intersection inter, IBoard board)
