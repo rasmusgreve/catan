@@ -27,22 +27,28 @@ namespace AIsOfCatan
             }
         }
 
-        public static string ToDeepString<T>(this IEnumerable<T> enumerable)
+        public static string ToDeepString<T>(this IEnumerable<List<T>> enumerable)
+        {
+            if (enumerable.Count() < 1) return "[]";
+
+            StringBuilder builder = new StringBuilder("[");
+            foreach( List<T> item in enumerable)
+            {
+                builder.Append(item.ToListString() + "/");
+            }
+            builder.Remove(builder.Length - 1, 1); // remove last slash
+            builder.Append("]");
+            return builder.ToString();
+        }
+
+        public static string ToListString<T>(this IEnumerable<T> enumerable)
         {
             if (enumerable.Count() < 1) return "[]";
 
             StringBuilder builder = new StringBuilder("[");
             foreach (var item in enumerable)
             {
-                IEnumerable<T> sublist = item as IEnumerable<T>;
-                if (sublist != null)
-                {
-                    builder.Append(sublist.ToDeepString() + "/");
-                }
-                else
-                {
-                    builder.Append(item.ToString() + "/");
-                }
+                builder.Append(item.ToString() + "/");
             }
             builder.Remove(builder.Length - 1, 1); // remove last slash
             builder.Append("]");

@@ -138,7 +138,8 @@ namespace AIsOfCatan
                     TakeTurn(players[turn]);
                     if (debug) ShowScores();
                 }
-                catch (AgentActionException e)
+                finally { }
+                /*catch (AgentActionException e)
                 {
                     Console.WriteLine("Player " + players[turn].Id + ", caused an exception: " + e.GetType().Name);
                     Console.WriteLine("\t\t-> Message: " + e.Message);
@@ -148,7 +149,7 @@ namespace AIsOfCatan
                         Console.WriteLine("This is game breaking, and the game ends now.");
                         return -1;
                     }
-                }
+                }*/
                 if (HasWon(players[turn])) return players[turn].Id;
 
                 NextTurn();
@@ -610,20 +611,14 @@ namespace AIsOfCatan
             {
                 if (other.Id == player.Id) continue; //No need to propose a trade with yourself
                 dict[other.Id] = (Trade)other.Agent.HandleTrade(state, trade.Reverse(), player.Id);
-                replyDict[other.Id] = dict[other.Id].Reverse();
-                switch (dict[other.Id].Status)
+                if (dict[other.Id].Status == TradeStatus.Countered)
                 {
-                    case TradeStatus.Untouched:
-                        Console.WriteLine("An agent responded falsely to a trade (didn't choose). Assumed declined");
-                        break;
-                    case TradeStatus.Countered:
-                        {
-                            //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
-                            var giveLog = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
-                            var takeLog = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
-                            Log(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
-                            break;
-                        }
+                    replyDict[other.Id] = dict[other.Id].Reverse();
+                    //Note, take and give are swapped since dict[other.Id] is as seen from the opponent
+                    var giveLog = dict[other.Id].Take.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                    var takeLog = dict[other.Id].Give.Where(c => c.Count > 0).Select(r => r[0]).ToList();
+                    Log(new CounterTradeLogEvent(other.Id, giveLog, takeLog));
+                    break;
                 }
             }
             proposedTrades[player.Id] = dict;

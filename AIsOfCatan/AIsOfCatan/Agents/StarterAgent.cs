@@ -131,6 +131,30 @@ namespace AIsOfCatan
                 }
 
                 //Trade players
+                if (!changed && Enum.GetValues(typeof(Resource)).Cast<Resource>().Any(r => resources.Count(res => res == r) > 2))
+                {
+                    // trade 1 of most for 1 missing
+                    List<List<Resource>> give = resources.OrderByDescending(r => resources.Count(res => res == r))
+                                                    .GroupBy(r => resources.Count(res => res == r)).First().Distinct()
+                                                    .Select(r => { var list = new List<Resource>(); list.Add(r); return list; }).ToList();
+                    List<List<Resource>> take = Enum.GetValues(typeof(Resource)).Cast<Resource>()
+                                                    .OrderBy(r => resources.Count(res => res == r))
+                                                    .GroupBy(r => resources.Count(res => res == r)).First()
+                                                    .Select(r => { var list = new List<Resource>(); list.Add(r); return list; }).ToList();
+                    if (give.Count > 0 && take.Count > 0)
+                    {
+                        Dictionary<int,ITrade> answers = actions.ProposeTrade(give, take);
+
+                        if (answers.Count > 0)
+                        {
+                            // trade with lowest score
+                            int otherPlayer = answers.OrderBy(kv => state.GetPlayerScore(kv.Key)).First().Key;
+                            state = actions.Trade(otherPlayer);
+                            changed = true;
+                        }
+                    }
+                }
+                
 
                 //Trade bank
                 foreach (Resource give in Enum.GetValues(typeof(Resource)))
@@ -168,7 +192,7 @@ namespace AIsOfCatan
             if (valid.Count() == 0) return offer.Decline();
 
             // take the one with least cards to give, and then by most duplicates
-            List<Resource> bestGive = offer.Give.OrderBy(o => o.Count)
+            List<Resource> bestGive = valid.OrderBy(o => o.Count)
                 .ThenByDescending(o => state.GetOwnResources().Sum(r => state.GetOwnResources().Count(res => res == r)))
                 .First();
 
