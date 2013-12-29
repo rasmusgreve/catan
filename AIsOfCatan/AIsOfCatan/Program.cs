@@ -13,11 +13,11 @@ namespace AIsOfCatan
         /// </summary>
         static void Main(string[] args)
         {
-            PerformGameBenchmarking();
+            //PerformGameBenchmarking();
             
-            /*var controller = new GameController();
+            var controller = new GameController();
             var agents = new IAgent[] { new StarterAgent(), new StarterAgent(), new StarterAgent(), new StarterAgent() }; // new HumanAgent()
-            int intWinner = controller.StartGame(agents, 0, 0, false, true);
+            int intWinner = controller.StartGame(agents, 10, 0, false, true);
 
             if (intWinner != -1)
             {
@@ -29,7 +29,7 @@ namespace AIsOfCatan
                 Console.WriteLine("It is a draw after 100 rounds");
             }
             
-            Console.WriteLine(controller.GetBoard());*/
+            Console.WriteLine(controller.GetBoard());
         }
 
         static void PerformGameBenchmarking()
